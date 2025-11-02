@@ -15,10 +15,10 @@ use crate::{
     instance::Instance,
     CreateAccountsArgs,
 };
-use anyhow::{bail, Context, Result};
 use accudo_sdk::transaction_builder::TransactionFactory;
 use accudo_transaction_generator_lib::{AccountType, TransactionType};
 use accudo_types::{account_address::AccountAddress, keyless::test_utils::get_sample_esk};
+use anyhow::{bail, Context, Result};
 use log::{error, info};
 use rand::{rngs::StdRng, SeedableRng};
 use std::{

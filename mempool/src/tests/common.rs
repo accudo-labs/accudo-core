@@ -6,7 +6,6 @@ use crate::{
     core_mempool::{CoreMempool, TimelineState},
     network::{BroadcastPeerPriority, MempoolSyncMsg},
 };
-use anyhow::{format_err, Result};
 use accudo_compression::client::CompressionClient;
 use accudo_config::config::{NodeConfig, MAX_APPLICATION_MESSAGE_SIZE};
 use accudo_consensus_types::common::{TransactionInProgress, TransactionSummary};
@@ -20,6 +19,7 @@ use accudo_types::{
         TransactionExecutable,
     },
 };
+use anyhow::{format_err, Result};
 use once_cell::sync::Lazy;
 use rand::{rngs::StdRng, SeedableRng};
 use serde::{Deserialize, Serialize};

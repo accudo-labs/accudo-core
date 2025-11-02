@@ -482,7 +482,10 @@ async fn test_keyless_groth16_verifies_using_rust_sdk() {
 
     let builder = info
         .transaction_factory()
-        .payload(accudo_stdlib::accudo_coin_transfer(recipient.address(), 100));
+        .payload(accudo_stdlib::accudo_coin_transfer(
+            recipient.address(),
+            100,
+        ));
     let signed_txn = account.sign_with_transaction_builder(builder);
 
     remove_training_wheels(&mut cli, &mut info, root_idx).await;
@@ -547,7 +550,10 @@ async fn test_keyless_groth16_verifies_using_rust_sdk_from_jwt() {
 
     let builder = info
         .transaction_factory()
-        .payload(accudo_stdlib::accudo_coin_transfer(recipient.address(), 100));
+        .payload(accudo_stdlib::accudo_coin_transfer(
+            recipient.address(),
+            100,
+        ));
     let signed_txn = account.sign_with_transaction_builder(builder);
 
     remove_training_wheels(&mut cli, &mut info, root_idx).await;

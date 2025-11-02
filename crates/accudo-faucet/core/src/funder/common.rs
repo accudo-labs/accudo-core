@@ -6,7 +6,6 @@ use crate::{
     endpoints::{AccudoTapError, AccudoTapErrorCode},
     middleware::NUM_OUTSTANDING_TRANSACTIONS,
 };
-use anyhow::{anyhow, Context, Result};
 use accudo_config::keys::ConfigKey;
 use accudo_logger::{
     error, info,
@@ -21,6 +20,7 @@ use accudo_sdk::{
         LocalAccount,
     },
 };
+use anyhow::{anyhow, Context, Result};
 use clap::Parser;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};

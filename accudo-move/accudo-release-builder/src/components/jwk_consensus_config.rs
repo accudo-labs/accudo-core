@@ -22,7 +22,10 @@ pub fn generate_jwk_consensus_config_update_proposal(
         is_testnet,
         next_execution_hash,
         is_multi_step,
-        &["accudo_framework::jwk_consensus_config", "std::string::utf8"],
+        &[
+            "accudo_framework::jwk_consensus_config",
+            "std::string::utf8",
+        ],
         |writer| {
             match config {
                 OnChainJWKConsensusConfig::Off => {

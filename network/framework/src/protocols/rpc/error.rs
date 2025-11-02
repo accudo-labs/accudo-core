@@ -5,8 +5,8 @@
 //! Rpc protocol errors
 
 use crate::peer_manager::PeerManagerError;
-use anyhow::anyhow;
 use accudo_types::PeerId;
+use anyhow::anyhow;
 use futures::channel::{mpsc, oneshot};
 use std::io;
 use thiserror::Error;

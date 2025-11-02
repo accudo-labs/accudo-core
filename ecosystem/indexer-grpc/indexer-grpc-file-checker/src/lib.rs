@@ -3,8 +3,8 @@
 
 pub mod processor;
 
-use anyhow::Result;
 use accudo_indexer_grpc_server_framework::RunnableConfig;
+use anyhow::Result;
 use processor::Processor;
 use serde::{Deserialize, Serialize};
 

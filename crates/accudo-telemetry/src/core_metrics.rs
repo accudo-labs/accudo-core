@@ -68,7 +68,9 @@ fn collect_core_metrics(core_metrics: &mut BTreeMap<String, String>, node_config
 fn collect_consensus_metrics(core_metrics: &mut BTreeMap<String, String>) {
     core_metrics.insert(
         CONSENSUS_PROPOSALS_COUNT.into(),
-        accudo_consensus::counters::PROPOSALS_COUNT.get().to_string(),
+        accudo_consensus::counters::PROPOSALS_COUNT
+            .get()
+            .to_string(),
     );
     core_metrics.insert(
         CONSENSUS_LAST_COMMITTED_ROUND.into(),

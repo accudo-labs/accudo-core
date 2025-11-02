@@ -3,8 +3,8 @@
 
 mod fake_context;
 
-use anyhow::Result;
 use accudo_api::{get_api_service, spec::get_spec};
+use anyhow::Result;
 use clap::{Parser, ValueEnum};
 use fake_context::get_fake_context;
 use std::{path::PathBuf, sync::Arc};

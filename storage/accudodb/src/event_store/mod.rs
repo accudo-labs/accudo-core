@@ -8,7 +8,6 @@
 
 use super::AccudoDB;
 use crate::schema::{event::EventSchema, event_accumulator::EventAccumulatorSchema};
-use anyhow::anyhow;
 use accudo_accumulator::HashReader;
 use accudo_crypto::{hash::CryptoHash, HashValue};
 use accudo_db_indexer_schemas::schema::{
@@ -24,6 +23,7 @@ use accudo_types::{
     proof::position::Position,
     transaction::Version,
 };
+use anyhow::anyhow;
 use std::{
     collections::HashMap,
     convert::{TryFrom, TryInto},

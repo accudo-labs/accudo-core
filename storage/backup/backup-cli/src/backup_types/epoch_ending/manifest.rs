@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::storage::FileHandle;
-use anyhow::{ensure, Result};
 use accudo_types::waypoint::Waypoint;
+use anyhow::{ensure, Result};
 use serde::{Deserialize, Serialize};
 
 /// A chunk of an epoch ending backup manifest, representing the

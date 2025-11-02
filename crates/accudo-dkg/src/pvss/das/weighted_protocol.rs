@@ -21,13 +21,13 @@ use crate::{
         HasMultiExp,
     },
 };
-use anyhow::bail;
 use accudo_crypto::{
     bls12381,
     blstrs::{multi_pairing, random_scalar},
     CryptoMaterialError, Genesis, SigningKey, ValidCryptoMaterial,
 };
 use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher};
+use anyhow::bail;
 use blstrs::{pairing, G1Affine, G1Projective, G2Affine, G2Projective, Gt};
 use group::{Curve, Group};
 use serde::{Deserialize, Serialize};

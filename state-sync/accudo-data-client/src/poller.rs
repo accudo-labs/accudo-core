@@ -281,7 +281,9 @@ pub async fn start_poller(poller: DataSummaryPoller) {
 
     // Start the poller
     let mut polling_round: u64 = 0;
-    info!((LogSchema::new(LogEntry::DataSummaryPoller).message("Starting the Accudo data poller!")));
+    info!(
+        (LogSchema::new(LogEntry::DataSummaryPoller).message("Starting the Accudo data poller!"))
+    );
     loop {
         // Wait for the next round before polling
         poll_loop_ticker.next().await;

@@ -13,7 +13,6 @@ use crate::{
     proof::accumulator::InMemoryTransactionAccumulator,
     transaction::{TransactionInfo, Version},
 };
-use anyhow::{bail, ensure, format_err, Context, Result};
 #[cfg(any(test, feature = "fuzzing"))]
 use accudo_crypto::hash::TestOnlyHasher;
 use accudo_crypto::{
@@ -23,6 +22,7 @@ use accudo_crypto::{
     },
     HashValue,
 };
+use anyhow::{bail, ensure, format_err, Context, Result};
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest_derive::Arbitrary;
 use serde::{Deserialize, Serialize};

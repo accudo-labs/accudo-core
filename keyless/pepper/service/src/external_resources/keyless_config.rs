@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::utils;
-use anyhow::{anyhow, Result};
 use accudo_types::keyless::Configuration;
+use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 
 /// This struct is a representation of an OnChainKeylessConfiguration resource as found on-chain.

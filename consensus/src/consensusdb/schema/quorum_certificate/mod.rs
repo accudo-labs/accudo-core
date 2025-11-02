@@ -11,13 +11,13 @@
 //! ```
 
 use crate::define_schema;
-use anyhow::Result;
 use accudo_consensus_types::quorum_cert::QuorumCert;
 use accudo_crypto::HashValue;
 use accudo_schemadb::{
     schema::{KeyCodec, ValueCodec},
     ColumnFamilyName,
 };
+use anyhow::Result;
 
 pub const QC_CF_NAME: ColumnFamilyName = "quorum_certificate";
 

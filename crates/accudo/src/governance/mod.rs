@@ -448,21 +448,20 @@ async fn get_metadata_from_url(metadata_url: &Url) -> CliTypedResult<Vec<u8>> {
 fn extract_proposal_id(txn: &Transaction) -> CliTypedResult<Option<u64>> {
     if let Transaction::UserTransaction(inner) = txn {
         // Find event with proposal id
-        let proposal_id =
-            if let Some(event) = inner.events.iter().find(|event| {
-                is_accudo_governance_create_proposal_event(event.typ.to_string().as_str())
-            }) {
-                let data: CreateProposalEvent = serde_json::from_value(event.data.clone())
-                    .map_err(|_| {
-                        CliError::UnexpectedError(
-                            "Failed to parse Proposal event to get ProposalId".to_string(),
-                        )
-                    })?;
-                Some(data.proposal_id.0)
-            } else {
-                warn!("No proposal event found to find proposal id");
-                None
-            };
+        let proposal_id = if let Some(event) = inner.events.iter().find(|event| {
+            is_accudo_governance_create_proposal_event(event.typ.to_string().as_str())
+        }) {
+            let data: CreateProposalEvent =
+                serde_json::from_value(event.data.clone()).map_err(|_| {
+                    CliError::UnexpectedError(
+                        "Failed to parse Proposal event to get ProposalId".to_string(),
+                    )
+                })?;
+            Some(data.proposal_id.0)
+        } else {
+            warn!("No proposal event found to find proposal id");
+            None
+        };
 
         return Ok(proposal_id);
     }

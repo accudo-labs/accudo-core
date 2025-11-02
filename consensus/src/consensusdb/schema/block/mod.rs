@@ -11,13 +11,13 @@
 //! ```
 
 use crate::define_schema;
-use anyhow::Result;
 use accudo_consensus_types::block::Block;
 use accudo_crypto::HashValue;
 use accudo_schemadb::{
     schema::{KeyCodec, ValueCodec},
     ColumnFamilyName,
 };
+use anyhow::Result;
 
 pub const BLOCK_CF_NAME: ColumnFamilyName = "block";
 

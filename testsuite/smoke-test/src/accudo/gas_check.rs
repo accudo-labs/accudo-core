@@ -43,7 +43,10 @@ async fn test_gas_check() {
     let transfer_too_much = account2.sign_with_transaction_builder(
         // TODO(Gas): double check this
         info.transaction_factory()
-            .payload(accudo_stdlib::accudo_coin_transfer(account1.address(), 1_000)),
+            .payload(accudo_stdlib::accudo_coin_transfer(
+                account1.address(),
+                1_000,
+            )),
     );
 
     let err = info

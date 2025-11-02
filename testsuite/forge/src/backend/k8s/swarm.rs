@@ -14,7 +14,6 @@ use crate::{
     FullNode, K8sApi, Node, Result, Swarm, SwarmChaos, Validator, Version, HAPROXY_SERVICE_SUFFIX,
     REST_API_HAPROXY_SERVICE_PORT, REST_API_SERVICE_PORT,
 };
-use anyhow::{anyhow, bail, format_err};
 use accudo_config::config::{NodeConfig, OverrideNodeConfig};
 use accudo_retrier::fixed_retry_strategy;
 use accudo_sdk::{
@@ -22,6 +21,7 @@ use accudo_sdk::{
     move_types::account_address::AccountAddress,
     types::{chain_id::ChainId, AccountKey, LocalAccount, PeerId},
 };
+use anyhow::{anyhow, bail, format_err};
 use k8s_openapi::api::{
     apps::v1::StatefulSet,
     core::v1::{ConfigMap, PersistentVolumeClaim, Service},

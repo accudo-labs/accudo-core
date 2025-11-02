@@ -8,8 +8,8 @@ use crate::{
     hash::CryptoHash,
     traits::*,
 };
-use anyhow::{anyhow, Result};
 use accudo_crypto_derive::{DeserializeKey, SerializeKey};
+use anyhow::{anyhow, Result};
 use core::convert::TryFrom;
 use serde::Serialize;
 use std::{cmp::Ordering, fmt};

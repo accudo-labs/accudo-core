@@ -8,10 +8,10 @@ use crate::{
         types::{PathType, RandConfig, RandShare, TShare, FUTURE_ROUNDS_TO_ACCEPT},
     },
 };
-use anyhow::ensure;
 use accudo_consensus_types::common::{Author, Round};
 use accudo_logger::warn;
 use accudo_types::randomness::{FullRandMetadata, RandMetadata, Randomness};
+use anyhow::ensure;
 use itertools::Either;
 use std::collections::{BTreeMap, HashMap, HashSet};
 

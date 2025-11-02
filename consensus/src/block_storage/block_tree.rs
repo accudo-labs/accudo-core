@@ -8,7 +8,6 @@ use crate::{
     persistent_liveness_storage::PersistentLivenessStorage,
     util::calculate_window_start_round,
 };
-use anyhow::{bail, ensure};
 use accudo_consensus_types::{
     block::Block,
     pipelined_block::{OrderedBlockWindow, PipelinedBlock},
@@ -22,6 +21,7 @@ use accudo_types::{
     block_info::{BlockInfo, Round},
     ledger_info::LedgerInfoWithSignatures,
 };
+use anyhow::{bail, ensure};
 use mirai_annotations::precondition;
 use std::{
     collections::{vec_deque::VecDeque, BTreeMap, HashMap, HashSet},

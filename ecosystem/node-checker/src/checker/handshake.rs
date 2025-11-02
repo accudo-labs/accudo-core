@@ -10,8 +10,8 @@ use crate::{
     get_provider,
     provider::{noise::NoiseProvider, ProviderCollection},
 };
-use anyhow::Result;
 use accudo_network_checker::args::HandshakeArgs;
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

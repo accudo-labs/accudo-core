@@ -6,7 +6,6 @@ use crate::{
     data_state_view::DataStateView, generate_compiled_blob, is_accudo_package, CompilationCache,
     DataManager, IndexReader, PackageInfo, TxnIndex, ACCUDO_COMMONS,
 };
-use anyhow::Result;
 use accudo_framework::ACCUDO_PACKAGES;
 use accudo_language_e2e_tests::executor::FakeExecutor;
 use accudo_transaction_simulation::{InMemoryStateStore, SimulationStateStore};
@@ -18,6 +17,7 @@ use accudo_types::{
     write_set::WriteSet,
 };
 use accudo_validator_interface::AccudoValidatorInterface;
+use anyhow::Result;
 use clap::ValueEnum;
 use itertools::Itertools;
 use move_binary_format::file_format_common::VERSION_6;

@@ -55,7 +55,10 @@ pub fn start_consensus(
     consensus_publisher: Option<Arc<ConsensusPublisher>>,
 ) -> (Runtime, Arc<StorageWriteProxy>, Arc<QuorumStoreDB>) {
     let runtime = accudo_runtimes::spawn_named_runtime("consensus".into(), None);
-    let storage = Arc::new(StorageWriteProxy::new(node_config, accudo_db.reader.clone()));
+    let storage = Arc::new(StorageWriteProxy::new(
+        node_config,
+        accudo_db.reader.clone(),
+    ));
     let quorum_store_db = Arc::new(QuorumStoreDB::new(node_config.storage.dir()));
 
     let txn_notifier = Arc::new(MempoolNotifier::new(
@@ -156,7 +159,9 @@ pub fn start_consensus_observer(
             node_config.consensus.mempool_executed_txn_timeout_ms,
         ));
         let execution_proxy = ExecutionProxy::new(
-            Arc::new(BlockExecutor::<AccudoVMBlockExecutor>::new(accudo_db.clone())),
+            Arc::new(BlockExecutor::<AccudoVMBlockExecutor>::new(
+                accudo_db.clone(),
+            )),
             txn_notifier,
             state_sync_notifier,
             node_config.transaction_filters.execution_filter.clone(),

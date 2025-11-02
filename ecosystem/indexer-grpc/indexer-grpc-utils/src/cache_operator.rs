@@ -5,8 +5,8 @@ use crate::{
     compression_util::{CacheEntry, StorageFormat, FILE_ENTRY_TRANSACTION_COUNT},
     counters::{log_grpc_step, IndexerGrpcStep},
 };
-use anyhow::{ensure, Context};
 use accudo_protos::transaction::v1::Transaction;
+use anyhow::{ensure, Context};
 use redis::{AsyncCommands, RedisResult};
 
 // Configurations for cache.

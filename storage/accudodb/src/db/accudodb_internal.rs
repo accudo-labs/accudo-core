@@ -204,7 +204,10 @@ impl AccudoDB {
             const BATCH_SIZE: Version = 10000;
             let mut next_version = indexer.next_version();
             while next_version < ledger_next_version {
-                info!(next_version = next_version, "AccudoDB Indexer catching up. ",);
+                info!(
+                    next_version = next_version,
+                    "AccudoDB Indexer catching up. ",
+                );
                 let end_version = std::cmp::min(ledger_next_version, next_version + BATCH_SIZE);
                 let write_sets = self
                     .ledger_db

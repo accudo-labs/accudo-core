@@ -8,10 +8,10 @@ use crate::{
     state_view::ReadSet,
     workload::{TransactionBlock, Workload},
 };
-use anyhow::{anyhow, bail};
 use accudo_logger::Level;
 use accudo_types::transaction::TransactionOutput;
 use accudo_vm::{accudo_vm::AccudoVMBlockExecutor, VMBlockExecutor};
+use anyhow::{anyhow, bail};
 use clap::Parser;
 use std::path::PathBuf;
 use tokio::fs;

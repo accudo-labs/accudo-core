@@ -6,12 +6,12 @@ use crate::dag::{
     types::{DAGMessage, TestAck, TestMessage},
     DAGRpcResult,
 };
-use anyhow::{anyhow, bail};
 use accudo_consensus_types::common::Author;
 use accudo_infallible::Mutex;
 use accudo_reliable_broadcast::RBNetworkSender;
 use accudo_time_service::{TimeService, TimeServiceTrait};
 use accudo_types::validator_verifier::random_validator_verifier;
+use anyhow::{anyhow, bail};
 use async_trait::async_trait;
 use bytes::Bytes;
 use claims::{assert_err, assert_ok};

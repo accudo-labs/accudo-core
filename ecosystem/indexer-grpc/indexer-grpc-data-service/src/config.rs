@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::service::RawDataServerWrapper;
-use anyhow::{bail, Result};
 use accudo_indexer_grpc_server_framework::RunnableConfig;
 use accudo_indexer_grpc_utils::{
     compression_util::StorageFormat, config::IndexerGrpcFileStoreConfig,
@@ -14,6 +13,7 @@ use accudo_protos::{
     util::timestamp::FILE_DESCRIPTOR_SET as UTIL_TIMESTAMP_FILE_DESCRIPTOR_SET,
 };
 use accudo_transaction_filter::BooleanTransactionFilter;
+use anyhow::{bail, Result};
 use serde::{Deserialize, Serialize};
 use std::{net::SocketAddr, sync::Arc};
 use tonic::{codec::CompressionEncoding, transport::Server};

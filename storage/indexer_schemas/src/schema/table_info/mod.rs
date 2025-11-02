@@ -10,12 +10,12 @@
 //! ```
 
 use crate::schema::TABLE_INFO_CF_NAME;
-use anyhow::Result;
 use accudo_schemadb::{
     define_pub_schema,
     schema::{KeyCodec, ValueCodec},
 };
 use accudo_types::state_store::table::{TableHandle, TableInfo};
+use anyhow::Result;
 
 define_pub_schema!(TableInfoSchema, TableHandle, TableInfo, TABLE_INFO_CF_NAME);
 

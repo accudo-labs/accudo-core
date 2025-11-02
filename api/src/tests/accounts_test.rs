@@ -525,7 +525,9 @@ async fn test_get_core_account_data_not_found() {
     let resp = context.expect_status_code(200).get("/accounts/0xf").await;
     context.check_golden_output(resp);
     context
-        .disable_feature(accudo_types::on_chain_config::FeatureFlag::DEFAULT_ACCOUNT_RESOURCE as u64)
+        .disable_feature(
+            accudo_types::on_chain_config::FeatureFlag::DEFAULT_ACCOUNT_RESOURCE as u64,
+        )
         .await;
     context.expect_status_code(404).get("/accounts/0xf").await;
 }

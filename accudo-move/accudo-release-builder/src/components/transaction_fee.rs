@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::utils::*;
-use anyhow::Result;
 use accudo_crypto::HashValue;
+use anyhow::Result;
 use move_model::{code_writer::CodeWriter, emitln, model::Loc};
 
 pub fn generate_fee_distribution_proposal(

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::metrics::{ERROR_COUNT, WAIT_FOR_FILE_STORE_COUNTER};
-use anyhow::{bail, Context, Result};
 use accudo_indexer_grpc_utils::{
     cache_operator::CacheOperator,
     compression_util::{FileStoreMetadata, StorageFormat},
@@ -17,6 +16,7 @@ use accudo_protos::internal::fullnode::v1::{
     stream_status::StatusType, transactions_from_node_response::Response,
     GetTransactionsFromNodeRequest, TransactionsFromNodeResponse,
 };
+use anyhow::{bail, Context, Result};
 use futures::{self, future::join_all, StreamExt};
 use prost::Message;
 use tokio::task::JoinHandle;

@@ -7,12 +7,12 @@
 //! The generated proposal includes a comment section, listing the contents of the
 //! gas schedule in a human readable format.
 
-use anyhow::Result;
 use accudo_gas_schedule::{
     AccudoGasParameters, InitialGasSchedule, ToOnChainGasSchedule, LATEST_GAS_FEATURE_VERSION,
 };
 use accudo_package_builder::PackageBuilder;
 use accudo_types::on_chain_config::GasScheduleV2;
+use anyhow::Result;
 use clap::Parser;
 use move_core_types::account_address::AccountAddress;
 use move_model::{code_writer::CodeWriter, emit, emitln, model::Loc};
@@ -133,7 +133,10 @@ pub fn generate_update_proposal(args: &GenArgs) -> Result<()> {
         &generate_script(&current_gas_schedule(feature_version))?,
     );
     // TODO: use relative path here
-    pack.add_local_dep("AccudoFramework", &accudo_framework_path().to_string_lossy());
+    pack.add_local_dep(
+        "AccudoFramework",
+        &accudo_framework_path().to_string_lossy(),
+    );
 
     pack.write_to_disk(args.output.as_deref().unwrap_or("./proposal"))?;
 

@@ -15,7 +15,6 @@ use crate::{
         do_state_checkpoint::DoStateCheckpoint,
     },
 };
-use anyhow::{anyhow, ensure, Result};
 use accudo_executor_types::{
     ChunkCommitNotification, ChunkExecutorTrait, TransactionReplayer, VerifyExecutionMode,
 };
@@ -48,6 +47,7 @@ use accudo_types::{
     write_set::WriteSet,
 };
 use accudo_vm::VMBlockExecutor;
+use anyhow::{anyhow, ensure, Result};
 use chunk_commit_queue::{ChunkCommitQueue, ChunkToUpdateLedger};
 use chunk_result_verifier::{ChunkResultVerifier, ReplayChunkVerifier, StateSyncChunkVerifier};
 use fail::fail_point;

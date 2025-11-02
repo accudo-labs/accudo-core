@@ -15,10 +15,10 @@ use clap::{Parser, ValueEnum};
 use serde_reflection::{Registry, Samples, Tracer};
 use std::fmt::{Display, Formatter};
 
-/// Rest API types
-mod api;
 /// Accudo transactions.
 mod accudo;
+/// Rest API types
+mod api;
 /// Consensus messages.
 mod consensus;
 /// Analyze Serde formats to detect certain patterns.

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{counters::DKG_STAGE_SECONDS, types::DKGTranscriptRequest, DKGMessage};
-use anyhow::{anyhow, ensure, Context};
 use accudo_consensus_types::common::Author;
 use accudo_infallible::{duration_since_epoch, Mutex};
 use accudo_logger::info;
@@ -12,6 +11,7 @@ use accudo_types::{
     epoch_state::EpochState,
     validator_verifier::VerifyError,
 };
+use anyhow::{anyhow, ensure, Context};
 use move_core_types::account_address::AccountAddress;
 use std::{collections::HashSet, sync::Arc, time::Duration};
 

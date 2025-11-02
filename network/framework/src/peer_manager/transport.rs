@@ -7,7 +7,6 @@ use crate::{
     peer_manager::{PeerManagerError, TransportNotification},
     transport::Connection,
 };
-use anyhow::format_err;
 use accudo_channels::{self};
 use accudo_config::network_id::NetworkContext;
 use accudo_logger::prelude::*;
@@ -15,6 +14,7 @@ use accudo_netcore::transport::{ConnectionOrigin, Transport};
 use accudo_short_hex_str::AsShortHexStr;
 use accudo_time_service::{TimeService, TimeServiceTrait};
 use accudo_types::{network_address::NetworkAddress, PeerId};
+use anyhow::format_err;
 use futures::{
     channel::oneshot,
     future::{BoxFuture, FutureExt},

@@ -26,7 +26,6 @@ use crate::{
     transaction_deduper::create_transaction_deduper,
     transaction_shuffler::create_transaction_shuffler,
 };
-use anyhow::{anyhow, Result};
 use accudo_bounded_executor::BoundedExecutor;
 use accudo_channels::{accudo_channel, message_queues::QueueStyle};
 use accudo_config::config::{ConsensusConfig, ConsensusObserverConfig};
@@ -46,6 +45,7 @@ use accudo_types::{
     on_chain_config::{OnChainConsensusConfig, OnChainExecutionConfig, OnChainRandomnessConfig},
     validator_signer::ValidatorSigner,
 };
+use anyhow::{anyhow, Result};
 use fail::fail_point;
 use futures::{
     channel::{mpsc::UnboundedSender, oneshot},

@@ -23,7 +23,6 @@ use crate::{
     },
     payload_client::PayloadClient,
 };
-use anyhow::{bail, ensure};
 use accudo_collections::BoundedVecDeque;
 use accudo_config::config::DagPayloadConfig;
 use accudo_consensus_types::{
@@ -38,6 +37,7 @@ use accudo_reliable_broadcast::{DropGuard, ReliableBroadcast};
 use accudo_time_service::{TimeService, TimeServiceTrait};
 use accudo_types::{block_info::Round, epoch_state::EpochState};
 use accudo_validator_transaction_pool as vtxn_pool;
+use anyhow::{bail, ensure};
 use async_trait::async_trait;
 use futures::{
     executor::block_on,

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::compression_util::{CacheEntry, StorageFormat};
-use anyhow::Context;
 use accudo_protos::transaction::v1::Transaction;
+use anyhow::Context;
 use dashmap::DashMap;
 use itertools::Itertools;
 use prost::Message;

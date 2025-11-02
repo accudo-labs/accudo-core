@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::run::RunConfig;
-use anyhow::{Context, Result};
 use accudo_logger::info;
+use anyhow::{Context, Result};
 use clap::Parser;
 use std::{fs::File, io::BufReader, path::PathBuf};
 

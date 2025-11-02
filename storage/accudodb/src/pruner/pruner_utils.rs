@@ -11,10 +11,10 @@ use crate::{
     state_merkle_db::StateMerkleDb,
     utils::get_progress,
 };
-use anyhow::Result;
 use accudo_jellyfish_merkle::StaleNodeIndex;
 use accudo_schemadb::{schema::KeyCodec, DB};
 use accudo_types::transaction::Version;
+use anyhow::Result;
 
 pub(crate) fn get_ledger_pruner_progress(ledger_db: &LedgerDb) -> Result<Version> {
     Ok(ledger_db.metadata_db().get_pruner_progress().unwrap_or(0))

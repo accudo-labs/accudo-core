@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{AccudoValidatorInterface, FilterCondition};
-use anyhow::{ensure, Result};
 use accudo_config::config::{
     RocksdbConfigs, StorageDirPaths, BUFFERED_STATE_TARGET_ITEMS,
     DEFAULT_MAX_NUM_NODES_PER_LRU_CACHE_SHARD, NO_OP_STORAGE_PRUNER_CONFIG,
@@ -16,6 +15,7 @@ use accudo_types::{
     state_store::{state_key::StateKey, state_value::StateValue},
     transaction::{PersistedAuxiliaryInfo, Transaction, TransactionInfo, Version},
 };
+use anyhow::{ensure, Result};
 use move_core_types::language_storage::ModuleId;
 use std::{collections::HashMap, path::Path, sync::Arc};
 

@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::storage::FileHandle;
-use anyhow::{ensure, Result};
 use accudo_types::transaction::Version;
+use anyhow::{ensure, Result};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Deserialize, Serialize, Debug)]

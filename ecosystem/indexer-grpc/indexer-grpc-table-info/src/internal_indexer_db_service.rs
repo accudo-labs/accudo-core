@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::metrics::INDEXER_DB_LATENCY;
-use anyhow::Result;
 use accudo_config::config::{internal_indexer_db_config::InternalIndexerDBConfig, NodeConfig};
 use accudo_db_indexer::{
     db_indexer::{DBIndexer, InternalIndexerDB},
@@ -12,6 +11,7 @@ use accudo_db_indexer::{
 use accudo_indexer_grpc_utils::counters::{log_grpc_step, IndexerGrpcStep};
 use accudo_storage_interface::DbReader;
 use accudo_types::{indexer::indexer_db_reader::IndexerReader, transaction::Version};
+use anyhow::Result;
 use std::{
     path::{Path, PathBuf},
     sync::Arc,

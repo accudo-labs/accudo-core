@@ -7,9 +7,9 @@ use crate::{
     state_view::ReadSet,
     workload::TransactionBlock,
 };
-use anyhow::{anyhow, bail};
 use accudo_logger::Level;
 use accudo_vm_environment::prod_configs::{set_layout_caches, set_paranoid_type_checks};
+use anyhow::{anyhow, bail};
 use clap::Parser;
 use std::path::PathBuf;
 use tokio::fs;

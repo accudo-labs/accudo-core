@@ -334,10 +334,12 @@ impl TransactionFactory {
         multisig_account: AccountAddress,
         payload: Vec<u8>,
     ) -> TransactionBuilder {
-        self.payload(accudo_stdlib::multisig_account_create_transaction_with_hash(
-            multisig_account,
-            HashValue::sha3_256_of(&payload).to_vec(),
-        ))
+        self.payload(
+            accudo_stdlib::multisig_account_create_transaction_with_hash(
+                multisig_account,
+                HashValue::sha3_256_of(&payload).to_vec(),
+            ),
+        )
     }
 
     pub fn mint(&self, to: AccountAddress, amount: u64) -> TransactionBuilder {

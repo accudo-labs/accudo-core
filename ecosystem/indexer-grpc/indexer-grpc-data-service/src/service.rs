@@ -7,7 +7,6 @@ use crate::metrics::{
     NUM_TRANSACTIONS_STRIPPED, PROCESSED_LATENCY_IN_SECS_PER_PROCESSOR,
     PROCESSED_VERSIONS_COUNT_PER_PROCESSOR, SHORT_CONNECTION_COUNT,
 };
-use anyhow::{Context, Result};
 use accudo_indexer_grpc_utils::{
     cache_operator::{CacheBatchGetStatus, CacheCoverageStatus, CacheOperator},
     chunk_transactions,
@@ -30,6 +29,7 @@ use accudo_protos::{
     transaction::v1::{transaction::TxnData, Transaction},
 };
 use accudo_transaction_filter::{BooleanTransactionFilter, Filterable};
+use anyhow::{Context, Result};
 use futures::Stream;
 use prost::Message;
 use redis::Client;

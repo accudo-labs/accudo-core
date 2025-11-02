@@ -26,8 +26,8 @@
 mod common;
 mod services;
 
-use anyhow::{anyhow, Context, Result};
 use accudo_localnet::docker::get_docker;
+use anyhow::{anyhow, Context, Result};
 use clap::Parser;
 use common::make_shared;
 use futures::TryFutureExt;

@@ -8,8 +8,8 @@ mod get_vfns;
 mod helpers;
 
 use crate::big_query::write_to_big_query;
-use anyhow::{Context, Result};
 use accudo_logger::info;
+use anyhow::{Context, Result};
 use big_query::BigQueryArgs;
 use check::NodeHealthCheckerArgs;
 use clap::{Parser, Subcommand};

@@ -21,11 +21,11 @@ use crate::{
         table::TableHandle,
     },
 };
-use anyhow::Result;
 use accudo_crypto::{
     hash::{CryptoHash, DummyHasher},
     HashValue,
 };
+use anyhow::Result;
 use bytes::Bytes;
 use inner::StateKeyInner;
 use move_core_types::{

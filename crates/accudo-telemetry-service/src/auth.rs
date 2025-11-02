@@ -12,10 +12,10 @@ use crate::{
     },
     warn,
 };
-use anyhow::Result;
 use accudo_config::config::{PeerRole, RoleType};
 use accudo_crypto::{noise, x25519};
 use accudo_types::{chain_id::ChainId, PeerId};
+use anyhow::Result;
 use reqwest::header::AUTHORIZATION;
 use warp::{filters::BoxedFilter, reject, reply, Filter, Rejection, Reply};
 

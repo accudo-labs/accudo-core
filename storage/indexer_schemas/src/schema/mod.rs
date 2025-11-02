@@ -15,8 +15,8 @@ pub mod state_keys;
 pub mod table_info;
 pub mod translated_v1_event;
 
-use anyhow::ensure;
 use accudo_schemadb::ColumnFamilyName;
+use anyhow::ensure;
 
 pub const DEFAULT_COLUMN_FAMILY_NAME: ColumnFamilyName = "default";
 pub const INDEXER_METADATA_CF_NAME: ColumnFamilyName = "indexer_metadata";

@@ -5,8 +5,8 @@
 #![allow(unused_imports)]
 
 use crate::response::InternalError;
-use anyhow::{format_err, Result};
 use accudo_api_types::AccudoErrorCode;
+use anyhow::{format_err, Result};
 use poem_openapi::payload::Json;
 
 /// Build a failpoint to intentionally crash an API for testing

@@ -14,7 +14,6 @@ use crate::{
         GlobalRestoreOptions, RestoreRunMode,
     },
 };
-use anyhow::{anyhow, ensure, Result};
 use accudo_logger::prelude::*;
 use accudo_types::{
     epoch_change::Verifier,
@@ -22,6 +21,7 @@ use accudo_types::{
     transaction::Version,
     waypoint::Waypoint,
 };
+use anyhow::{anyhow, ensure, Result};
 use clap::Parser;
 use futures::StreamExt;
 use std::{collections::HashMap, sync::Arc, time::Instant};

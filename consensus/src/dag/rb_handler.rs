@@ -17,7 +17,6 @@ use crate::{
     },
     util::is_vtxn_expected,
 };
-use anyhow::{bail, ensure, Context};
 use accudo_config::config::DagPayloadConfig;
 use accudo_consensus_types::common::{Author, Round};
 use accudo_infallible::Mutex;
@@ -28,6 +27,7 @@ use accudo_types::{
     validator_signer::ValidatorSigner,
     validator_txn::ValidatorTransaction,
 };
+use anyhow::{bail, ensure, Context};
 use async_trait::async_trait;
 use claims::assert_some;
 use dashmap::DashSet;

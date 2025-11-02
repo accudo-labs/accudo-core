@@ -20,7 +20,6 @@ use crate::{
     genesis::git::from_yaml,
     move_tool::{ArgWithType, FunctionArgType, MemberId},
 };
-use anyhow::{bail, Context};
 use accudo_api_types::ViewFunction;
 use accudo_crypto::{
     ed25519::{Ed25519PrivateKey, Ed25519PublicKey, Ed25519Signature},
@@ -55,6 +54,7 @@ use accudo_types::{
     },
 };
 use accudo_vm_types::output::VMOutput;
+use anyhow::{bail, Context};
 use async_trait::async_trait;
 use clap::{Parser, ValueEnum};
 use hex::FromHexError;

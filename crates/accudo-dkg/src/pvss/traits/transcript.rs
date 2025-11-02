@@ -51,8 +51,8 @@ use crate::pvss::{
     traits::{Convert, HasEncryptionPublicParams, Reconstructable, SecretSharingConfig},
     Player,
 };
-use anyhow::bail;
 use accudo_crypto::{SigningKey, Uniform, ValidCryptoMaterial, VerifyingKey};
+use anyhow::bail;
 use num_traits::Zero;
 use serde::{de::DeserializeOwned, Serialize};
 use std::{fmt::Debug, ops::AddAssign};

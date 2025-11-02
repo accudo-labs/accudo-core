@@ -404,7 +404,8 @@ impl Flags {
             skip_attribute_checks: false,
             debug: debug_compiler_env_var(),
             warn_of_deprecation_use: move_compiler_warn_of_deprecation_use_env_var(),
-            warn_of_deprecation_use_in_accudo_libs: warn_of_deprecation_use_in_accudo_libs_env_var(),
+            warn_of_deprecation_use_in_accudo_libs: warn_of_deprecation_use_in_accudo_libs_env_var(
+            ),
             warn_unused: false,
             lang_v2: false,
             language_version: LanguageVersion::V1,

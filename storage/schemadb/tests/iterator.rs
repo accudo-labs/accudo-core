@@ -2,7 +2,6 @@
 // Parts of the project are originally copyright © Meta Platforms, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_schemadb::{
     define_schema,
     iterator::SchemaIterator,
@@ -10,6 +9,7 @@ use accudo_schemadb::{
     DB,
 };
 use accudo_storage_interface::AccudoDbError;
+use anyhow::Result;
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use rocksdb::{ColumnFamilyDescriptor, SliceTransform, DEFAULT_COLUMN_FAMILY_NAME};
 

@@ -9,8 +9,8 @@ use crate::{
     },
     transaction::authenticator::EphemeralPublicKey,
 };
-use anyhow::{ensure, Context};
 use accudo_crypto::{poseidon_bn254, CryptoMaterialError};
+use anyhow::{ensure, Context};
 use ark_bn254::Fr;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;

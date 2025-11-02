@@ -4,8 +4,8 @@
 use crate::{
     get_version_path_with_base, Client, DEFAULT_VERSION_PATH_BASE, X_ACCUDO_SDK_HEADER_VALUE,
 };
-use anyhow::Result;
 use accudo_api_types::X_ACCUDO_CLIENT;
+use anyhow::Result;
 use reqwest::{
     header::{self, HeaderMap, HeaderName, HeaderValue},
     Client as ReqwestClient, ClientBuilder as ReqwestClientBuilder,

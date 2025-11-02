@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{batch_update_gradually, generate_traffic};
-use anyhow::bail;
 use accudo_forge::{NetworkContextSynchronizer, NetworkTest, Result, SwarmExt, Test};
+use anyhow::bail;
 use async_trait::async_trait;
 use log::info;
 use std::ops::DerefMut;

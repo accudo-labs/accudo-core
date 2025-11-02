@@ -15,12 +15,12 @@
 //! numeric value.
 
 use crate::schema::{ensure_slice_len_eq, WRITE_SET_CF_NAME};
-use anyhow::Result;
 use accudo_schemadb::{
     define_schema,
     schema::{KeyCodec, ValueCodec},
 };
 use accudo_types::{transaction::Version, write_set::WriteSet};
+use anyhow::Result;
 use byteorder::{BigEndian, ReadBytesExt};
 use std::mem::size_of;
 

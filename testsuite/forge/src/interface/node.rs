@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{Result, Version};
-use anyhow::anyhow;
 use accudo_config::{config::NodeConfig, network_id::NetworkId};
 use accudo_inspection_service::inspection_client::InspectionClient;
 use accudo_rest_client::{AccudoBaseUrl, Client as RestClient};
 use accudo_sdk::types::PeerId;
+use anyhow::anyhow;
 use std::{
     collections::HashMap,
     time::{Duration, Instant},

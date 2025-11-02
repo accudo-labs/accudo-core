@@ -1,12 +1,12 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
-use anyhow::Result;
 use accudo_backup_cli::{
     coordinators::backup::BackupCompactor,
     metadata::cache::MetadataCacheOpt,
     storage::DBToolStorageOpt,
     utils::{storage_ext::BackupStorageExt, ConcurrentDownloadsOpt},
 };
+use anyhow::Result;
 use clap::{Parser, Subcommand};
 
 /// Support compacting and cleaning obsolete metadata files

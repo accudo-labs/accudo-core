@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{db_indexer::DBIndexer, db_v2::IndexerAsyncV2};
-use anyhow::anyhow;
 use accudo_types::{
     account_address::AccountAddress,
     contract_event::{ContractEventV1, ContractEventV2, EventWithVersion},
@@ -15,6 +14,7 @@ use accudo_types::{
     },
     transaction::{AccountOrderedTransactionsWithProof, Version},
 };
+use anyhow::anyhow;
 use std::sync::Arc;
 
 #[derive(Clone)]

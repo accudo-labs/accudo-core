@@ -11,8 +11,8 @@ use crate::{
     },
     CheckSummary,
 };
-use anyhow::Result;
 use accudo_logger::{error, info, warn};
+use anyhow::Result;
 use async_trait::async_trait;
 use futures::future::try_join_all;
 use serde::{Deserialize, Serialize};

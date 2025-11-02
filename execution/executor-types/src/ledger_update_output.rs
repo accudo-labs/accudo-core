@@ -3,13 +3,13 @@
 
 #![forbid(unsafe_code)]
 
-use anyhow::{ensure, Result};
 use accudo_crypto::HashValue;
 use accudo_drop_helper::DropHelper;
 use accudo_types::{
     proof::accumulator::InMemoryTransactionAccumulator,
     transaction::{TransactionInfo, Version},
 };
+use anyhow::{ensure, Result};
 use derive_more::Deref;
 use itertools::zip_eq;
 use std::{clone::Clone, sync::Arc};

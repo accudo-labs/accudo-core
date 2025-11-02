@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{mode::TConsensusMode, types::ObservedKeyLevelUpdateRequest};
-use anyhow::Context;
 use accudo_logger::info;
 use accudo_types::jwks::{Issuer, KeyLevelUpdate, ProviderJWKs, QuorumCertifiedUpdate, KID};
+use anyhow::Context;
 
 pub struct PerKeyMode {}
 

@@ -169,7 +169,10 @@ impl CliCommand<RotateSummary> for RotateKey {
         let (new_private_key, new_public_key) = if new_derivation_path.is_some() {
             (
                 None,
-                accudo_ledger::get_public_key(new_derivation_path.clone().unwrap().as_str(), false)?,
+                accudo_ledger::get_public_key(
+                    new_derivation_path.clone().unwrap().as_str(),
+                    false,
+                )?,
             )
         } else {
             let new_private_key = self

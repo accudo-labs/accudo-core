@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{wait_for_all_nodes_to_catchup_to_version, AccudoPublicInfo};
-use anyhow::{bail, Context, Result};
 use accudo_config::config::DEFAULT_MAX_PAGE_SIZE;
 use accudo_rest_client::Client as RestClient;
+use anyhow::{bail, Context, Result};
 use async_trait::async_trait;
 use chrono::Utc;
 use core::time;

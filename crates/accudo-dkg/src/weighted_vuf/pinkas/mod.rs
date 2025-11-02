@@ -11,8 +11,8 @@ use crate::{
     utils::{g1_multi_exp, g2_multi_exp, parallel_multi_pairing, random::random_nonzero_scalar},
     weighted_vuf::traits::WeightedVUF,
 };
-use anyhow::{anyhow, bail};
 use accudo_crypto::blstrs::{multi_pairing, random_scalar};
+use anyhow::{anyhow, bail};
 use blstrs::{pairing, G1Projective, G2Projective, Gt, Scalar};
 use ff::Field;
 use group::{Curve, Group};

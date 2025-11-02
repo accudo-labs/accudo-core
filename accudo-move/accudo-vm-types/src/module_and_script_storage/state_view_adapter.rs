@@ -7,12 +7,12 @@ use crate::{
     module_and_script_storage::module_storage::AccudoModuleStorage,
     resolver::BlockSynchronizationKillSwitch,
 };
-use ambassador::{delegate_to_methods, Delegate};
 use accudo_types::{
     error::PanicError,
     state_store::{state_key::StateKey, state_value::StateValueMetadata, StateView, TStateView},
     vm::modules::AccudoModuleExtension,
 };
+use ambassador::{delegate_to_methods, Delegate};
 use bytes::Bytes;
 use move_binary_format::{
     errors::{PartialVMResult, VMResult},

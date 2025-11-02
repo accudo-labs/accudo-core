@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{accudo_debugger::AccudoDebugger, common::Opts};
-use anyhow::Result;
 use accudo_rest_client::Client;
+use anyhow::Result;
 use clap::Parser;
 use url::Url;
 

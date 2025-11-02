@@ -9,8 +9,8 @@ use crate::{
     secp256r1_ecdsa::{PrivateKey, PublicKey, ORDER_HALF},
     traits::{Signature as SignatureTrait, *},
 };
-use anyhow::{anyhow, Result};
 use accudo_crypto_derive::{key_name, DeserializeKey, SerializeKey};
+use anyhow::{anyhow, Result};
 use core::convert::TryFrom;
 use p256::NonZeroScalar;
 use serde::Serialize;

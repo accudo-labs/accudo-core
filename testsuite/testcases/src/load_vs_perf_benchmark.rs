@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{create_emitter_and_request, LoadDestination, NetworkLoadTest};
-use anyhow::Context;
 use accudo_forge::{
     args::TransactionTypeArg,
     emitter::NumAccountsMode,
@@ -11,6 +10,7 @@ use accudo_forge::{
     EmitJob, EmitJobMode, EmitJobRequest, NetworkContext, NetworkContextSynchronizer, NetworkTest,
     Result, Test, TransactionType, TxnStats, WorkflowProgress,
 };
+use anyhow::Context;
 use async_trait::async_trait;
 use log::{error, info};
 use rand::SeedableRng;

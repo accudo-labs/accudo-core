@@ -7,9 +7,9 @@ use crate::{
         BatchMetadata, FileStoreMetadata, IFileStore, METADATA_FILE_NAME,
     },
 };
-use anyhow::Result;
 use accudo_protos::{transaction::v1::Transaction, util::timestamp::Timestamp};
 use accudo_transaction_filter::{BooleanTransactionFilter, Filterable};
+use anyhow::Result;
 use prost::Message;
 use std::{
     path::PathBuf,

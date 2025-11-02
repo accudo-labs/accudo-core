@@ -142,7 +142,9 @@ impl AccudoLedgerStatusCode {
             AccudoLedgerStatusCode::InsNotSupported => "Ins(Instruction) not supported",
             AccudoLedgerStatusCode::ClaNotSupported => "Cla not supported",
             AccudoLedgerStatusCode::WrongResponseLength => "Wrong response length",
-            AccudoLedgerStatusCode::DisplayBip32PathFail => "BIP32 path conversion to string failed",
+            AccudoLedgerStatusCode::DisplayBip32PathFail => {
+                "BIP32 path conversion to string failed"
+            },
             AccudoLedgerStatusCode::DisplayAddressFail => "Address conversion to string failed",
             AccudoLedgerStatusCode::DisplayAmountFail => "Amount conversion to string failed",
             AccudoLedgerStatusCode::WrongTxnLength => "Wrong raw transaction length",

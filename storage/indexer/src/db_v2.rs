@@ -10,7 +10,7 @@ use accudo_db_indexer_schemas::{
     schema::{indexer_metadata::IndexerMetadataSchema, table_info::TableInfoSchema},
 };
 use accudo_logger::{info, sample, sample::SampleRate};
-use accudo_resource_viewer::{AnnotatedMoveValue, AccudoValueAnnotator};
+use accudo_resource_viewer::{AccudoValueAnnotator, AnnotatedMoveValue};
 use accudo_schemadb::{batch::SchemaBatch, DB};
 use accudo_storage_interface::{
     db_other_bail as bail, state_store::state_view::db_state_view::DbStateViewAtVersion,

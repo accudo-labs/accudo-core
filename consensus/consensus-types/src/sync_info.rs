@@ -6,8 +6,8 @@ use crate::{
     common::Round, quorum_cert::QuorumCert, timeout_2chain::TwoChainTimeoutCertificate,
     wrapped_ledger_info::WrappedLedgerInfo,
 };
-use anyhow::{ensure, Context};
 use accudo_types::{block_info::BlockInfo, validator_verifier::ValidatorVerifier};
+use anyhow::{ensure, Context};
 use fail::fail_point;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display, Formatter};

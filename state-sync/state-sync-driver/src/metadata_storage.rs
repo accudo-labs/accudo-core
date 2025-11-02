@@ -5,7 +5,6 @@ use crate::{
     error::Error,
     metadata_storage::database_schema::{MetadataKey, MetadataSchema, MetadataValue},
 };
-use anyhow::{anyhow, Result};
 use accudo_logger::prelude::*;
 use accudo_schemadb::{
     batch::SchemaBatch,
@@ -14,6 +13,7 @@ use accudo_schemadb::{
     ColumnFamilyName, Options, DB,
 };
 use accudo_types::ledger_info::LedgerInfoWithSignatures;
+use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 use std::{path::Path, sync::Arc, time::Instant};
 

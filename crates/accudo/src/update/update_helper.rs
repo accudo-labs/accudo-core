@@ -5,8 +5,8 @@ use crate::{
     cli_build_information,
     update::{get_additional_binaries_dir, UpdateRequiredInfo},
 };
-use anyhow::{anyhow, bail, Context, Result};
 use accudo_build_info::BUILD_OS;
+use anyhow::{anyhow, bail, Context, Result};
 use self_update::{backends::github::Update, update::ReleaseUpdate};
 use std::path::PathBuf;
 

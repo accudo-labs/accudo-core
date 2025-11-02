@@ -21,7 +21,6 @@
 //! governance framework itself is working as intended.
 
 use crate::accudo_framework_path;
-use anyhow::{anyhow, bail, Context, Result};
 use accudo::{
     common::types::PromptOptions, governance::compile_in_temp_dir, move_tool::FrameworkPackageArgs,
 };
@@ -49,6 +48,7 @@ use accudo_vm_types::{
     module_and_script_storage::AsAccudoCodeStorage, module_write_set::ModuleWriteSet,
     storage::change_set_configs::ChangeSetConfigs,
 };
+use anyhow::{anyhow, bail, Context, Result};
 use clap::Parser;
 use move_binary_format::{
     access::ModuleAccess,

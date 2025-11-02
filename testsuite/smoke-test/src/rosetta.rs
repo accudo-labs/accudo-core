@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::smoke_test_environment::SwarmBuilder;
-use anyhow::anyhow;
 use accudo::{
     account::create::DEFAULT_FUNDED_COINS,
     common::types::GasOptions,
@@ -41,6 +40,7 @@ use accudo_types::{
     on_chain_config::{GasScheduleV2, OnChainRandomnessConfig},
     transaction::SignedTransaction,
 };
+use anyhow::anyhow;
 use serde_json::json;
 use std::{
     collections::{BTreeMap, HashSet},

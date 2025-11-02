@@ -11,9 +11,9 @@ use crate::{
     },
     transaction::authenticator::EphemeralSignature,
 };
-use anyhow::bail;
 use accudo_crypto::CryptoMaterialError;
 use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher};
+use anyhow::bail;
 use ark_bn254::{Bn254, Fr};
 use ark_ff::{BigInteger, PrimeField};
 use ark_groth16::{Groth16, PreparedVerifyingKey, Proof};

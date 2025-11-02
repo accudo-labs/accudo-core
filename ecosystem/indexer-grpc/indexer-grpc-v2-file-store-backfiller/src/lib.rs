@@ -3,9 +3,9 @@
 
 pub mod processor;
 
-use anyhow::Result;
 use accudo_indexer_grpc_server_framework::RunnableConfig;
 use accudo_indexer_grpc_utils::config::IndexerGrpcFileStoreConfig;
+use anyhow::Result;
 use processor::Processor;
 use serde::{Deserialize, Serialize};
 use url::Url;

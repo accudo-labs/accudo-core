@@ -9,9 +9,9 @@ use crate::{
         ValidatorConsensusInfo, ValidatorConsensusInfoMoveStruct, ValidatorVerifier,
     },
 };
-use anyhow::{Context, Result};
 use accudo_crypto::Uniform;
 use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher};
+use anyhow::{Context, Result};
 use move_core_types::{
     account_address::AccountAddress, ident_str, identifier::IdentStr, language_storage::TypeTag,
     move_resource::MoveStructType,

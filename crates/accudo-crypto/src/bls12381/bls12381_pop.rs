@@ -14,8 +14,8 @@ use crate::{
     bls12381::bls12381_keys::{PrivateKey, PublicKey},
     CryptoMaterialError, Length, ValidCryptoMaterial, ValidCryptoMaterialStringExt,
 };
-use anyhow::{anyhow, Result};
 use accudo_crypto_derive::{DeserializeKey, SerializeKey};
+use anyhow::{anyhow, Result};
 use blst::BLST_ERROR;
 use std::{convert::TryFrom, fmt};
 

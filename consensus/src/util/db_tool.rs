@@ -10,10 +10,10 @@ use crate::{
         types::PersistedValue,
     },
 };
-use anyhow::{bail, Result};
 use accudo_consensus_types::{block::Block, common::Payload};
 use accudo_crypto::HashValue;
 use accudo_types::transaction::{SignedTransaction, Transaction};
+use anyhow::{bail, Result};
 use clap::Parser;
 use std::{collections::HashMap, path::PathBuf};
 

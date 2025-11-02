@@ -4,9 +4,9 @@
 pub mod metrics;
 pub mod worker;
 
-use anyhow::{Context, Result};
 use accudo_indexer_grpc_server_framework::RunnableConfig;
 use accudo_indexer_grpc_utils::{config::IndexerGrpcFileStoreConfig, types::RedisUrl};
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use url::Url;
 use worker::Worker;

@@ -6,8 +6,8 @@ use crate::{
     filters::{EventFilter, TransactionRootFilter, UserTransactionFilter},
     traits::Filterable,
 };
-use anyhow::{anyhow, ensure, Result};
 use accudo_protos::transaction::v1::{transaction::TxnData, Transaction};
+use anyhow::{anyhow, ensure, Result};
 use prost::Message;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;

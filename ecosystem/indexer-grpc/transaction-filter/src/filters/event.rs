@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{errors::FilterError, filters::MoveStructTagFilter, traits::Filterable};
-use anyhow::Error;
 use accudo_protos::transaction::v1::{move_type::Content, Event};
+use anyhow::Error;
 use derivative::Derivative;
 use memchr::memmem::Finder;
 use once_cell::sync::OnceCell;

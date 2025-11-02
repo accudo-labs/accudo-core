@@ -609,10 +609,7 @@ pub fn explorer_transaction_link(
             network
         )
     } else {
-        format!(
-            "https://explorer.accudo.org/txn/{}",
-            hash.to_hex_literal()
-        )
+        format!("https://explorer.accudo.org/txn/{}", hash.to_hex_literal())
     }
 }
 

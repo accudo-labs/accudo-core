@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{block::Block, common::Author, proof_of_store::ProofCache, sync_info::SyncInfo};
-use anyhow::{anyhow, ensure, format_err, Context, Result};
 use accudo_short_hex_str::AsShortHexStr;
 use accudo_types::validator_verifier::ValidatorVerifier;
+use anyhow::{anyhow, ensure, format_err, Context, Result};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 

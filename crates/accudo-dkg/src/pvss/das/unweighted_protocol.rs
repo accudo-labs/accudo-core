@@ -19,13 +19,13 @@ use crate::{
         },
     },
 };
-use anyhow::bail;
 use accudo_crypto::{
     bls12381,
     blstrs::{multi_pairing, random_scalar},
     CryptoMaterialError, Genesis, SigningKey, ValidCryptoMaterial,
 };
 use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher};
+use anyhow::bail;
 use blstrs::{G1Projective, G2Projective, Gt};
 use group::Group;
 use serde::{Deserialize, Serialize};

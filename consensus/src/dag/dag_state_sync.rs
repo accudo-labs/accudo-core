@@ -13,7 +13,6 @@ use crate::{
     dag::DAGMessage, network::IncomingDAGRequest, payload_manager::TPayloadManager,
     pipeline::execution_client::TExecutionClient,
 };
-use anyhow::{bail, ensure};
 use accudo_channels::accudo_channel;
 use accudo_consensus_types::common::{Author, Round};
 use accudo_logger::{debug, error};
@@ -21,6 +20,7 @@ use accudo_time_service::TimeService;
 use accudo_types::{
     epoch_change::EpochChangeProof, epoch_state::EpochState, ledger_info::LedgerInfoWithSignatures,
 };
+use anyhow::{bail, ensure};
 use core::fmt;
 use futures::StreamExt;
 use std::sync::Arc;

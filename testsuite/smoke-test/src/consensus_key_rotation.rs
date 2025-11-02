@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{smoke_test_environment::SwarmBuilder, utils::get_on_chain_resource};
-use anyhow::bail;
 use accudo::common::types::GasOptions;
 use accudo_config::config::{OverrideNodeConfig, PersistableConfig};
 use accudo_crypto::{bls12381, Uniform};
@@ -13,6 +12,7 @@ use accudo_types::{
     on_chain_config::{ConfigurationResource, OnChainRandomnessConfig, ValidatorSet},
     validator_verifier::ValidatorVerifier,
 };
+use anyhow::bail;
 use rand::{thread_rng, Rng};
 use std::{
     fs::File,

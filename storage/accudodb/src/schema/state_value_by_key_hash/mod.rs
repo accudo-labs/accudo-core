@@ -15,13 +15,13 @@
 //! ```
 
 use crate::schema::{ensure_slice_len_eq, STATE_VALUE_BY_KEY_HASH_CF_NAME};
-use anyhow::Result;
 use accudo_crypto::HashValue;
 use accudo_schemadb::{
     define_schema,
     schema::{KeyCodec, ValueCodec},
 };
 use accudo_types::{state_store::state_value::StateValue, transaction::Version};
+use anyhow::Result;
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use std::{io::Write, mem::size_of};
 

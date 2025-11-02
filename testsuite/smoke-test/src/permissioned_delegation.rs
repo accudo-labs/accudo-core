@@ -100,27 +100,25 @@ async fn test_permissioned_delegation() {
     );
 
     // Transfer 1 APT and 2 APT.
-    let transfer_txn = account1.sign_aa_transaction_with_transaction_builder(
-        vec![],
-        None,
-        info.transaction_factory()
-            .payload(accudo_stdlib::accudo_account_fungible_transfer_only(
-                account2.address(),
-                100000000,
-            )),
-    );
+    let transfer_txn =
+        account1.sign_aa_transaction_with_transaction_builder(
+            vec![],
+            None,
+            info.transaction_factory().payload(
+                accudo_stdlib::accudo_account_fungible_transfer_only(account2.address(), 100000000),
+            ),
+        );
     info.client().submit_and_wait(&transfer_txn).await.unwrap();
 
     // gas permission check failed.
-    let transfer_txn = account1.sign_aa_transaction_with_transaction_builder(
-        vec![],
-        None,
-        info.transaction_factory()
-            .payload(accudo_stdlib::accudo_account_fungible_transfer_only(
-                account2.address(),
-                200000000,
-            )),
-    );
+    let transfer_txn =
+        account1.sign_aa_transaction_with_transaction_builder(
+            vec![],
+            None,
+            info.transaction_factory().payload(
+                accudo_stdlib::accudo_account_fungible_transfer_only(account2.address(), 200000000),
+            ),
+        );
     assert!(info.client().submit_and_wait(&transfer_txn).await.is_err());
     account1.decrement_sequence_number();
 

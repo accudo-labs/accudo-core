@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{
-    Address, AccudoError, EntryFunctionId, EventGuid, HashValue, HexEncodedBytes,
+    AccudoError, Address, EntryFunctionId, EventGuid, HashValue, HexEncodedBytes,
     MoveModuleBytecode, MoveModuleId, MoveResource, MoveScriptBytecode, MoveStructTag, MoveType,
     MoveValue, VerifyInput, VerifyInputWithRecursion, U64,
 };
-use anyhow::{bail, Context as AnyhowContext, Result};
 use accudo_crypto::{
     ed25519::{self, Ed25519PublicKey, ED25519_PUBLIC_KEY_LENGTH, ED25519_SIGNATURE_LENGTH},
     multi_ed25519::{self, MultiEd25519PublicKey, BITMAP_NUM_OF_BYTES, MAX_NUM_OF_KEYS},
@@ -35,6 +34,7 @@ use accudo_types::{
         Script, SignedTransaction, TransactionOutput, TransactionWithProof,
     },
 };
+use anyhow::{bail, Context as AnyhowContext, Result};
 use bcs::to_bytes;
 use once_cell::sync::Lazy;
 use poem_openapi::{Object, Union};
@@ -116,7 +116,9 @@ pub struct TransactionOnChainData {
 }
 
 impl From<(TransactionWithProof, accudo_crypto::HashValue)> for TransactionOnChainData {
-    fn from((txn, accumulator_root_hash): (TransactionWithProof, accudo_crypto::HashValue)) -> Self {
+    fn from(
+        (txn, accumulator_root_hash): (TransactionWithProof, accudo_crypto::HashValue),
+    ) -> Self {
         Self {
             version: txn.version,
             transaction: txn.transaction,

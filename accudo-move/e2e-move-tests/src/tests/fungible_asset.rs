@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{assert_success, tests::common, BlockSplit, MoveHarness, SUCCESS};
-use accudo_cached_packages::accudo_stdlib::{accudo_account_batch_transfer, accudo_account_transfer};
+use accudo_cached_packages::accudo_stdlib::{
+    accudo_account_batch_transfer, accudo_account_transfer,
+};
 use accudo_language_e2e_tests::{
     account::Account,
     executor::{ExecutorMode, FakeExecutor},

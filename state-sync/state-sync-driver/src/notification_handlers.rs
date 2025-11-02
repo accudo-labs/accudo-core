@@ -374,7 +374,10 @@ impl ConsensusNotificationHandler {
     ) -> Result<(), Error> {
         // Wrap the result in an error that consensus can process
         let result = result.map_err(|error| {
-            accudo_consensus_notifications::Error::UnexpectedErrorEncountered(format!("{:?}", error))
+            accudo_consensus_notifications::Error::UnexpectedErrorEncountered(format!(
+                "{:?}",
+                error
+            ))
         });
 
         // Send the result
@@ -406,7 +409,10 @@ impl ConsensusNotificationHandler {
     ) -> Result<(), Error> {
         // Wrap the result in an error that consensus can process
         let result = result.map_err(|error| {
-            accudo_consensus_notifications::Error::UnexpectedErrorEncountered(format!("{:?}", error))
+            accudo_consensus_notifications::Error::UnexpectedErrorEncountered(format!(
+                "{:?}",
+                error
+            ))
         });
 
         // Send the result
@@ -434,7 +440,10 @@ impl ConsensusNotificationHandler {
     ) -> Result<(), Error> {
         // Wrap the result in an error that consensus can process
         let result = result.map_err(|error| {
-            accudo_consensus_notifications::Error::UnexpectedErrorEncountered(format!("{:?}", error))
+            accudo_consensus_notifications::Error::UnexpectedErrorEncountered(format!(
+                "{:?}",
+                error
+            ))
         });
 
         // Send the result

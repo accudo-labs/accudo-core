@@ -14,9 +14,9 @@ mod utils;
 mod macros;
 
 use crate::utils::{NetworkName, TestName};
-use anyhow::Result;
 use accudo_logger::{info, Level, Logger};
 use accudo_push_metrics::MetricsPusher;
+use anyhow::Result;
 use consts::{NETWORK_NAME, NUM_THREADS, STACK_SIZE};
 use futures::future::join_all;
 use std::time::{SystemTime, UNIX_EPOCH};

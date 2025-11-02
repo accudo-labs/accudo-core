@@ -13,9 +13,9 @@ use crate::{
     NAMESPACE_CLEANUP_THRESHOLD_SECS, ORPHAN_POD_CLEANUP_THRESHOLD_SECS,
     VALIDATOR_HAPROXY_SERVICE_SUFFIX, VALIDATOR_SERVICE_SUFFIX,
 };
+use accudo_sdk::types::PeerId;
 use again::RetryPolicy;
 use anyhow::{anyhow, bail, format_err};
-use accudo_sdk::types::PeerId;
 use k8s_openapi::api::{
     apps::v1::{Deployment, StatefulSet},
     batch::v1::Job,
@@ -617,7 +617,10 @@ pub async fn install_testnet_resources(
         serde_yaml::to_string(&accudo_node_helm_values_override).unwrap()
     );
 
-    merge_yaml(&mut accudo_node_helm_values, accudo_node_helm_values_override);
+    merge_yaml(
+        &mut accudo_node_helm_values,
+        accudo_node_helm_values_override,
+    );
     merge_yaml(&mut genesis_helm_values, genesis_helm_values_override);
 
     info!(

@@ -8,10 +8,10 @@ use crate::rand::rand_gen::{
         TAugmentedData,
     },
 };
-use anyhow::ensure;
 use accudo_consensus_types::common::Author;
 use accudo_logger::error;
 use accudo_types::validator_signer::ValidatorSigner;
+use anyhow::ensure;
 use std::{collections::HashMap, sync::Arc};
 
 pub struct AugDataStore<D> {

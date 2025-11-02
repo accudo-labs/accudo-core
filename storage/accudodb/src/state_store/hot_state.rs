@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::metrics::{COUNTER, GAUGE, OTHER_TIMERS_SECONDS};
-use anyhow::{ensure, Result};
 use accudo_infallible::Mutex;
 use accudo_logger::prelude::*;
 use accudo_metrics_core::{IntCounterVecHelper, IntGaugeVecHelper, TimerHelper};
@@ -18,6 +17,7 @@ use accudo_types::state_store::{
 };
 #[cfg(test)]
 use accudo_types::transaction::Version;
+use anyhow::{ensure, Result};
 use arr_macro::arr;
 use dashmap::{mapref::one::Ref, DashMap};
 #[cfg(test)]

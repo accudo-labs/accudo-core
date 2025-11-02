@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::indexer_api::confirm_metadata_applied;
-use anyhow::{anyhow, Context, Result};
 use accudo_protos::indexer::v1::GetTransactionsRequest;
+use anyhow::{anyhow, Context, Result};
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl};
 use diesel_async::{pg::AsyncPgConnection, AsyncConnection, RunQueryDsl};
 use futures::StreamExt;

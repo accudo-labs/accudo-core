@@ -5,9 +5,9 @@ use crate::{
     common::{ArcError, IP_LOCAL_HOST},
     no_panic_println,
 };
-use anyhow::{anyhow, Context, Result};
 use accudo_faucet_core::server::{FunderKeyEnum, RunConfig};
 use accudo_localnet::health_checker::HealthChecker;
+use anyhow::{anyhow, Context, Result};
 use futures::channel::oneshot;
 use std::{future::Future, path::PathBuf};
 use url::Url;

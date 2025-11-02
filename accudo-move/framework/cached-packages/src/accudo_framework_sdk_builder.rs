@@ -1453,7 +1453,9 @@ impl EntryFunctionCall {
                 is_multi_step_proposal,
             ),
             AccudoGovernanceForceEndEpoch {} => accudo_governance_force_end_epoch(),
-            AccudoGovernanceForceEndEpochTestOnly {} => accudo_governance_force_end_epoch_test_only(),
+            AccudoGovernanceForceEndEpochTestOnly {} => {
+                accudo_governance_force_end_epoch_test_only()
+            },
             AccudoGovernancePartialVote {
                 stake_pool,
                 proposal_id,
@@ -2581,7 +2583,10 @@ pub fn accudo_account_create_account(auth_key: AccountAddress) -> TransactionPay
 /// This would create the recipient APT PFS first, which also registers it to receive APT, before transferring.
 /// TODO: once migration is complete, rename to just "transfer_only" and make it an entry function (for cheapest way
 /// to transfer APT) - if we want to allow APT PFS without account itself
-pub fn accudo_account_fungible_transfer_only(to: AccountAddress, amount: u64) -> TransactionPayload {
+pub fn accudo_account_fungible_transfer_only(
+    to: AccountAddress,
+    amount: u64,
+) -> TransactionPayload {
     TransactionPayload::EntryFunction(EntryFunction::new(
         ModuleId::new(
             AccountAddress::new([
@@ -5780,7 +5785,9 @@ mod decoder {
         }
     }
 
-    pub fn accudo_account_batch_transfer(payload: &TransactionPayload) -> Option<EntryFunctionCall> {
+    pub fn accudo_account_batch_transfer(
+        payload: &TransactionPayload,
+    ) -> Option<EntryFunctionCall> {
         if let TransactionPayload::EntryFunction(script) = payload {
             Some(EntryFunctionCall::AccudoAccountBatchTransfer {
                 recipients: bcs::from_bytes(script.args().get(0)?).ok()?,
@@ -5805,7 +5812,9 @@ mod decoder {
         }
     }
 
-    pub fn accudo_account_create_account(payload: &TransactionPayload) -> Option<EntryFunctionCall> {
+    pub fn accudo_account_create_account(
+        payload: &TransactionPayload,
+    ) -> Option<EntryFunctionCall> {
         if let TransactionPayload::EntryFunction(script) = payload {
             Some(EntryFunctionCall::AccudoAccountCreateAccount {
                 auth_key: bcs::from_bytes(script.args().get(0)?).ok()?,
@@ -5832,9 +5841,11 @@ mod decoder {
         payload: &TransactionPayload,
     ) -> Option<EntryFunctionCall> {
         if let TransactionPayload::EntryFunction(script) = payload {
-            Some(EntryFunctionCall::AccudoAccountSetAllowDirectCoinTransfers {
-                allow: bcs::from_bytes(script.args().get(0)?).ok()?,
-            })
+            Some(
+                EntryFunctionCall::AccudoAccountSetAllowDirectCoinTransfers {
+                    allow: bcs::from_bytes(script.args().get(0)?).ok()?,
+                },
+            )
         } else {
             None
         }
@@ -5851,7 +5862,9 @@ mod decoder {
         }
     }
 
-    pub fn accudo_account_transfer_coins(payload: &TransactionPayload) -> Option<EntryFunctionCall> {
+    pub fn accudo_account_transfer_coins(
+        payload: &TransactionPayload,
+    ) -> Option<EntryFunctionCall> {
         if let TransactionPayload::EntryFunction(script) = payload {
             Some(EntryFunctionCall::AccudoAccountTransferCoins {
                 coin_type: script.ty_args().get(0)?.clone(),
@@ -6003,7 +6016,9 @@ mod decoder {
         }
     }
 
-    pub fn accudo_governance_reconfigure(payload: &TransactionPayload) -> Option<EntryFunctionCall> {
+    pub fn accudo_governance_reconfigure(
+        payload: &TransactionPayload,
+    ) -> Option<EntryFunctionCall> {
         if let TransactionPayload::EntryFunction(_script) = payload {
             Some(EntryFunctionCall::AccudoGovernanceReconfigure {})
         } else {

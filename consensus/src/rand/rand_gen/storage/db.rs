@@ -14,9 +14,9 @@ use crate::{
         types::{AugData, AugDataId, CertifiedAugData, TAugmentedData},
     },
 };
-use anyhow::Result;
 use accudo_logger::info;
 use accudo_schemadb::{batch::SchemaBatch, schema::Schema, Options, DB};
+use anyhow::Result;
 use std::{path::Path, sync::Arc, time::Instant};
 
 pub struct RandDb {

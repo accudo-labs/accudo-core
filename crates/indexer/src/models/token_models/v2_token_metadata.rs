@@ -11,8 +11,8 @@ use crate::{
     schema::current_token_v2_metadata,
     util::{standardize_address, truncate_str},
 };
-use anyhow::Context;
 use accudo_api_types::WriteResource;
+use anyhow::Context;
 use field_count::FieldCount;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;

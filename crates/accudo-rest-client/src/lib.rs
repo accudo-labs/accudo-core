@@ -17,7 +17,6 @@ pub mod types;
 
 pub use crate::client_builder::{AccudoBaseUrl, ClientBuilder};
 use crate::{accudo::AccudoVersion, error::RestError};
-use anyhow::{anyhow, Result};
 pub use accudo_api_types::{
     self, IndexResponseBcs, MoveModuleBytecode, PendingTransaction, Transaction,
 };
@@ -41,6 +40,7 @@ use accudo_types::{
         SignedTransaction, Version,
     },
 };
+use anyhow::{anyhow, Result};
 use move_core_types::{
     ident_str,
     language_storage::{ModuleId, StructTag, TypeTag},

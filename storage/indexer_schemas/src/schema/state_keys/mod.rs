@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{schema::STATE_KEYS_CF_NAME, utils::ensure_slice_len_eq};
-use anyhow::Result;
 use accudo_schemadb::{
     define_pub_schema,
     schema::{KeyCodec, SeekKeyCodec, ValueCodec},
 };
 use accudo_types::state_store::state_key::{prefix::StateKeyPrefix, StateKey};
+use anyhow::Result;
 
 define_pub_schema!(StateKeysSchema, StateKey, (), STATE_KEYS_CF_NAME);
 

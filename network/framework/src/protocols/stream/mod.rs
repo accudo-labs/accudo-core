@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::protocols::wire::messaging::v1::{MultiplexMessage, NetworkMessage};
-use anyhow::{bail, ensure};
 use accudo_channels::Sender;
 use accudo_id_generator::{IdGenerator, U32IdGenerator};
+use anyhow::{bail, ensure};
 use futures_util::SinkExt;
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest_derive::Arbitrary;

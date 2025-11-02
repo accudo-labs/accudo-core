@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{HashReader, MerkleAccumulator, MerkleAccumulatorView};
-use anyhow::{ensure, format_err, Result};
 use accudo_crypto::hash::{HashValue, TestOnlyHasher, ACCUMULATOR_PLACEHOLDER_HASH};
 use accudo_types::proof::{definition::LeafCount, position::Position};
+use anyhow::{ensure, format_err, Result};
 use proptest::{collection::vec, prelude::*};
 use std::collections::HashMap;
 

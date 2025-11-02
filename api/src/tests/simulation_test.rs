@@ -163,7 +163,8 @@ async fn test_simulate_transaction_with_valid_signature(
         use_txn_payload_v2_format,
         use_orderless_transactions,
     );
-    let resp = simulate_accudo_transfer(&mut context, true, SMALL_TRANSFER_AMOUNT, 400, false).await;
+    let resp =
+        simulate_accudo_transfer(&mut context, true, SMALL_TRANSFER_AMOUNT, 400, false).await;
     context.check_golden_output(resp);
 }
 
@@ -210,7 +211,8 @@ async fn test_simulate_transaction_with_not_valid_signature(
         simulate_accudo_transfer_bcs(&mut context, false, SMALL_TRANSFER_AMOUNT, 200, true).await;
     assert!(resp[0]["success"].as_bool().is_some_and(|v| v));
 
-    let resp = simulate_accudo_transfer(&mut context, false, SMALL_TRANSFER_AMOUNT, 200, true).await;
+    let resp =
+        simulate_accudo_transfer(&mut context, false, SMALL_TRANSFER_AMOUNT, 200, true).await;
     assert!(resp[0]["success"].as_bool().is_some_and(|v| v));
 }
 
@@ -235,7 +237,8 @@ async fn test_simulate_transaction_with_insufficient_balance(
         simulate_accudo_transfer_bcs(&mut context, false, LARGE_TRANSFER_AMOUNT, 200, true).await;
     assert!(!resp[0]["success"].as_bool().is_some_and(|v| v));
 
-    let resp = simulate_accudo_transfer(&mut context, false, LARGE_TRANSFER_AMOUNT, 200, true).await;
+    let resp =
+        simulate_accudo_transfer(&mut context, false, LARGE_TRANSFER_AMOUNT, 200, true).await;
     assert!(!resp[0]["success"].as_bool().is_some_and(|v| v));
 }
 

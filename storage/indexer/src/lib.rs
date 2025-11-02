@@ -20,7 +20,7 @@ use accudo_db_indexer_schemas::{
     },
 };
 use accudo_logger::warn;
-use accudo_resource_viewer::{AnnotatedMoveValue, AccudoValueAnnotator};
+use accudo_resource_viewer::{AccudoValueAnnotator, AnnotatedMoveValue};
 use accudo_rocksdb_options::gen_rocksdb_options;
 use accudo_schemadb::{batch::SchemaBatch, DB};
 use accudo_storage_interface::{

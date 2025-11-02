@@ -1,9 +1,9 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{Context, Result};
 #[cfg(target_os = "linux")]
 use accudo_system_utils::profiling::start_cpu_profiling;
+use anyhow::{Context, Result};
 use backtrace::Backtrace;
 use clap::Parser;
 use figment::{

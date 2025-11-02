@@ -11,7 +11,6 @@ use crate::{
     },
     helpers::extract_network_address,
 };
-use anyhow::{Context, Result};
 use accudo_logger::info;
 use accudo_sdk::{
     rest_client::Client as AccudoClient,
@@ -20,6 +19,7 @@ use accudo_sdk::{
         on_chain_config::ValidatorSet, validator_info::ValidatorInfo,
     },
 };
+use anyhow::{Context, Result};
 use clap::Parser;
 use reqwest::Url;
 use std::collections::HashMap;

@@ -4,8 +4,8 @@
 use crate::compression_util::{
     FileEntry, FileStoreMetadata, StorageFormat, FILE_ENTRY_TRANSACTION_COUNT,
 };
-use anyhow::{Context, Result};
 use accudo_protos::transaction::v1::Transaction;
+use anyhow::{Context, Result};
 
 pub mod gcs;
 pub use gcs::*;

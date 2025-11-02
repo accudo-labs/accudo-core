@@ -6,8 +6,8 @@ use super::{
     build::build_baseline_configuration_runners,
     common::ServerArgs,
 };
-use anyhow::{Context, Result};
 use accudo_logger::info;
+use anyhow::{Context, Result};
 use clap::Parser;
 use poem::{http::Method, listener::TcpListener, middleware::Cors, EndpointExt, Route, Server};
 use std::path::PathBuf;

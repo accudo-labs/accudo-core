@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{counters, network::NetworkSender, network_interface::ConsensusMsg};
-use anyhow::bail;
 use accudo_consensus_types::{
     common::Author,
     pipeline::{commit_decision::CommitDecision, commit_vote::CommitVote},
@@ -10,6 +9,7 @@ use accudo_consensus_types::{
 use accudo_infallible::Mutex;
 use accudo_reliable_broadcast::{BroadcastStatus, RBMessage, RBNetworkSender};
 use accudo_types::{validator_verifier::ValidatorVerifier, PeerId};
+use anyhow::bail;
 use async_trait::async_trait;
 use bytes::Bytes;
 use serde::{Deserialize, Serialize};

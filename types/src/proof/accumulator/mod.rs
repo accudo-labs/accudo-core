@@ -19,7 +19,6 @@ pub mod mock;
 
 use super::MerkleTreeInternalNode;
 use crate::proof::definition::{LeafCount, MAX_ACCUMULATOR_LEAVES};
-use anyhow::{ensure, format_err, Result};
 use accudo_crypto::{
     hash::{
         CryptoHash, CryptoHasher, EventAccumulatorHasher, TransactionAccumulatorHasher,
@@ -27,6 +26,7 @@ use accudo_crypto::{
     },
     HashValue,
 };
+use anyhow::{ensure, format_err, Result};
 use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
 

@@ -7,7 +7,6 @@ use crate::{
     network::IncomingRpcRequest,
     DKGMessage,
 };
-use anyhow::{anyhow, bail, ensure, Result};
 use accudo_channels::{accudo_channel, message_queues::QueueStyle};
 use accudo_crypto::Uniform;
 use accudo_infallible::duration_since_epoch;
@@ -21,6 +20,7 @@ use accudo_types::{
     validator_txn::{Topic, ValidatorTransaction},
 };
 use accudo_validator_transaction_pool::{TxnGuard, VTxnPoolState};
+use anyhow::{anyhow, bail, ensure, Result};
 use fail::fail_point;
 use futures_channel::oneshot;
 use futures_util::{future::AbortHandle, FutureExt, StreamExt};

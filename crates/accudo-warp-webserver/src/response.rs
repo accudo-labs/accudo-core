@@ -2,13 +2,13 @@
 // Parts of the project are originally copyright © Meta Platforms, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_api_types::{
     mime_types::{BCS, JSON},
     LedgerInfo, X_ACCUDO_BLOCK_HEIGHT, X_ACCUDO_CHAIN_ID, X_ACCUDO_EPOCH,
     X_ACCUDO_LEDGER_OLDEST_VERSION, X_ACCUDO_LEDGER_TIMESTAMP, X_ACCUDO_LEDGER_VERSION,
     X_ACCUDO_OLDEST_BLOCK_HEIGHT,
 };
+use anyhow::Result;
 use hyper::{header::CONTENT_TYPE, http::HeaderValue};
 use serde::Serialize;
 
@@ -60,7 +60,10 @@ impl warp::Reply for Response {
             self.ledger_info.ledger_timestamp.0.into(),
         );
         headers.insert(X_ACCUDO_EPOCH, self.ledger_info.epoch.0.into());
-        headers.insert(X_ACCUDO_BLOCK_HEIGHT, self.ledger_info.block_height.0.into());
+        headers.insert(
+            X_ACCUDO_BLOCK_HEIGHT,
+            self.ledger_info.block_height.0.into(),
+        );
         headers.insert(
             X_ACCUDO_OLDEST_BLOCK_HEIGHT,
             self.ledger_info.oldest_block_height.0.into(),

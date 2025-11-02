@@ -1,7 +1,6 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::anyhow;
 use accudo_config::config::{NodeConfig, DEFAULT_EXECUTION_CONCURRENCY_LEVEL};
 #[cfg(unix)]
 use accudo_logger::prelude::*;
@@ -13,6 +12,7 @@ use accudo_types::{
 };
 use accudo_vm::AccudoVM;
 use accudo_vm_environment::prod_configs::{set_layout_caches, set_paranoid_type_checks};
+use anyhow::anyhow;
 
 /// Error message to display when non-production features are enabled
 pub const ERROR_MSG_BAD_FEATURE_FLAGS: &str = r#"

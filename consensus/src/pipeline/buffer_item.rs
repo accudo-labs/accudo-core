@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{counters, pipeline::hashable::Hashable};
-use anyhow::anyhow;
 use accudo_consensus_types::{
     common::{Author, Round},
     pipeline::commit_vote::CommitVote,
@@ -18,6 +17,7 @@ use accudo_types::{
     ledger_info::{LedgerInfo, LedgerInfoWithSignatures, SignatureAggregator},
     validator_verifier::ValidatorVerifier,
 };
+use anyhow::anyhow;
 use futures::future::BoxFuture;
 use itertools::zip_eq;
 use std::{collections::HashMap, sync::Arc};

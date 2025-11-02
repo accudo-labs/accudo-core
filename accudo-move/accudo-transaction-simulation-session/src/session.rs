@@ -6,8 +6,7 @@ use crate::{
     delta::{load_delta, save_delta},
     txn_output::{save_events, save_write_set},
 };
-use anyhow::Result;
-use accudo_resource_viewer::{AnnotatedMoveValue, AccudoValueAnnotator};
+use accudo_resource_viewer::{AccudoValueAnnotator, AnnotatedMoveValue};
 use accudo_rest_client::{AccudoBaseUrl, Client};
 use accudo_transaction_simulation::{
     DeltaStateStore, EitherStateView, EmptyStateView, SimulationStateStore, GENESIS_CHANGE_SET_HEAD,
@@ -27,6 +26,7 @@ use accudo_vm::{data_cache::AsMoveResolver, AccudoVM};
 use accudo_vm_environment::environment::AccudoEnvironment;
 use accudo_vm_logging::log_schema::AdapterLogSchema;
 use accudo_vm_types::module_and_script_storage::AsAccudoCodeStorage;
+use anyhow::Result;
 use move_core_types::{
     identifier::Identifier,
     language_storage::{ModuleId, StructTag, TypeTag},

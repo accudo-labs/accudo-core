@@ -6,7 +6,6 @@ use crate::{
     keys::{generate_key_objects, PrivateIdentity, PublicIdentity},
     GenesisInfo,
 };
-use anyhow::ensure;
 use accudo_config::{
     config::{
         DiscoveryMethod, Identity, IdentityBlob, InitialSafetyRulesConfig, NetworkConfig,
@@ -37,6 +36,7 @@ use accudo_types::{
     waypoint::Waypoint,
 };
 use accudo_vm_genesis::default_gas_schedule;
+use anyhow::ensure;
 use rand::Rng;
 use serde::{de::DeserializeOwned, Serialize};
 use std::{

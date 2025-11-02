@@ -6,8 +6,8 @@ use crate::{
     file_lock::FileLock,
     listener::{EmptyPackageCacheListener, PackageCacheListener},
 };
-use anyhow::{anyhow, bail, Result};
 use accudo_framework::natives::code::PackageRegistry;
+use anyhow::{anyhow, bail, Result};
 use futures::future;
 use git2::{
     build::RepoBuilder, FetchOptions, ObjectType, Oid, RemoteCallbacks, Repository, TreeWalkResult,

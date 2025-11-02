@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::config::IndexerGrpcGatewayConfig;
-use anyhow::Context;
 use accudo_protos::indexer::v1::{
     grpc_manager_client::GrpcManagerClient, GetDataServiceForRequestRequest,
     GetDataServiceForRequestResponse, GetTransactionsRequest,
 };
+use anyhow::Context;
 use axum::{
     extract::{Request, State},
     http::{StatusCode, Uri},

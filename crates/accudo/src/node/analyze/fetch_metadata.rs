@@ -1,12 +1,12 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{anyhow, Result};
 use accudo_rest_client::{
     accudo_api_types::{IdentifierWrapper, MoveResource, WriteSetChange},
     Client as RestClient, Transaction, VersionedNewBlockEvent,
 };
 use accudo_types::account_address::AccountAddress;
+use anyhow::{anyhow, Result};
 use std::str::FromStr;
 
 const MAX_FETCH_BATCH_SIZE: u16 = 1000;

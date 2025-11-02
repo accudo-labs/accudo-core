@@ -91,7 +91,8 @@ fn enable_prometheus_node_metrics() -> bool {
 #[inline]
 fn enable_push_logs() -> bool {
     force_enable_telemetry()
-        || !(telemetry_is_disabled() || is_env_variable_true(ENV_ACCUDO_DISABLE_TELEMETRY_PUSH_LOGS))
+        || !(telemetry_is_disabled()
+            || is_env_variable_true(ENV_ACCUDO_DISABLE_TELEMETRY_PUSH_LOGS))
 }
 
 /// Flag to control enabling/disabling telemetry push events

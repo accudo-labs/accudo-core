@@ -14,8 +14,8 @@ use crate::{
         telemetry::{BigQueryRow, TelemetryDump},
     },
 };
-use anyhow::anyhow;
 use accudo_types::PeerId;
+use anyhow::anyhow;
 use gcp_bigquery_client::model::table_data_insert_all_request::TableDataInsertAllRequest;
 use serde_json::json;
 use std::{str::FromStr, time::Duration};

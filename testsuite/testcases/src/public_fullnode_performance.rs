@@ -6,7 +6,6 @@ use crate::{
     multi_region_network_test::create_multi_region_swarm_network_chaos, LoadDestination,
     NetworkLoadTest,
 };
-use anyhow::Error;
 use accudo_config::config::{NodeConfig, OverrideNodeConfig};
 use accudo_forge::{
     NetworkContext, NetworkContextSynchronizer, NetworkTest, OverrideNodeConfigFn, Result, Swarm,
@@ -14,6 +13,7 @@ use accudo_forge::{
 };
 use accudo_sdk::move_types::account_address::AccountAddress;
 use accudo_types::PeerId;
+use anyhow::Error;
 use async_trait::async_trait;
 use itertools::{EitherOrBoth, Itertools};
 use log::info;

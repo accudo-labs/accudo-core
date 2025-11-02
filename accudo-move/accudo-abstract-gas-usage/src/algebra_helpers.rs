@@ -1,8 +1,8 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{bail, Result};
 use accudo_gas_algebra::DynamicExpression;
+use anyhow::{bail, Result};
 use std::collections::{
     btree_map::Entry::{Occupied, Vacant},
     BTreeMap,

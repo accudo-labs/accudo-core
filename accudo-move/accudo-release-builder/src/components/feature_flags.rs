@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{components::get_signer_arg, utils::*};
-use anyhow::Result;
 use accudo_crypto::HashValue;
 use accudo_types::on_chain_config::{FeatureFlag as AccudoFeatureFlag, Features as AccudoFeatures};
+use anyhow::Result;
 use move_model::{code_writer::CodeWriter, emit, emitln, model::Loc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -287,7 +287,9 @@ impl From<FeatureFlag> for AccudoFeatureFlag {
             },
             FeatureFlag::SaferResourceGroups => AccudoFeatureFlag::SAFER_RESOURCE_GROUPS,
             FeatureFlag::SaferMetadata => AccudoFeatureFlag::SAFER_METADATA,
-            FeatureFlag::SingleSenderAuthenticator => AccudoFeatureFlag::SINGLE_SENDER_AUTHENTICATOR,
+            FeatureFlag::SingleSenderAuthenticator => {
+                AccudoFeatureFlag::SINGLE_SENDER_AUTHENTICATOR
+            },
             FeatureFlag::SponsoredAutomaticAccountCreation => {
                 AccudoFeatureFlag::SPONSORED_AUTOMATIC_ACCOUNT_V1_CREATION
             },
@@ -297,7 +299,9 @@ impl From<FeatureFlag> for AccudoFeatureFlag {
             },
             FeatureFlag::ConcurrentTokenV2 => AccudoFeatureFlag::CONCURRENT_TOKEN_V2,
             FeatureFlag::LimitMaxIdentifierLength => AccudoFeatureFlag::LIMIT_MAX_IDENTIFIER_LENGTH,
-            FeatureFlag::OperatorBeneficiaryChange => AccudoFeatureFlag::OPERATOR_BENEFICIARY_CHANGE,
+            FeatureFlag::OperatorBeneficiaryChange => {
+                AccudoFeatureFlag::OPERATOR_BENEFICIARY_CHANGE
+            },
             FeatureFlag::ResourceGroupsSplitInVmChangeSet => {
                 AccudoFeatureFlag::RESOURCE_GROUPS_SPLIT_IN_VM_CHANGE_SET
             },
@@ -338,7 +342,9 @@ impl From<FeatureFlag> for AccudoFeatureFlag {
             FeatureFlag::ObjectNativeDerivedAddress => {
                 AccudoFeatureFlag::OBJECT_NATIVE_DERIVED_ADDRESS
             },
-            FeatureFlag::DispatchableFungibleAsset => AccudoFeatureFlag::DISPATCHABLE_FUNGIBLE_ASSET,
+            FeatureFlag::DispatchableFungibleAsset => {
+                AccudoFeatureFlag::DISPATCHABLE_FUNGIBLE_ASSET
+            },
             FeatureFlag::NewAccountsDefaultToFaAptStore => {
                 AccudoFeatureFlag::NEW_ACCOUNTS_DEFAULT_TO_FA_APT_STORE
             },
@@ -348,7 +354,9 @@ impl From<FeatureFlag> for AccudoFeatureFlag {
             FeatureFlag::AggregatorV2IsAtLeastApi => {
                 AccudoFeatureFlag::AGGREGATOR_V2_IS_AT_LEAST_API
             },
-            FeatureFlag::ConcurrentFungibleBalance => AccudoFeatureFlag::CONCURRENT_FUNGIBLE_BALANCE,
+            FeatureFlag::ConcurrentFungibleBalance => {
+                AccudoFeatureFlag::CONCURRENT_FUNGIBLE_BALANCE
+            },
             FeatureFlag::DefaultToConcurrentFungibleBalance => {
                 AccudoFeatureFlag::DEFAULT_TO_CONCURRENT_FUNGIBLE_BALANCE
             },
@@ -469,7 +477,9 @@ impl From<AccudoFeatureFlag> for FeatureFlag {
             },
             AccudoFeatureFlag::SAFER_RESOURCE_GROUPS => FeatureFlag::SaferResourceGroups,
             AccudoFeatureFlag::SAFER_METADATA => FeatureFlag::SaferMetadata,
-            AccudoFeatureFlag::SINGLE_SENDER_AUTHENTICATOR => FeatureFlag::SingleSenderAuthenticator,
+            AccudoFeatureFlag::SINGLE_SENDER_AUTHENTICATOR => {
+                FeatureFlag::SingleSenderAuthenticator
+            },
             AccudoFeatureFlag::SPONSORED_AUTOMATIC_ACCOUNT_V1_CREATION => {
                 FeatureFlag::SponsoredAutomaticAccountCreation
             },
@@ -479,7 +489,9 @@ impl From<AccudoFeatureFlag> for FeatureFlag {
             },
             AccudoFeatureFlag::CONCURRENT_TOKEN_V2 => FeatureFlag::ConcurrentTokenV2,
             AccudoFeatureFlag::LIMIT_MAX_IDENTIFIER_LENGTH => FeatureFlag::LimitMaxIdentifierLength,
-            AccudoFeatureFlag::OPERATOR_BENEFICIARY_CHANGE => FeatureFlag::OperatorBeneficiaryChange,
+            AccudoFeatureFlag::OPERATOR_BENEFICIARY_CHANGE => {
+                FeatureFlag::OperatorBeneficiaryChange
+            },
             AccudoFeatureFlag::RESOURCE_GROUPS_SPLIT_IN_VM_CHANGE_SET => {
                 FeatureFlag::ResourceGroupsSplitInVmChangeSet
             },
@@ -520,7 +532,9 @@ impl From<AccudoFeatureFlag> for FeatureFlag {
             AccudoFeatureFlag::OBJECT_NATIVE_DERIVED_ADDRESS => {
                 FeatureFlag::ObjectNativeDerivedAddress
             },
-            AccudoFeatureFlag::DISPATCHABLE_FUNGIBLE_ASSET => FeatureFlag::DispatchableFungibleAsset,
+            AccudoFeatureFlag::DISPATCHABLE_FUNGIBLE_ASSET => {
+                FeatureFlag::DispatchableFungibleAsset
+            },
             AccudoFeatureFlag::NEW_ACCOUNTS_DEFAULT_TO_FA_APT_STORE => {
                 FeatureFlag::NewAccountsDefaultToFaAptStore
             },
@@ -530,7 +544,9 @@ impl From<AccudoFeatureFlag> for FeatureFlag {
             AccudoFeatureFlag::AGGREGATOR_V2_IS_AT_LEAST_API => {
                 FeatureFlag::AggregatorV2IsAtLeastApi
             },
-            AccudoFeatureFlag::CONCURRENT_FUNGIBLE_BALANCE => FeatureFlag::ConcurrentFungibleBalance,
+            AccudoFeatureFlag::CONCURRENT_FUNGIBLE_BALANCE => {
+                FeatureFlag::ConcurrentFungibleBalance
+            },
             AccudoFeatureFlag::DEFAULT_TO_CONCURRENT_FUNGIBLE_BALANCE => {
                 FeatureFlag::DefaultToConcurrentFungibleBalance
             },

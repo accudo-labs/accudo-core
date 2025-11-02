@@ -12,7 +12,6 @@ use crate::{
     funder::common::update_sequence_numbers,
     middleware::TRANSFER_FUNDER_ACCOUNT_BALANCE,
 };
-use anyhow::{Context, Result};
 use accudo_logger::info;
 use accudo_sdk::{
     crypto::{ed25519::Ed25519PrivateKey, PrivateKey},
@@ -25,6 +24,7 @@ use accudo_sdk::{
         LocalAccount,
     },
 };
+use anyhow::{Context, Result};
 use async_trait::async_trait;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};

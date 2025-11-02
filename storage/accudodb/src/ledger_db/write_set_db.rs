@@ -95,7 +95,10 @@ impl WriteSetDb {
         let mut ret = Vec::with_capacity((end_version - begin_version) as usize);
         for current_version in begin_version..end_version {
             let (version, write_set) = iter.next().transpose()?.ok_or_else(|| {
-                AccudoDbError::NotFound(format!("Write set missing for version {}", current_version))
+                AccudoDbError::NotFound(format!(
+                    "Write set missing for version {}",
+                    current_version
+                ))
             })?;
             ensure!(
                 version == current_version,

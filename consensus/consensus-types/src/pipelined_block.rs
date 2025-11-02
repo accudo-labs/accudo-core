@@ -11,7 +11,6 @@ use crate::{
     vote_proposal::VoteProposal,
     wrapped_ledger_info::WrappedLedgerInfo,
 };
-use anyhow::Error;
 use accudo_crypto::hash::{HashValue, ACCUMULATOR_PLACEHOLDER_HASH};
 use accudo_executor_types::{
     state_compute_result::StateComputeResult, ExecutorError, ExecutorResult,
@@ -29,6 +28,7 @@ use accudo_types::{
     },
     validator_txn::ValidatorTransaction,
 };
+use anyhow::Error;
 use derivative::Derivative;
 use futures::future::{join5, BoxFuture, Shared};
 use once_cell::sync::OnceCell;

@@ -6,8 +6,8 @@ use super::{
     traits::{Provider, ProviderError},
     CommonProviderConfig,
 };
-use anyhow::Result;
 use accudo_rest_client::{accudo_api_types::IndexResponse, Client};
+use anyhow::Result;
 use async_trait::async_trait;
 use futures::TryFutureExt;
 use serde::{Deserialize, Serialize};

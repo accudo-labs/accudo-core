@@ -12,8 +12,8 @@ pub use self::{
 };
 use self::{fake::FakeFunderConfig, transfer::TransferFunderConfig};
 use crate::endpoints::AccudoTapError;
-use anyhow::{Context, Result};
 use accudo_sdk::types::{account_address::AccountAddress, transaction::SignedTransaction};
+use anyhow::{Context, Result};
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 pub use fake::FakeFunder;

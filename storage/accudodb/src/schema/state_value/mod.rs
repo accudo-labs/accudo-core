@@ -15,7 +15,6 @@
 //! ```
 
 use crate::schema::{ensure_slice_len_gt, STATE_VALUE_CF_NAME};
-use anyhow::Result;
 use accudo_schemadb::{
     define_schema,
     schema::{KeyCodec, SeekKeyCodec, ValueCodec},
@@ -27,6 +26,7 @@ use accudo_types::{
     },
     transaction::Version,
 };
+use anyhow::Result;
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use std::{io::Write, mem::size_of};
 

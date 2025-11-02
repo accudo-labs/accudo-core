@@ -228,10 +228,9 @@ impl CheckerTrait for RedisRatelimitChecker {
         data: CheckerData,
         dry_run: bool,
     ) -> Result<Vec<RejectionReason>, AccudoTapError> {
-        let mut conn = self
-            .get_redis_connection()
-            .await
-            .map_err(|e| AccudoTapError::new_with_error_code(e, AccudoTapErrorCode::StorageError))?;
+        let mut conn = self.get_redis_connection().await.map_err(|e| {
+            AccudoTapError::new_with_error_code(e, AccudoTapErrorCode::StorageError)
+        })?;
 
         // Generate a key corresponding to this identifier and the current day.
         let key_prefix = self.ratelimit_key_provider.ratelimit_key_prefix();
@@ -310,10 +309,9 @@ impl CheckerTrait for RedisRatelimitChecker {
             return Ok(());
         }
 
-        let mut conn = self
-            .get_redis_connection()
-            .await
-            .map_err(|e| AccudoTapError::new_with_error_code(e, AccudoTapErrorCode::StorageError))?;
+        let mut conn = self.get_redis_connection().await.map_err(|e| {
+            AccudoTapError::new_with_error_code(e, AccudoTapErrorCode::StorageError)
+        })?;
 
         // Generate a key corresponding to this identifier and the current day. In the
         // JWT case we re-verify the JWT. This is inefficient, but these failures are

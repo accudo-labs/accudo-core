@@ -1,9 +1,9 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{ensure, Context, Result};
 use accudo_indexer_grpc_utils::compression_util::{FileEntry, StorageFormat};
 use accudo_metrics_core::{register_int_counter, IntCounter};
+use anyhow::{ensure, Context, Result};
 use cloud_storage::Client;
 use once_cell::sync::Lazy;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};

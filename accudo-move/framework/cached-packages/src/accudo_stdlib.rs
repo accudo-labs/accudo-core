@@ -4,7 +4,8 @@
 #![allow(unused_imports)]
 
 pub use crate::{
-    accudo_framework_sdk_builder::*, accudo_token_objects_sdk_builder as accudo_token_objects_stdlib,
+    accudo_framework_sdk_builder::*,
+    accudo_token_objects_sdk_builder as accudo_token_objects_stdlib,
     accudo_token_sdk_builder as accudo_token_stdlib,
 };
 use accudo_framework::{BuildOptions, BuiltPackage};

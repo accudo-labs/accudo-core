@@ -361,9 +361,11 @@ impl CliCommand<TransactionSummary> for ExecuteReject {
 
     async fn execute(self) -> CliTypedResult<TransactionSummary> {
         self.txn_options
-            .submit_transaction(accudo_stdlib::multisig_account_execute_rejected_transaction(
-                self.multisig_account.multisig_address,
-            ))
+            .submit_transaction(
+                accudo_stdlib::multisig_account_execute_rejected_transaction(
+                    self.multisig_account.multisig_address,
+                ),
+            )
             .await
             .map(|inner| inner.into())
     }

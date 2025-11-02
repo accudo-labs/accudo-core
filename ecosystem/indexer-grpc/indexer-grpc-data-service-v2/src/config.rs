@@ -7,7 +7,6 @@ use crate::{
     live_data_service::LiveDataService,
     service::{DataServiceWrapper, DataServiceWrapperWrapper},
 };
-use anyhow::Result;
 use accudo_indexer_grpc_server_framework::RunnableConfig;
 use accudo_indexer_grpc_utils::config::IndexerGrpcFileStoreConfig;
 use accudo_protos::{
@@ -15,6 +14,7 @@ use accudo_protos::{
     transaction::v1::FILE_DESCRIPTOR_SET as TRANSACTION_V1_TESTING_FILE_DESCRIPTOR_SET,
     util::timestamp::FILE_DESCRIPTOR_SET as UTIL_TIMESTAMP_FILE_DESCRIPTOR_SET,
 };
+use anyhow::Result;
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use std::{net::SocketAddr, sync::Arc};

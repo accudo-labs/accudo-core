@@ -19,7 +19,6 @@ use crate::{
     thread_pool::{IO_POOL, VALIDATION_POOL},
     QuorumStoreRequest, QuorumStoreResponse, SubmissionStatus,
 };
-use anyhow::Result;
 use accudo_config::{config::TransactionFilterConfig, network_id::PeerNetworkId};
 use accudo_consensus_types::common::RejectedTransactionSummary;
 use accudo_crypto::HashValue;
@@ -37,6 +36,7 @@ use accudo_types::{
     vm_status::{DiscardedVMStatus, StatusCode},
 };
 use accudo_vm_validator::vm_validator::{get_account_sequence_number, TransactionValidation};
+use anyhow::Result;
 use futures::{channel::oneshot, stream::FuturesUnordered};
 use rayon::prelude::*;
 use std::{

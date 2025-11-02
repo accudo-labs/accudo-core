@@ -19,7 +19,6 @@ use crate::{
     vm_status::{DiscardedVMStatus, KeptVMStatus, StatusCode, StatusType, VMStatus},
     write_set::{HotStateOp, WriteSet},
 };
-use anyhow::{ensure, format_err, Context, Error, Result};
 use accudo_crypto::{
     ed25519::*,
     hash::CryptoHash,
@@ -29,6 +28,7 @@ use accudo_crypto::{
     CryptoMaterialError, HashValue,
 };
 use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher};
+use anyhow::{ensure, format_err, Context, Error, Result};
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest_derive::Arbitrary;
 use rand::Rng;

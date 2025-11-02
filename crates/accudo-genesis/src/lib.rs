@@ -179,6 +179,8 @@ impl GenesisInfo {
             None,
         )?;
         let db_rw = DbReaderWriter::new(accudodb);
-        accudo_executor::db_bootstrapper::generate_waypoint::<AccudoVMBlockExecutor>(&db_rw, genesis)
+        accudo_executor::db_bootstrapper::generate_waypoint::<AccudoVMBlockExecutor>(
+            &db_rw, genesis,
+        )
     }
 }

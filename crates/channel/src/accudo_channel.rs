@@ -9,9 +9,9 @@
 //! to be sent out from this channel.
 //! Internally, it uses the `PerKeyQueue` to store messages
 use crate::message_queues::{PerKeyQueue, QueueStyle};
-use anyhow::{ensure, Result};
 use accudo_infallible::{Mutex, NonZeroUsize};
 use accudo_metrics_core::IntCounterVec;
+use anyhow::{ensure, Result};
 use futures::{
     channel::oneshot,
     stream::{FusedStream, Stream},

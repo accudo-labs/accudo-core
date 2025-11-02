@@ -18,7 +18,6 @@ use crate::{
     metrics::{ACCUDO_JELLYFISH_INTERNAL_ENCODED_BYTES, ACCUDO_JELLYFISH_LEAF_ENCODED_BYTES},
     Key, TreeReader,
 };
-use anyhow::{ensure, Context, Result};
 use accudo_crypto::{
     hash::{CryptoHash, SPARSE_MERKLE_PLACEHOLDER_HASH},
     HashValue,
@@ -28,6 +27,7 @@ use accudo_types::{
     proof::{definition::NodeInProof, SparseMerkleInternalNode, SparseMerkleLeafNode},
     transaction::Version,
 };
+use anyhow::{ensure, Context, Result};
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::cast::FromPrimitive;

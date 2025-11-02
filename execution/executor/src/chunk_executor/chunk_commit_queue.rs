@@ -11,13 +11,13 @@ use crate::{
         executed_chunk::ExecutedChunk, partial_state_compute_result::PartialStateComputeResult,
     },
 };
-use anyhow::{anyhow, ensure, Result};
 use accudo_metrics_core::TimerHelper;
 use accudo_storage_interface::{
     state_store::{state::LedgerState, state_summary::LedgerStateSummary},
     DbReader, LedgerSummary,
 };
 use accudo_types::{proof::accumulator::InMemoryTransactionAccumulator, transaction::Version};
+use anyhow::{anyhow, ensure, Result};
 use std::{collections::VecDeque, sync::Arc};
 
 pub(crate) struct ChunkToUpdateLedger {

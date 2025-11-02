@@ -1,7 +1,6 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_backup_cli::{
     backup_types::{
         epoch_ending::restore::{EpochEndingRestoreController, EpochEndingRestoreOpt},
@@ -13,6 +12,7 @@ use accudo_backup_cli::{
     utils::GlobalRestoreOpt,
 };
 use accudo_executor_types::VerifyExecutionMode;
+use anyhow::Result;
 use clap::{Parser, Subcommand};
 
 /// Restore the database using either a one-time or continuous backup.

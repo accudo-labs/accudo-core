@@ -1,11 +1,11 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{bail, format_err, Result};
 use accudo_config::keys::ConfigKey;
 use accudo_crypto::{ed25519::Ed25519PrivateKey, encoding_type::EncodingType};
 use accudo_sdk::types::chain_id::ChainId;
 use accudo_transaction_generator_lib::AccountType;
+use anyhow::{bail, format_err, Result};
 use clap::{ArgGroup, Parser};
 use serde::{Deserialize, Serialize};
 use std::{

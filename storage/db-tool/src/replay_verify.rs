@@ -1,7 +1,6 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_backup_cli::{
     coordinators::replay_verify::{ReplayError, ReplayVerifyCoordinator},
     metadata::cache::MetadataCacheOpt,
@@ -16,6 +15,7 @@ use accudo_db::{get_restore_handler::GetRestoreHandler, AccudoDB};
 use accudo_executor_types::VerifyExecutionMode;
 use accudo_logger::info;
 use accudo_types::transaction::Version;
+use anyhow::Result;
 use clap::Parser;
 use std::{path::PathBuf, process, sync::Arc};
 

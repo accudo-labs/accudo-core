@@ -6,8 +6,8 @@ use crate::{
     counters::{log_grpc_step, IndexerGrpcStep},
     file_store_operator::{FileStoreOperator, METADATA_FILE_NAME},
 };
-use anyhow::bail;
 use accudo_protos::transaction::v1::Transaction;
+use anyhow::bail;
 use cloud_storage::{Bucket, Object};
 use std::{env, path::PathBuf};
 

@@ -11,10 +11,9 @@ use crate::{
         ForbiddenError, InternalError, NotFoundError, ServiceUnavailableError, StdApiError,
     },
 };
-use anyhow::{anyhow, bail, ensure, format_err, Context as AnyhowContext, Result};
 use accudo_api_types::{
-    transaction::ReplayProtector, AccudoErrorCode, AsConverter, BcsBlock, GasEstimation, LedgerInfo,
-    ResourceGroup, TransactionOnChainData, TransactionSummary,
+    transaction::ReplayProtector, AccudoErrorCode, AsConverter, BcsBlock, GasEstimation,
+    LedgerInfo, ResourceGroup, TransactionOnChainData, TransactionSummary,
 };
 use accudo_config::config::{GasEstimationConfig, NodeConfig, RoleType};
 use accudo_crypto::HashValue;
@@ -50,6 +49,7 @@ use accudo_types::{
         IndexedTransactionSummary, SignedTransaction, Transaction, TransactionWithProof, Version,
     },
 };
+use anyhow::{anyhow, bail, ensure, format_err, Context as AnyhowContext, Result};
 use futures::{channel::oneshot, SinkExt};
 use mini_moka::sync::Cache;
 use move_core_types::{
@@ -238,7 +238,9 @@ impl Context {
         self.db
             .get_first_viable_block()
             .context("Failed to retrieve oldest block information")
-            .map_err(|e| E::service_unavailable_with_code_no_info(e, AccudoErrorCode::InternalError))
+            .map_err(|e| {
+                E::service_unavailable_with_code_no_info(e, AccudoErrorCode::InternalError)
+            })
     }
 
     pub fn get_latest_storage_ledger_info<E: ServiceUnavailableError>(
@@ -325,7 +327,10 @@ impl Context {
                 if let Some(mut latest_version) = indexer_reader
                     .get_latest_internal_indexer_ledger_version()
                     .map_err(|err| {
-                        E::service_unavailable_with_code_no_info(err, AccudoErrorCode::InternalError)
+                        E::service_unavailable_with_code_no_info(
+                            err,
+                            AccudoErrorCode::InternalError,
+                        )
                     })?
                 {
                     // The internal indexer version can be ahead of the storage committed version since it syncs to db's latest synced version

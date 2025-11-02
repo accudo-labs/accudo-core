@@ -1,7 +1,6 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{anyhow, bail, ensure};
 use accudo_consensus_types::common::{Author, Round};
 use accudo_crypto::bls12381::Signature;
 use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher};
@@ -18,6 +17,7 @@ use accudo_types::{
     },
     validator_verifier::ValidatorVerifier,
 };
+use anyhow::{anyhow, bail, ensure};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use sha3::{Digest, Sha3_256};
 use std::{fmt::Debug, sync::Arc};

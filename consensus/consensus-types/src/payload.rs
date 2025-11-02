@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::proof_of_store::{BatchInfo, ProofOfStore};
-use anyhow::ensure;
 use accudo_types::{transaction::SignedTransaction, PeerId};
+use anyhow::ensure;
 use core::fmt;
 use serde::{Deserialize, Serialize};
 use std::{

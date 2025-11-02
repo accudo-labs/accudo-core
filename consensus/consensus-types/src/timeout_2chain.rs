@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{common::Author, quorum_cert::QuorumCert};
-use anyhow::ensure;
 use accudo_crypto::{bls12381, CryptoMaterialError};
 use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher};
 use accudo_types::{
@@ -13,6 +12,7 @@ use accudo_types::{
     validator_signer::ValidatorSigner,
     validator_verifier::{ValidatorVerifier, VerifyError},
 };
+use anyhow::ensure;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::{

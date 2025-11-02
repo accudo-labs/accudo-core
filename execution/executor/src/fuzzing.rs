@@ -3,11 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::block_executor::BlockExecutor;
-use anyhow::Result;
 use accudo_block_executor::txn_provider::default::DefaultTxnProvider;
 use accudo_crypto::{hash::SPARSE_MERKLE_PLACEHOLDER_HASH, HashValue};
 use accudo_executor_types::BlockExecutorTrait;
-use accudo_storage_interface::{chunk_to_commit::ChunkToCommit, DbReader, DbReaderWriter, DbWriter};
+use accudo_storage_interface::{
+    chunk_to_commit::ChunkToCommit, DbReader, DbReaderWriter, DbWriter,
+};
 use accudo_types::{
     block_executor::{
         config::BlockExecutorConfigFromOnchain, partitioner::PartitionedTransactions,
@@ -28,6 +29,7 @@ use accudo_vm::{
     sharded_block_executor::{executor_client::ExecutorClient, ShardedBlockExecutor},
     VMBlockExecutor,
 };
+use anyhow::Result;
 use std::sync::Arc;
 
 fn create_test_executor() -> BlockExecutor<FakeVM> {

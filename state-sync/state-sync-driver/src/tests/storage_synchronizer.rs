@@ -24,7 +24,6 @@ use crate::{
         },
     },
 };
-use anyhow::format_err;
 use accudo_config::config::StateSyncDriverConfig;
 use accudo_data_streaming_service::data_notification::NotificationId;
 use accudo_event_notifications::EventSubscriptionService;
@@ -37,6 +36,7 @@ use accudo_types::{
     ledger_info::LedgerInfoWithSignatures,
     transaction::{TransactionOutputListWithProofV2, Version},
 };
+use anyhow::format_err;
 use claims::assert_matches;
 use futures::StreamExt;
 use mockall::predicate::always;

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{generate_onchain_config_blob, NetworkLoadTest};
-use anyhow::Ok;
 use accudo::test::CliTestFramework;
 use accudo_forge::{NetworkContextSynchronizer, NetworkTest, NodeExt, SwarmExt, Test};
 use accudo_sdk::bcs;
@@ -13,6 +12,7 @@ use accudo_types::{
         DEFAULT_WINDOW_SIZE,
     },
 };
+use anyhow::Ok;
 use async_trait::async_trait;
 use log::info;
 use std::{sync::Arc, time::Duration};

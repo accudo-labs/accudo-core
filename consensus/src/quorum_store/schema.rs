@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::quorum_store::types::PersistedValue;
-use anyhow::Result;
 use accudo_crypto::HashValue;
 use accudo_schemadb::{
     schema::{KeyCodec, Schema, ValueCodec},
     ColumnFamilyName,
 };
 use accudo_types::quorum_store::BatchId;
+use anyhow::Result;
 
 pub(crate) const BATCH_CF_NAME: ColumnFamilyName = "batch";
 pub(crate) const BATCH_ID_CF_NAME: ColumnFamilyName = "batch_ID";

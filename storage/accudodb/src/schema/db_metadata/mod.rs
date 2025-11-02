@@ -10,13 +10,13 @@
 //!
 
 use crate::schema::DB_METADATA_CF_NAME;
-use anyhow::Result;
 use accudo_db_indexer_schemas::metadata::StateSnapshotProgress;
 use accudo_schemadb::{
     define_schema,
     schema::{KeyCodec, ValueCodec},
 };
 use accudo_types::transaction::Version;
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
 type ShardId = usize;

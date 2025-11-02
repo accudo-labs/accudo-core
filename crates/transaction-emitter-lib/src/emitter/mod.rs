@@ -16,12 +16,12 @@ use crate::emitter::{
     submission_worker::SubmissionWorker,
     transaction_executor::RestApiReliableTransactionSubmitter,
 };
-use again::RetryPolicy;
-use anyhow::{ensure, format_err, Result};
 use accudo_config::config::DEFAULT_MAX_SUBMIT_TRANSACTION_BATCH_SIZE;
 use accudo_crypto::{ed25519::Ed25519PrivateKey, HashValue};
 use accudo_logger::{sample, sample::SampleRate};
-use accudo_rest_client::{accudo_api_types::AccudoErrorCode, error::RestError, Client as RestClient};
+use accudo_rest_client::{
+    accudo_api_types::AccudoErrorCode, error::RestError, Client as RestClient,
+};
 use accudo_sdk::{
     move_types::account_address::AccountAddress,
     transaction_builder::{accudo_stdlib, TransactionFactory},
@@ -31,6 +31,8 @@ use accudo_transaction_generator_lib::{
     create_txn_generator_creator, AccountType, TransactionType, SEND_AMOUNT,
 };
 use accudo_types::account_config::accudo_test_root_address;
+use again::RetryPolicy;
+use anyhow::{ensure, format_err, Result};
 use futures::future::{join_all, try_join_all, FutureExt};
 use log::{error, info, warn};
 use once_cell::sync::Lazy;

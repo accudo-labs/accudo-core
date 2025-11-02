@@ -16,12 +16,12 @@ use crate::{
         TestFailure, TestName,
     },
 };
-use anyhow::{anyhow, Result};
 use accudo_api_types::U64;
 use accudo_logger::error;
 use accudo_rest_client::Client;
 use accudo_sdk::{coin_client::CoinClient, types::LocalAccount};
 use accudo_types::account_address::AccountAddress;
+use anyhow::{anyhow, Result};
 
 const TRANSFER_AMOUNT: u64 = 1_000;
 

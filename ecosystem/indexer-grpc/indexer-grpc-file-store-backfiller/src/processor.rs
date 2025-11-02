@@ -1,7 +1,6 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{ensure, Context, Result};
 use accudo_indexer_grpc_utils::{
     compression_util::StorageFormat, config::IndexerGrpcFileStoreConfig, create_grpc_client,
     file_store_operator::FileStoreOperator,
@@ -13,6 +12,7 @@ use accudo_protos::{
     },
     transaction::v1::Transaction,
 };
+use anyhow::{ensure, Context, Result};
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 use std::{

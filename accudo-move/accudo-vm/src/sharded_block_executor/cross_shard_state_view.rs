@@ -1,7 +1,6 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 use crate::sharded_block_executor::remote_state_value::RemoteStateValue;
-use anyhow::Result;
 use accudo_logger::trace;
 use accudo_types::{
     block_executor::partitioner::TransactionWithDependencies,
@@ -11,6 +10,7 @@ use accudo_types::{
     },
     transaction::analyzed_transaction::AnalyzedTransaction,
 };
+use anyhow::Result;
 use std::collections::{HashMap, HashSet};
 
 /// A state view for reading cross shard state values. It is backed by a state view

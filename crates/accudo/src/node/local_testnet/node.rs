@@ -3,9 +3,9 @@
 
 use super::{health_checker::HealthChecker, traits::ServiceManager, RunLocalnet};
 use crate::node::local_testnet::utils::socket_addr_to_url;
-use anyhow::{anyhow, Context, Result};
 use accudo_config::config::{NodeConfig, DEFAULT_GRPC_STREAM_PORT};
 use accudo_node::{load_node_config, start_test_environment_node};
+use anyhow::{anyhow, Context, Result};
 use async_trait::async_trait;
 use clap::Parser;
 use maplit::hashset;

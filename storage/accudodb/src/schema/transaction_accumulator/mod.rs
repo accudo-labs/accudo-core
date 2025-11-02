@@ -12,13 +12,13 @@
 //! ```
 
 use crate::schema::{ensure_slice_len_eq, TRANSACTION_ACCUMULATOR_CF_NAME};
-use anyhow::Result;
 use accudo_crypto::HashValue;
 use accudo_schemadb::{
     define_schema,
     schema::{KeyCodec, ValueCodec},
 };
 use accudo_types::proof::position::Position;
+use anyhow::Result;
 use byteorder::{BigEndian, ReadBytesExt};
 use std::mem::size_of;
 

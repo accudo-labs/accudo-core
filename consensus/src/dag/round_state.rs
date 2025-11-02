@@ -5,10 +5,10 @@ use crate::dag::{
     observability::tracing::{observe_round, RoundStage},
     types::NodeCertificate,
 };
-use anyhow::ensure;
 use accudo_consensus_types::common::Round;
 use accudo_infallible::{duration_since_epoch, Mutex};
 use accudo_types::epoch_state::EpochState;
+use anyhow::ensure;
 use std::{cmp::Ordering, sync::Arc, time::Duration};
 use tokio::task::JoinHandle;
 

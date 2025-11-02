@@ -1,7 +1,6 @@
 // Copyright (c) Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_crypto::HashValue;
 use accudo_experimental_layered_map::{LayeredMap, MapLayer};
 use accudo_schemadb::{
@@ -11,6 +10,7 @@ use accudo_schemadb::{
     DB, DEFAULT_COLUMN_FAMILY_NAME,
 };
 use accudo_temppath::TempPath;
+use anyhow::Result;
 use criterion::{
     criterion_group, criterion_main, measurement::WallTime, BatchSize, BenchmarkGroup, Criterion,
 };

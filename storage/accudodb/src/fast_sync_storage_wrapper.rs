@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::AccudoDB;
-use anyhow::anyhow;
 use accudo_config::config::{NodeConfig, StorageDirPaths};
 use accudo_crypto::HashValue;
 use accudo_db_indexer::db_indexer::InternalIndexerDB;
@@ -15,6 +14,7 @@ use accudo_types::{
     state_store::{state_key::StateKey, state_value::StateValue},
     transaction::{TransactionOutputListWithProofV2, Version},
 };
+use anyhow::anyhow;
 use either::Either;
 use std::{sync::Arc, time::Instant};
 use tokio::sync::watch::Sender;

@@ -21,7 +21,9 @@ use accudo_crypto::{
 };
 use accudo_infallible::Mutex;
 use accudo_keyless_pepper_common::{PepperRequest, PepperRequestV2, PepperRequestWithAudOverride};
-use accudo_types::{jwks::rsa::SECURE_TEST_RSA_JWK, transaction::authenticator::EphemeralPublicKey};
+use accudo_types::{
+    jwks::rsa::SECURE_TEST_RSA_JWK, transaction::authenticator::EphemeralPublicKey,
+};
 use hyper::{
     header::{
         ACCESS_CONTROL_ALLOW_HEADERS, ACCESS_CONTROL_ALLOW_METHODS, ACCESS_CONTROL_ALLOW_ORIGIN,

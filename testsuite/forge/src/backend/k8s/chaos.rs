@@ -5,8 +5,8 @@ use crate::{
     dump_string_to_file, K8sSwarm, Result, Swarm, SwarmChaos, SwarmCpuStress, SwarmNetEm,
     SwarmNetworkBandwidth, SwarmNetworkDelay, SwarmNetworkLoss, SwarmNetworkPartition, KUBECTL_BIN,
 };
-use anyhow::bail;
 use accudo_sdk::{move_types::account_address::AccountAddress, types::PeerId};
+use anyhow::bail;
 use log::info;
 use std::process::{Command, Stdio};
 use tempfile::TempDir;

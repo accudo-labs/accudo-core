@@ -32,7 +32,8 @@ pub fn start_jwk_consensus_runtime(
     vtxn_pool_writer: VTxnPoolState,
 ) -> Runtime {
     let runtime = accudo_runtimes::spawn_named_runtime("jwk".into(), Some(4));
-    let (self_sender, self_receiver) = accudo_channels::new(1_024, &counters::PENDING_SELF_MESSAGES);
+    let (self_sender, self_receiver) =
+        accudo_channels::new(1_024, &counters::PENDING_SELF_MESSAGES);
     let jwk_consensus_network_client = JWKConsensusNetworkClient::new(network_client);
     let epoch_manager = EpochManager::new(
         my_addr,

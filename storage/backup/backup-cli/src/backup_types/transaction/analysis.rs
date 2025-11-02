@@ -2,12 +2,12 @@
 // Parts of the project are originally copyright © Meta Platforms, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_types::{
     contract_event::ContractEvent,
     transaction::{PersistedAuxiliaryInfo, Transaction, TransactionInfo, Version},
     write_set::{TransactionWrite, WriteSet},
 };
+use anyhow::Result;
 use serde::Serialize;
 use std::{
     fs::{File, OpenOptions},

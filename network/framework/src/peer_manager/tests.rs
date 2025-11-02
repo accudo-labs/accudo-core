@@ -21,7 +21,6 @@ use crate::{
     transport::{Connection, ConnectionId, ConnectionMetadata},
     ProtocolId,
 };
-use anyhow::anyhow;
 use accudo_channels::{accudo_channel, message_queues::QueueStyle};
 use accudo_config::{
     config::{PeerRole, MAX_INBOUND_CONNECTIONS},
@@ -33,6 +32,7 @@ use accudo_netcore::transport::{
 };
 use accudo_time_service::TimeService;
 use accudo_types::{network_address::NetworkAddress, PeerId};
+use anyhow::anyhow;
 use bytes::Bytes;
 use futures::{channel::oneshot, io::AsyncWriteExt, stream::StreamExt};
 use std::error::Error;

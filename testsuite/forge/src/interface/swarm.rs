@@ -5,13 +5,13 @@
 use crate::{
     AccudoPublicInfo, ChainInfo, FullNode, NodeExt, Result, SwarmChaos, Validator, Version,
 };
-use anyhow::{anyhow, bail};
 use accudo_config::{
     config::{NodeConfig, OverrideNodeConfig},
     network_id::NetworkId,
 };
 use accudo_rest_client::Client as RestClient;
 use accudo_sdk::types::PeerId;
+use anyhow::{anyhow, bail};
 use futures::future::{join_all, try_join_all};
 use log::info;
 use prometheus_http_query::response::{PromqlResult, Sample};

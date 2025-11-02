@@ -1,10 +1,10 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{anyhow, bail, Context, Result};
 use accudo_crypto::x25519;
 use accudo_rest_client::Client as AccudoRestClient;
 use accudo_sdk::types::network_address::NetworkAddress;
+use anyhow::{anyhow, bail, Context, Result};
 use reqwest::cookie::Jar;
 use serde::{Deserialize, Serialize};
 use std::{sync::Arc, time::Duration};

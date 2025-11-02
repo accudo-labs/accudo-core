@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::NetworkLoadTest;
-use anyhow::Context;
 use accudo_forge::{NetworkContextSynchronizer, NetworkTest, NodeExt, Test};
 use accudo_sdk::move_types::account_address::AccountAddress;
+use anyhow::Context;
 use async_trait::async_trait;
 use std::{
     ops::DerefMut,

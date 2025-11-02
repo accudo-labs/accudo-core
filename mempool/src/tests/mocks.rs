@@ -8,7 +8,6 @@ use crate::{
     shared_mempool::start_shared_mempool,
     MempoolClientSender, QuorumStoreRequest,
 };
-use anyhow::{format_err, Result};
 use accudo_channels::{self, accudo_channel, message_queues::QueueStyle};
 use accudo_config::{
     config::{NetworkConfig, NodeConfig},
@@ -37,6 +36,7 @@ use accudo_types::{
 use accudo_vm_validator::{
     mocks::mock_vm_validator::MockVMValidator, vm_validator::TransactionValidation,
 };
+use anyhow::{format_err, Result};
 use futures::channel::mpsc;
 use maplit::hashmap;
 use std::{
@@ -121,7 +121,8 @@ impl MockSharedMempool {
         let mempool = Arc::new(Mutex::new(CoreMempool::new(&config)));
         let (network_reqs_tx, _network_reqs_rx) = accudo_channel::new(QueueStyle::FIFO, 8, None);
         let (connection_reqs_tx, _) = accudo_channel::new(QueueStyle::FIFO, 8, None);
-        let (_network_notifs_tx, network_notifs_rx) = accudo_channel::new(QueueStyle::FIFO, 8, None);
+        let (_network_notifs_tx, network_notifs_rx) =
+            accudo_channel::new(QueueStyle::FIFO, 8, None);
         let network_sender = NetworkSender::new(
             PeerManagerRequestSender::new(network_reqs_tx),
             ConnectionRequestSender::new(connection_reqs_tx),

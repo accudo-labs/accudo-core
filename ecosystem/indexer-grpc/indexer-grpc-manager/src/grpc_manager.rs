@@ -9,8 +9,8 @@ use crate::{
     metrics::IS_MASTER,
     service::GrpcManagerService,
 };
-use anyhow::Result;
 use accudo_protos::indexer::v1::grpc_manager_server::GrpcManagerServer;
+use anyhow::Result;
 use std::{sync::Arc, time::Duration};
 use tokio::sync::{oneshot::channel, Mutex};
 use tonic::{codec::CompressionEncoding, transport::Server};

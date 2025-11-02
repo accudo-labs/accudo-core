@@ -2,7 +2,6 @@
 // Parts of the project are originally copyright © Meta Platforms, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{ensure, format_err, Context, Result};
 use accudo_config::config::{
     RocksdbConfigs, StorageDirPaths, BUFFERED_STATE_TARGET_ITEMS,
     DEFAULT_MAX_NUM_NODES_PER_LRU_CACHE_SHARD, NO_OP_STORAGE_PRUNER_CONFIG,
@@ -12,6 +11,7 @@ use accudo_executor::db_bootstrapper::calculate_genesis;
 use accudo_storage_interface::DbReaderWriter;
 use accudo_types::{transaction::Transaction, waypoint::Waypoint};
 use accudo_vm::accudo_vm::AccudoVMBlockExecutor;
+use anyhow::{ensure, format_err, Context, Result};
 use clap::Parser;
 use std::{
     fs::File,

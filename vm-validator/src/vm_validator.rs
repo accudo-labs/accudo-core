@@ -2,7 +2,6 @@
 // Parts of the project are originally copyright © Meta Platforms, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_logger::{error, info};
 use accudo_storage_interface::{
     state_store::state_view::{
@@ -24,6 +23,7 @@ use accudo_types::{
 use accudo_vm::AccudoVM;
 use accudo_vm_environment::environment::AccudoEnvironment;
 use accudo_vm_logging::log_schema::AdapterLogSchema;
+use anyhow::Result;
 use fail::fail_point;
 use move_binary_format::{
     errors::{Location, PartialVMError, VMResult},
@@ -413,7 +413,9 @@ impl TransactionValidation for PooledVMValidator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use accudo_types::state_store::{state_slot::StateSlot, state_value::StateValue, MockStateView};
+    use accudo_types::state_store::{
+        state_slot::StateSlot, state_value::StateValue, MockStateView,
+    };
     use move_binary_format::file_format::empty_module_with_dependencies_and_friends;
     use move_core_types::ident_str;
     use move_vm_runtime::ModuleStorage;

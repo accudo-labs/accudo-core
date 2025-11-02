@@ -13,7 +13,6 @@ use crate::{
     rand::rand_gen::types::RandConfig,
     test_utils::mock_storage::MockStorage,
 };
-use anyhow::{anyhow, format_err, Result};
 use accudo_channels::accudo_channel;
 use accudo_consensus_types::{
     common::{Payload, Round},
@@ -32,6 +31,7 @@ use accudo_types::{
     transaction::SignedTransaction,
     validator_signer::ValidatorSigner,
 };
+use anyhow::{anyhow, format_err, Result};
 use futures::{channel::mpsc, SinkExt};
 use futures_channel::mpsc::UnboundedSender;
 use move_core_types::account_address::AccountAddress;

@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{BroadcastStatus, RBMessage, RBNetworkSender, ReliableBroadcast};
-use anyhow::bail;
 use accudo_bounded_executor::BoundedExecutor;
 use accudo_consensus_types::common::Author;
 use accudo_enum_conversion_derive::EnumConversion;
 use accudo_infallible::Mutex;
 use accudo_time_service::TimeService;
 use accudo_types::validator_verifier::random_validator_verifier;
+use anyhow::bail;
 use async_trait::async_trait;
 use bytes::Bytes;
 use claims::assert_ok_eq;

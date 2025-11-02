@@ -13,12 +13,12 @@ use crate::{
         types::{Batch, PersistedValue},
     },
 };
-use anyhow::ensure;
 use accudo_config::config::BatchTransactionFilterConfig;
 use accudo_consensus_types::payload::TDataInfo;
 use accudo_logger::prelude::*;
 use accudo_short_hex_str::AsShortHexStr;
 use accudo_types::PeerId;
+use anyhow::ensure;
 use std::sync::Arc;
 use tokio::sync::{
     mpsc::{Receiver, Sender},

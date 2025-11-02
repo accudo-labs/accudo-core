@@ -5,7 +5,6 @@ use crate::{
     accont_manager::{Account, AccountManager},
     config::{ScriptTransaction, ScriptTransactions},
 };
-use anyhow::Context;
 use accudo::{
     account::fund::FundWithFaucet,
     common::types::{CliCommand, MovePackageOptions, ScriptFunctionArguments, TransactionOptions},
@@ -16,6 +15,7 @@ use accudo_protos::{
     indexer::v1::{raw_data_client::RawDataClient, GetTransactionsRequest},
     transaction::v1::Transaction,
 };
+use anyhow::Context;
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},

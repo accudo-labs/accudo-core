@@ -8,7 +8,6 @@ use crate::{
     opt_block_data::OptBlockData,
     quorum_cert::QuorumCert,
 };
-use anyhow::{bail, ensure, format_err, Result};
 use accudo_bitvec::BitVec;
 use accudo_crypto::{bls12381, hash::CryptoHash, HashValue};
 use accudo_infallible::duration_since_epoch;
@@ -25,6 +24,7 @@ use accudo_types::{
     validator_txn::ValidatorTransaction,
     validator_verifier::ValidatorVerifier,
 };
+use anyhow::{bail, ensure, format_err, Result};
 use mirai_annotations::debug_checked_verify_eq;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::{

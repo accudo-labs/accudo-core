@@ -6,12 +6,12 @@ use crate::{
     common::{make_shared, ArcError},
     no_panic_println,
 };
-use anyhow::{anyhow, Context, Result};
 use accudo_indexer_processor_sdk::{
     accudo_indexer_transaction_stream::TransactionStreamConfig,
     postgres::utils::database::run_pending_migrations, server_framework::RunnableConfig,
 };
 use accudo_localnet::{health_checker::HealthChecker, processors::get_processor_config};
+use anyhow::{anyhow, Context, Result};
 use diesel::Connection;
 use diesel_async::{async_connection_wrapper::AsyncConnectionWrapper, pg::AsyncPgConnection};
 use futures::{future::try_join_all, stream::FuturesUnordered, StreamExt, TryFutureExt};

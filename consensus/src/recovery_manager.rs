@@ -12,7 +12,6 @@ use crate::{
     pipeline::execution_client::TExecutionClient,
     round_manager::VerifiedEvent,
 };
-use anyhow::{anyhow, ensure, Context, Result};
 use accudo_channels::accudo_channel;
 use accudo_consensus_types::{
     common::Author, proposal_msg::ProposalMsg, sync_info::SyncInfo, vote_msg::VoteMsg,
@@ -20,6 +19,7 @@ use accudo_consensus_types::{
 use accudo_infallible::Mutex;
 use accudo_logger::prelude::*;
 use accudo_types::{block_info::Round, epoch_state::EpochState};
+use anyhow::{anyhow, ensure, Context, Result};
 use futures::{FutureExt, StreamExt};
 use futures_channel::oneshot;
 use std::{mem::Discriminant, process, sync::Arc};

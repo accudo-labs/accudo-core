@@ -17,8 +17,8 @@ use crate::{
         deserialize_token_object_property_map_from_bcs_hexstring, standardize_address, truncate_str,
     },
 };
-use anyhow::{Context, Result};
 use accudo_api_types::{deserialize_from_string, Event, WriteResource};
+use anyhow::{Context, Result};
 use bigdecimal::BigDecimal;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -481,9 +481,8 @@ impl V2TokenResource {
             "0x4::collection::UnlimitedSupply" => {
                 serde_json::from_value(data.clone()).map(|inner| Some(Self::UnlimitedSupply(inner)))
             },
-            "0x4::accudo_token::AccudoCollection" => {
-                serde_json::from_value(data.clone()).map(|inner| Some(Self::AccudoCollection(inner)))
-            },
+            "0x4::accudo_token::AccudoCollection" => serde_json::from_value(data.clone())
+                .map(|inner| Some(Self::AccudoCollection(inner))),
             "0x4::token::Token" => {
                 serde_json::from_value(data.clone()).map(|inner| Some(Self::TokenV2(inner)))
             },

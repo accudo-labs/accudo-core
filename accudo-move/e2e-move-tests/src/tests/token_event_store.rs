@@ -45,8 +45,10 @@ fn test_token_creation_with_token_events_store() {
     );
 
     // mutate the token properties
-    let signed_txn =
-        h.create_transaction_payload(&acc, accudo_token_stdlib::token_opt_in_direct_transfer(true));
+    let signed_txn = h.create_transaction_payload(
+        &acc,
+        accudo_token_stdlib::token_opt_in_direct_transfer(true),
+    );
     let (_, mut events) = h.run_with_events(signed_txn);
     // First one is always the 0x1::transaction_fee::FeeStatement
     let _event = events.pop().unwrap();

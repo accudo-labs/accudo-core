@@ -12,12 +12,12 @@
 //! ```
 
 use crate::{schema::EVENT_BY_VERSION_CF_NAME, utils::ensure_slice_len_eq};
-use anyhow::Result;
 use accudo_schemadb::{
     define_pub_schema,
     schema::{KeyCodec, ValueCodec},
 };
 use accudo_types::{event::EventKey, transaction::Version};
+use anyhow::Result;
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use std::mem::size_of;
 

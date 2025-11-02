@@ -6,7 +6,6 @@ use crate::{
     consensusdb::ConsensusDB, epoch_manager::LivenessStorageData, error::DbError,
     util::calculate_window_start_round,
 };
-use anyhow::{bail, format_err, Context, Result};
 use accudo_config::config::NodeConfig;
 use accudo_consensus_types::{
     block::Block, quorum_cert::QuorumCert, timeout_2chain::TwoChainTimeoutCertificate, vote::Vote,
@@ -19,6 +18,7 @@ use accudo_types::{
     block_info::Round, epoch_change::EpochChangeProof, ledger_info::LedgerInfoWithSignatures,
     proof::TransactionAccumulatorSummary, transaction::Version,
 };
+use anyhow::{bail, format_err, Context, Result};
 use std::{
     cmp::max,
     collections::{HashMap, HashSet},

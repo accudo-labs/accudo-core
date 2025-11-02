@@ -21,6 +21,7 @@ pub mod executable;
 pub mod fee_statement;
 pub mod function_info;
 pub mod governance;
+pub mod hash_utils;
 pub mod indexer;
 pub mod jwks;
 pub mod ledger_info;

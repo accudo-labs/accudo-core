@@ -15,12 +15,12 @@ use crate::{
     state_kv_db::StateKvDb,
     state_merkle_db::StateMerkleDb,
 };
-use anyhow::Result;
 use accudo_infallible::Mutex;
 use accudo_logger::prelude::*;
 use accudo_metrics_core::TimerHelper;
 use accudo_schemadb::{ColumnFamilyName, DB};
 use accudo_types::state_store::NUM_STATE_SHARDS;
+use anyhow::Result;
 use once_cell::sync::Lazy;
 use std::{
     collections::HashMap,

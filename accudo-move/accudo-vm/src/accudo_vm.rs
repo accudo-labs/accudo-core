@@ -2961,12 +2961,15 @@ impl AccudoVMBlockExecutor {
         config: BlockExecutorConfig,
         transaction_slice_metadata: TransactionSliceMetadata,
     ) -> Result<BlockOutput<SignatureVerifiedTransaction, TransactionOutput>, VMStatus> {
-        fail_point!("accudo_vm_block_executor::execute_block_with_config", |_| {
-            Err(VMStatus::error(
-                StatusCode::UNKNOWN_INVARIANT_VIOLATION_ERROR,
-                None,
-            ))
-        });
+        fail_point!(
+            "accudo_vm_block_executor::execute_block_with_config",
+            |_| {
+                Err(VMStatus::error(
+                    StatusCode::UNKNOWN_INVARIANT_VIOLATION_ERROR,
+                    None,
+                ))
+            }
+        );
 
         let log_context = AdapterLogSchema::new(state_view.id(), 0);
         let num_txns = txn_provider.num_txns();

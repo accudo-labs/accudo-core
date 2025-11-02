@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{common::IP_LOCAL_HOST, no_panic_println};
-use anyhow::{bail, Result};
 use accudo_config::config::{NodeConfig, TableInfoServiceMode};
 use accudo_localnet::health_checker::HealthChecker;
 use accudo_node::{load_node_config, start_and_report_ports};
 use accudo_types::network_address::{NetworkAddress, Protocol};
+use anyhow::{bail, Result};
 use futures::channel::oneshot;
 use rand::{rngs::StdRng, SeedableRng};
 use std::{future::Future, path::Path, thread, time::Duration};

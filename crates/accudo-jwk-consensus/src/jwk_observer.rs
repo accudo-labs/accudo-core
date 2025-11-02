@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::counters::OBSERVATION_SECONDS;
-use anyhow::{anyhow, Result};
 use accudo_channels::accudo_channel;
 use accudo_jwk_utils::{fetch_jwks_from_jwks_uri, fetch_jwks_uri_from_openid_config};
 use accudo_logger::{debug, info};
 use accudo_types::jwks::{jwk::JWK, Issuer};
+use anyhow::{anyhow, Result};
 use futures::{FutureExt, StreamExt};
 use move_core_types::account_address::AccountAddress;
 use std::time::{Duration, Instant};

@@ -100,7 +100,10 @@ pub fn accudo_prod_deserializer_config(features: &Features) -> DeserializerConfi
 }
 
 /// Returns [VerifierConfig] used by the Accudo blockchain in production.
-pub fn accudo_prod_verifier_config(gas_feature_version: u64, features: &Features) -> VerifierConfig {
+pub fn accudo_prod_verifier_config(
+    gas_feature_version: u64,
+    features: &Features,
+) -> VerifierConfig {
     let sig_checker_v2_fix_script_ty_param_count =
         features.is_enabled(FeatureFlag::SIGNATURE_CHECKER_V2_SCRIPT_FIX);
     let sig_checker_v2_fix_function_signatures = gas_feature_version >= RELEASE_V1_34;

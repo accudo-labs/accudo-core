@@ -1,8 +1,8 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{Context, Result};
 use accudo_sdk::types::network_address::NetworkAddress;
+use anyhow::{Context, Result};
 use reqwest::Url;
 use std::net::{SocketAddr, ToSocketAddrs};
 

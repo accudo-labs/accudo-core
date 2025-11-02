@@ -219,7 +219,10 @@ pub fn convert_epilogue_error(
             ..
         } => e,
         status => {
-            let err_msg = format!("[accudo_vm] Unexpected success epilogue error: {:?}", status);
+            let err_msg = format!(
+                "[accudo_vm] Unexpected success epilogue error: {:?}",
+                status
+            );
             speculative_error!(log_context, err_msg.clone());
             VMStatus::Error {
                 status_code: StatusCode::UNEXPECTED_ERROR_FROM_KNOWN_MOVE_FUNCTION,

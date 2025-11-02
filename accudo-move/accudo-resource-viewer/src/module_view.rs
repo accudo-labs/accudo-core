@@ -1,12 +1,12 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::anyhow;
 use accudo_types::{
     on_chain_config::{Features, OnChainConfig},
     state_store::{state_key::StateKey, StateView},
 };
 use accudo_vm_environment::prod_configs::accudo_prod_deserializer_config;
+use anyhow::anyhow;
 use move_binary_format::{deserializer::DeserializerConfig, CompiledModule};
 use move_bytecode_utils::compiled_module_viewer::CompiledModuleView;
 use move_core_types::language_storage::ModuleId;

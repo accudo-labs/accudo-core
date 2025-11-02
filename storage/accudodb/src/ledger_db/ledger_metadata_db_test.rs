@@ -59,7 +59,10 @@ fn get_last_version(ledger_infos_with_sigs: &[LedgerInfoWithSignatures]) -> Vers
         .version()
 }
 
-fn set_up(path: &impl AsRef<Path>, ledger_infos_with_sigs: &[LedgerInfoWithSignatures]) -> AccudoDB {
+fn set_up(
+    path: &impl AsRef<Path>,
+    ledger_infos_with_sigs: &[LedgerInfoWithSignatures],
+) -> AccudoDB {
     let db = AccudoDB::new_for_test(path);
     let ledger_metadata_db = db.ledger_db.metadata_db();
 

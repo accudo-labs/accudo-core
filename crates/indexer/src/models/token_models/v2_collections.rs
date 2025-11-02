@@ -17,8 +17,8 @@ use crate::{
     schema::{collections_v2, current_collections_v2},
     util::standardize_address,
 };
-use anyhow::Context;
 use accudo_api_types::{WriteResource as APIWriteResource, WriteTableItem as APIWriteTableItem};
+use anyhow::Context;
 use bigdecimal::{BigDecimal, Zero};
 use diesel::{prelude::*, sql_query, sql_types::Text};
 use field_count::FieldCount;

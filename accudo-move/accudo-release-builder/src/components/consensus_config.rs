@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{components::get_signer_arg, utils::*};
-use anyhow::Result;
 use accudo_crypto::HashValue;
 use accudo_framework::generate_blob_as_hex_string;
 use accudo_types::on_chain_config::OnChainConsensusConfig;
+use anyhow::Result;
 use move_model::{code_writer::CodeWriter, emit, emitln, model::Loc};
 
 pub fn generate_consensus_upgrade_proposal(

@@ -11,8 +11,8 @@ use crate::{
     },
     update::get_revela_path,
 };
-use anyhow::Context;
 use accudo_types::vm::module_metadata::prelude::*;
+use anyhow::Context;
 use async_trait::async_trait;
 use clap::{Args, Parser, ValueEnum};
 use itertools::Itertools;

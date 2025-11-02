@@ -24,7 +24,6 @@ use crate::{
         GlobalRestoreOptions, RestoreRunMode,
     },
 };
-use anyhow::{anyhow, ensure, Result};
 use accudo_db::backup::restore_handler::RestoreHandler;
 use accudo_executor::chunk_executor::ChunkExecutor;
 use accudo_executor_types::{ChunkExecutorTrait, TransactionReplayer, VerifyExecutionMode};
@@ -42,6 +41,7 @@ use accudo_types::{
     write_set::WriteSet,
 };
 use accudo_vm::{accudo_vm::AccudoVMBlockExecutor, AccudoVM};
+use anyhow::{anyhow, ensure, Result};
 use clap::Parser;
 use futures::{
     future,

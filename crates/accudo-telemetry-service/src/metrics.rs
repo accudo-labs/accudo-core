@@ -9,11 +9,11 @@ use crate::{
     },
     debug, error,
 };
-use anyhow::anyhow;
 use accudo_metrics_core::{
     register_histogram_vec, register_int_counter, register_int_counter_vec, HistogramVec,
     IntCounter, IntCounterVec,
 };
+use anyhow::anyhow;
 use flate2::{write::GzEncoder, Compression};
 use once_cell::sync::Lazy;
 use std::{env, io::Write, time::Duration};

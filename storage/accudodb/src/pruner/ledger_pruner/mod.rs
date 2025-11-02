@@ -28,12 +28,12 @@ use crate::{
     },
     transaction_store::TransactionStore,
 };
-use anyhow::anyhow;
 use accudo_db_indexer::db_indexer::InternalIndexerDB;
 use accudo_experimental_runtimes::thread_manager::THREAD_MANAGER;
 use accudo_logger::info;
 use accudo_storage_interface::Result;
 use accudo_types::transaction::{AtomicVersion, Version};
+use anyhow::anyhow;
 use rayon::prelude::*;
 use std::{
     cmp::min,

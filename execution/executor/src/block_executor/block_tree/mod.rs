@@ -11,7 +11,6 @@ use crate::{
     logging::{LogEntry, LogSchema},
     types::partial_state_compute_result::PartialStateComputeResult,
 };
-use anyhow::{anyhow, ensure, Result};
 use accudo_consensus_types::block::Block as ConsensusBlock;
 use accudo_crypto::HashValue;
 use accudo_drop_helper::DEFAULT_DROPPER;
@@ -20,6 +19,7 @@ use accudo_infallible::Mutex;
 use accudo_logger::{debug, info};
 use accudo_storage_interface::DbReader;
 use accudo_types::{ledger_info::LedgerInfo, proof::definition::LeafCount};
+use anyhow::{anyhow, ensure, Result};
 use std::{
     collections::{hash_map::Entry, HashMap},
     sync::{mpsc::Receiver, Arc, Weak},

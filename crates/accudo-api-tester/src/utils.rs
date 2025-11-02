@@ -10,12 +10,12 @@ use crate::{
     tests::{coin_transfer, new_account, publish_module, tokenv1_transfer, view_function},
     time_fn,
 };
-use anyhow::{anyhow, Error, Result};
 use accudo_api_types::U64;
 use accudo_logger::{error, info};
 use accudo_rest_client::{error::RestError, Client, FaucetClient};
 use accudo_sdk::types::LocalAccount;
 use accudo_types::account_address::AccountAddress;
+use anyhow::{anyhow, Error, Result};
 use std::{env, fmt::Display, num::ParseIntError, str::FromStr};
 
 // Test failure

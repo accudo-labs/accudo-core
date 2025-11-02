@@ -8,7 +8,9 @@ use accudo_crypto::{
     x25519, PrivateKey,
 };
 use accudo_keygen::KeyGen;
-use accudo_types::{account_address::AccountAddress, transaction::authenticator::AuthenticationKey};
+use accudo_types::{
+    account_address::AccountAddress, transaction::authenticator::AuthenticationKey,
+};
 use serde::{Deserialize, Serialize};
 
 /// Type for serializing private keys file

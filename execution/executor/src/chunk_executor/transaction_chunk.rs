@@ -5,7 +5,6 @@ use crate::{
     metrics::{CHUNK_OTHER_TIMERS, VM_EXECUTE_CHUNK},
     workflow::do_get_execution_output::DoGetExecutionOutput,
 };
-use anyhow::Result;
 use accudo_executor_types::execution_output::ExecutionOutput;
 use accudo_experimental_runtimes::thread_manager::optimal_min_len;
 use accudo_metrics_core::TimerHelper;
@@ -20,6 +19,7 @@ use accudo_types::{
     transaction::{AuxiliaryInfo, PersistedAuxiliaryInfo, Transaction, TransactionOutput, Version},
 };
 use accudo_vm::VMBlockExecutor;
+use anyhow::Result;
 use once_cell::sync::Lazy;
 use rayon::iter::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
 use std::sync::Arc;

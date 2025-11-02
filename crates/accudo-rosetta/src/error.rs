@@ -276,7 +276,9 @@ impl From<RestError> for ApiError {
                 AccudoErrorCode::ResourceNotFound => {
                     ApiError::ResourceNotFound(Some(err.error.message))
                 },
-                AccudoErrorCode::ModuleNotFound => ApiError::ModuleNotFound(Some(err.error.message)),
+                AccudoErrorCode::ModuleNotFound => {
+                    ApiError::ModuleNotFound(Some(err.error.message))
+                },
                 AccudoErrorCode::StructFieldNotFound => {
                     ApiError::StructFieldNotFound(Some(err.error.message))
                 },

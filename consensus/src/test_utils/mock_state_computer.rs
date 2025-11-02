@@ -6,12 +6,12 @@ use crate::{
     error::StateSyncError, payload_manager::TPayloadManager, state_replication::StateComputer,
     transaction_deduper::TransactionDeduper, transaction_shuffler::TransactionShuffler,
 };
-use anyhow::{anyhow, Result};
 use accudo_crypto::HashValue;
 use accudo_types::{
     block_executor::config::BlockExecutorConfigFromOnchain, epoch_state::EpochState,
     ledger_info::LedgerInfoWithSignatures, on_chain_config::OnChainConsensusConfig,
 };
+use anyhow::{anyhow, Result};
 use std::{sync::Arc, time::Duration};
 
 /// Random Compute Result State Computer

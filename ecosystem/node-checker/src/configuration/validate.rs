@@ -3,8 +3,8 @@
 
 use super::{read_configuration_from_file, BaselineConfiguration};
 use crate::checker::build_checkers;
-use anyhow::{Context, Result};
 use accudo_logger::debug;
+use anyhow::{Context, Result};
 use clap::Parser;
 use std::path::PathBuf;
 

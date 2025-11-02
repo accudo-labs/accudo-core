@@ -1,11 +1,12 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_comparison_testing::{
-    prepare_accudo_packages, DataCollection, Execution, ExecutionMode, OnlineExecutor, ACCUDO_COMMONS,
+    prepare_accudo_packages, DataCollection, Execution, ExecutionMode, OnlineExecutor,
+    ACCUDO_COMMONS,
 };
 use accudo_rest_client::Client;
+use anyhow::Result;
 use clap::{Parser, Subcommand};
 use move_core_types::account_address::AccountAddress;
 use std::path::PathBuf;

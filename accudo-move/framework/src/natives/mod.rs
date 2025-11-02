@@ -26,8 +26,8 @@ pub mod type_info;
 pub mod util;
 
 use crate::natives::cryptography::multi_ed25519;
-use aggregator_natives::{aggregator, aggregator_factory, aggregator_v2};
 use accudo_native_interface::{RawSafeNative, SafeNativeBuilder};
+use aggregator_natives::{aggregator, aggregator_factory, aggregator_v2};
 use cryptography::ed25519;
 use move_core_types::account_address::AccountAddress;
 use move_vm_runtime::native_functions::{make_table_from_iter, NativeFunctionTable};

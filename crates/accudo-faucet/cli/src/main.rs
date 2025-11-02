@@ -1,7 +1,6 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{Context, Result};
 use accudo_faucet_core::funder::{
     ApiConnectionConfig, FunderTrait, MintFunder, TransactionSubmissionConfig,
 };
@@ -12,6 +11,7 @@ use accudo_sdk::{
         LocalAccount,
     },
 };
+use anyhow::{Context, Result};
 use clap::Parser;
 use std::{collections::HashSet, str::FromStr};
 

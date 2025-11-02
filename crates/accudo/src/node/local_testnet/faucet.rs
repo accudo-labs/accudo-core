@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::{health_checker::HealthChecker, traits::ServiceManager, RunLocalnet};
-use anyhow::Result;
 use accudo_faucet_core::server::{FunderKeyEnum, RunConfig};
+use anyhow::Result;
 use async_trait::async_trait;
 use clap::Parser;
 use maplit::hashset;

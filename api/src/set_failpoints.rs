@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::context::Context;
-#[allow(unused_imports)]
-use anyhow::{format_err, Result};
 #[cfg(feature = "failpoints")]
 use accudo_logger::prelude::*;
+#[allow(unused_imports)]
+use anyhow::{format_err, Result};
 use poem::{
     handler,
     web::{Data, Query},

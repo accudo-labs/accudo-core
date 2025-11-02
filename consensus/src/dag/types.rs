@@ -10,7 +10,6 @@ use crate::{
     network::TConsensusMsg,
     network_interface::ConsensusMsg,
 };
-use anyhow::{bail, ensure};
 use accudo_bitvec::BitVec;
 use accudo_consensus_types::common::{Author, Payload, Round};
 use accudo_crypto::{
@@ -31,6 +30,7 @@ use accudo_types::{
     validator_txn::ValidatorTransaction,
     validator_verifier::ValidatorVerifier,
 };
+use anyhow::{bail, ensure};
 use futures_channel::oneshot;
 use serde::{Deserialize, Serialize};
 use std::{

@@ -2,7 +2,6 @@
 // Parts of the project are originally copyright © Meta Platforms, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_schemadb::{
     batch::SchemaBatch,
     define_schema,
@@ -10,6 +9,7 @@ use accudo_schemadb::{
     ColumnFamilyName, DB,
 };
 use accudo_storage_interface::AccudoDbError;
+use anyhow::Result;
 use byteorder::{LittleEndian, ReadBytesExt};
 use rocksdb::{ColumnFamilyDescriptor, DEFAULT_COLUMN_FAMILY_NAME};
 
@@ -101,7 +101,10 @@ fn open_db_read_only(dir: &accudo_temppath::TempPath) -> DB {
         .expect("Failed to open DB.")
 }
 
-fn open_db_as_secondary(dir: &accudo_temppath::TempPath, dir_sec: &accudo_temppath::TempPath) -> DB {
+fn open_db_as_secondary(
+    dir: &accudo_temppath::TempPath,
+    dir_sec: &accudo_temppath::TempPath,
+) -> DB {
     DB::open_cf_as_secondary(
         &rocksdb::Options::default(),
         dir.path(),

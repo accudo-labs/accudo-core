@@ -5,8 +5,8 @@ use crate::{
     dkg::{DKGSessionMetadata, DKGTrait},
     validator_verifier::ValidatorVerifier,
 };
-use anyhow::{anyhow, ensure};
 use accudo_crypto::{bls12381, Uniform};
+use anyhow::{anyhow, ensure};
 use move_core_types::account_address::AccountAddress;
 use rand::{CryptoRng, Rng, RngCore};
 use serde::{Deserialize, Serialize};

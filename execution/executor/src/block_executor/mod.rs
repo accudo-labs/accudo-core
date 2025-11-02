@@ -17,7 +17,6 @@ use crate::{
         do_state_checkpoint::DoStateCheckpoint,
     },
 };
-use anyhow::Result;
 use accudo_crypto::HashValue;
 use accudo_executor_types::{
     state_compute_result::StateComputeResult, BlockExecutorTrait, ExecutorError, ExecutorResult,
@@ -41,6 +40,7 @@ use accudo_types::{
     state_store::StateViewId,
 };
 use accudo_vm::VMBlockExecutor;
+use anyhow::Result;
 use block_tree::BlockTree;
 use fail::fail_point;
 use std::sync::Arc;

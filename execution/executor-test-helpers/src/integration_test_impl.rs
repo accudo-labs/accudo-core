@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{bootstrap_genesis, gen_block_id, gen_ledger_info_with_sigs};
-use anyhow::{ensure, Result};
 use accudo_cached_packages::accudo_stdlib;
 use accudo_config::config::DEFAULT_MAX_NUM_NODES_PER_LRU_CACHE_SHARD;
 use accudo_consensus_types::block::Block;
@@ -41,6 +40,7 @@ use accudo_types::{
     waypoint::Waypoint,
 };
 use accudo_vm::accudo_vm::AccudoVMBlockExecutor;
+use anyhow::{ensure, Result};
 use move_core_types::move_resource::MoveStructType;
 use rand::SeedableRng;
 use std::{path::Path, sync::Arc};

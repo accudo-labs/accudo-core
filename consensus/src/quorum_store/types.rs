@@ -1,7 +1,6 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::ensure;
 use accudo_consensus_types::{
     common::{BatchPayload, TxnSummaryWithExpiration},
     proof_of_store::BatchInfo,
@@ -11,6 +10,7 @@ use accudo_types::{
     ledger_info::LedgerInfoWithSignatures, quorum_store::BatchId, transaction::SignedTransaction,
     validator_verifier::ValidatorVerifier, PeerId,
 };
+use anyhow::ensure;
 use serde::{Deserialize, Serialize};
 use std::{
     fmt::{Display, Formatter},

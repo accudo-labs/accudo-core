@@ -10,7 +10,6 @@ use crate::{
     versioned_data::Entry as SizeEntry,
     VersionedData,
 };
-use anyhow::anyhow;
 use accudo_aggregator::types::ReadPosition;
 use accudo_infallible::Mutex;
 use accudo_types::{
@@ -18,6 +17,7 @@ use accudo_types::{
     write_set::{TransactionWrite, WriteOpKind},
 };
 use accudo_vm_types::{resolver::ResourceGroupSize, resource_group_adapter::group_size_as_sum};
+use anyhow::anyhow;
 use claims::{assert_ok, assert_some};
 use dashmap::DashMap;
 use equivalent::Equivalent;

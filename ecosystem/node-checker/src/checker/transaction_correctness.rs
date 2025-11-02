@@ -6,8 +6,8 @@ use crate::{
     get_provider,
     provider::{api_index::ApiIndexProvider, Provider, ProviderCollection},
 };
-use anyhow::Result;
 use accudo_rest_client::{accudo_api_types::TransactionData, Client as AccudoRestClient};
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::cmp::{max, min};
 

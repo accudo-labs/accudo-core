@@ -9,13 +9,13 @@
 //! ```
 
 use crate::schema::{ensure_slice_len_eq, BLOCK_INFO_CF_NAME};
-use anyhow::Result;
 use accudo_schemadb::{
     define_schema,
     schema::{KeyCodec, ValueCodec},
 };
 use accudo_storage_interface::block_info::BlockInfo;
 use accudo_types::block_info::BlockHeight;
+use anyhow::Result;
 use byteorder::{BigEndian, ReadBytesExt};
 use std::mem::size_of;
 

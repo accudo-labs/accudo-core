@@ -1,8 +1,8 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::bail;
 use accudo_transaction_generator_lib::{create_prebuilt_packages_bundle, PrebuiltPackageConfig};
+use anyhow::bail;
 use clap::Parser;
 use std::{
     fs, io,

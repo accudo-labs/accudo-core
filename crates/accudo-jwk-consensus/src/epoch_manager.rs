@@ -10,7 +10,6 @@ use crate::{
     update_certifier::UpdateCertifier,
     TConsensusManager,
 };
-use anyhow::{anyhow, Result};
 use accudo_bounded_executor::BoundedExecutor;
 use accudo_channels::{accudo_channel, message_queues::QueueStyle};
 use accudo_config::config::SafetyRulesConfig;
@@ -34,6 +33,7 @@ use accudo_types::{
     },
 };
 use accudo_validator_transaction_pool::VTxnPoolState;
+use anyhow::{anyhow, Result};
 use futures::StreamExt;
 use futures_channel::oneshot;
 use std::{sync::Arc, time::Duration};

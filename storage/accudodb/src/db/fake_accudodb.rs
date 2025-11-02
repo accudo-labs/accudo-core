@@ -6,7 +6,6 @@ use crate::{
     metrics::{LATEST_CHECKPOINT_VERSION, LEDGER_VERSION, NEXT_BLOCK_EPOCH},
     AccudoDB,
 };
-use anyhow::format_err;
 use accudo_accumulator::{HashReader, MerkleAccumulator};
 use accudo_crypto::{
     hash::{CryptoHash, TransactionAccumulatorHasher, SPARSE_MERKLE_PLACEHOLDER_HASH},
@@ -54,6 +53,7 @@ use accudo_types::{
     },
     write_set::WriteSet,
 };
+use anyhow::format_err;
 use dashmap::DashMap;
 use itertools::zip_eq;
 use move_core_types::move_resource::MoveStructType;
@@ -439,7 +439,8 @@ impl DbWriter for FakeAccudoDB {
         &self,
         version: Version,
         expected_root_hash: HashValue,
-    ) -> Result<Box<dyn accudo_storage_interface::StateSnapshotReceiver<StateKey, StateValue>>> {
+    ) -> Result<Box<dyn accudo_storage_interface::StateSnapshotReceiver<StateKey, StateValue>>>
+    {
         self.inner
             .get_state_snapshot_receiver(version, expected_root_hash)
     }
@@ -993,7 +994,6 @@ mod tests {
         db::test_helper::{arb_blocks_to_commit, update_in_memory_state},
         AccudoDB,
     };
-    use anyhow::{anyhow, ensure, Result};
     use accudo_crypto::{hash::CryptoHash, HashValue};
     use accudo_storage_interface::{
         state_store::state_view::cached_state_view::ShardedStateCache, DbReader, DbWriter,
@@ -1007,6 +1007,7 @@ mod tests {
             TransactionToCommit, TransactionWithProof, Version,
         },
     };
+    use anyhow::{anyhow, ensure, Result};
     use proptest::prelude::*;
 
     proptest! {

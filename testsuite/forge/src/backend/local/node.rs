@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{FullNode, HealthCheckError, LocalVersion, Node, NodeExt, Validator, Version};
-use anyhow::{anyhow, ensure, Context, Result};
 use accudo_config::{
     config::{NodeConfig, SECURE_STORAGE_FILENAME},
     keys::ConfigKey,
@@ -18,6 +17,7 @@ use accudo_sdk::{
     types::{account_address::AccountAddress, PeerId},
 };
 use accudo_state_sync_driver::metadata_storage::STATE_SYNC_DB_NAME;
+use anyhow::{anyhow, ensure, Context, Result};
 use std::{
     env,
     fs::{self, OpenOptions},

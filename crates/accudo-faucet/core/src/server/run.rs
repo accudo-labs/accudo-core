@@ -12,7 +12,6 @@ use crate::{
     funder::{ApiConnectionConfig, FunderConfig, MintFunderConfig, TransactionSubmissionConfig},
     middleware::middleware_log,
 };
-use anyhow::{anyhow, Context, Result};
 use accudo_config::keys::ConfigKey;
 use accudo_faucet_metrics_server::{run_metrics_server, MetricsServerConfig};
 use accudo_logger::info;
@@ -20,6 +19,7 @@ use accudo_sdk::{
     crypto::ed25519::Ed25519PrivateKey,
     types::{account_config::accudo_test_root_address, chain_id::ChainId},
 };
+use anyhow::{anyhow, Context, Result};
 use clap::Parser;
 use futures::{channel::oneshot::Sender as OneShotSender, lock::Mutex};
 use poem::{http::Method, listener::TcpAcceptor, middleware::Cors, EndpointExt, Route, Server};
@@ -384,11 +384,11 @@ mod test {
         },
         helpers::get_current_time_secs,
     };
-    use anyhow::{bail, Result};
     use accudo_sdk::{
         crypto::{ed25519::Ed25519PrivateKey, HashValue, PrivateKey, Uniform},
         types::{account_address::AccountAddress, transaction::authenticator::AuthenticationKey},
     };
+    use anyhow::{bail, Result};
     use once_cell::sync::OnceCell;
     use poem_openapi::types::{ParseFromJSON, ToJSON};
     use rand::{

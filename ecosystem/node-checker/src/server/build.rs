@@ -11,8 +11,8 @@ use crate::{
     },
     runner::{Runner, SyncRunner},
 };
-use anyhow::{bail, Context, Result};
 use accudo_logger::info;
+use anyhow::{bail, Context, Result};
 use std::{collections::HashMap, path::PathBuf, sync::Arc};
 
 /// This struct is a wrapper to help with all the different baseline

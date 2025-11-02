@@ -2,13 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::FETCH_ACCOUNT_RETRY_POLICY;
-use anyhow::{Context, Result};
 use accudo_logger::{sample, sample::SampleRate};
-use accudo_rest_client::{accudo_api_types::AccudoErrorCode, error::RestError, Client as RestClient};
+use accudo_rest_client::{
+    accudo_api_types::AccudoErrorCode, error::RestError, Client as RestClient,
+};
 use accudo_sdk::{
     move_types::account_address::AccountAddress, types::transaction::SignedTransaction,
 };
 use accudo_transaction_generator_lib::{CounterState, ReliableTransactionSubmitter};
+use anyhow::{Context, Result};
 use async_trait::async_trait;
 use futures::future::join_all;
 use log::{debug, info, warn};

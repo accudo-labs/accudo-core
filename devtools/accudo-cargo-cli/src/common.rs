@@ -457,7 +457,10 @@ fn recompute_merge_base_metadata(
     }
 
     // Delete the accudo-core clone
-    debug!("Deleting accudo-core clone directory: {:?}", clone_directory);
+    debug!(
+        "Deleting accudo-core clone directory: {:?}",
+        clone_directory
+    );
     if let Err(error) = fs::remove_dir_all(clone_directory.clone()) {
         warn!(
             "Error deleting accudo-core clone directory: {:?}. Error: {:?}",

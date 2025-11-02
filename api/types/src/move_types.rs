@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{Address, Bytecode, IdentifierWrapper, VerifyInput, VerifyInputWithRecursion};
-use anyhow::{bail, format_err};
 use accudo_resource_viewer::{
     AnnotatedMoveClosure, AnnotatedMoveStruct, AnnotatedMoveValue, RawMoveStruct,
 };
 use accudo_types::{account_config::CORE_CODE_ADDRESS, event::EventKey, transaction::Module};
+use anyhow::{bail, format_err};
 use move_binary_format::{
     access::ModuleAccess,
     file_format::{CompiledModule, CompiledScript, StructTypeParameter, Visibility},

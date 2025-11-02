@@ -11,12 +11,12 @@ use crate::{
     schema::current_delegator_balances,
     util::standardize_address,
 };
-use anyhow::Context;
 use accudo_api_types::{
     DeleteTableItem as APIDeleteTableItem, Transaction as APITransaction,
     WriteResource as APIWriteResource, WriteSetChange as APIWriteSetChange,
     WriteTableItem as APIWriteTableItem,
 };
+use anyhow::Context;
 use bigdecimal::{BigDecimal, Zero};
 use diesel::{prelude::*, ExpressionMethods};
 use field_count::FieldCount;

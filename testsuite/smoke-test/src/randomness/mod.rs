@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::utils;
-use anyhow::{anyhow, ensure, Result};
 use accudo_crypto::{compat::Sha3_256, Uniform};
 use accudo_dkg::weighted_vuf::traits::WeightedVUF;
 use accudo_forge::LocalSwarm;
@@ -14,6 +13,7 @@ use accudo_types::{
     randomness::{PerBlockRandomness, RandMetadata, WVUF},
     validator_verifier::ValidatorConsensusInfo,
 };
+use anyhow::{anyhow, ensure, Result};
 use digest::Digest;
 use move_core_types::{account_address::AccountAddress, language_storage::CORE_CODE_ADDRESS};
 use rand::{prelude::StdRng, SeedableRng};

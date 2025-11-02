@@ -55,7 +55,6 @@ use crate::{
     round_manager::{RoundManager, UnverifiedEvent, VerifiedEvent},
     util::time_service::TimeService,
 };
-use anyhow::{anyhow, bail, ensure, Context};
 use accudo_bounded_executor::BoundedExecutor;
 use accudo_channels::{accudo_channel, message_queues::QueueStyle};
 use accudo_config::config::{
@@ -99,6 +98,7 @@ use accudo_types::{
     validator_verifier::ValidatorVerifier,
 };
 use accudo_validator_transaction_pool::VTxnPoolState;
+use anyhow::{anyhow, bail, ensure, Context};
 use fail::fail_point;
 use futures::{
     channel::{mpsc, mpsc::Sender, oneshot},
@@ -1264,11 +1264,12 @@ impl<P: OnChainConfigProvider> EpochManager<P> {
             )
             .await;
 
-        let (rand_msg_tx, rand_msg_rx) = accudo_channel::new::<AccountAddress, IncomingRandGenRequest>(
-            QueueStyle::KLAST,
-            self.config.internal_per_key_channel_size,
-            None,
-        );
+        let (rand_msg_tx, rand_msg_rx) =
+            accudo_channel::new::<AccountAddress, IncomingRandGenRequest>(
+                QueueStyle::KLAST,
+                self.config.internal_per_key_channel_size,
+                None,
+            );
 
         self.rand_manager_msg_tx = Some(rand_msg_tx);
 
@@ -1703,7 +1704,9 @@ impl<P: OnChainConfigProvider> EpochManager<P> {
     }
 
     fn forward_event(
-        quorum_store_msg_tx: Option<accudo_channel::Sender<AccountAddress, (Author, VerifiedEvent)>>,
+        quorum_store_msg_tx: Option<
+            accudo_channel::Sender<AccountAddress, (Author, VerifiedEvent)>,
+        >,
         round_manager_tx: Option<
             accudo_channel::Sender<(Author, Discriminant<VerifiedEvent>), (Author, VerifiedEvent)>,
         >,

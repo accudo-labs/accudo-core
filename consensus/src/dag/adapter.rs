@@ -15,7 +15,6 @@ use crate::{
     },
     pipeline::buffer_manager::OrderedBlocks,
 };
-use anyhow::{anyhow, bail, format_err};
 use accudo_bitvec::BitVec;
 use accudo_consensus_types::{
     block::Block,
@@ -38,6 +37,7 @@ use accudo_types::{
     on_chain_config::CommitHistoryResource,
     state_store::state_key::StateKey,
 };
+use anyhow::{anyhow, bail, format_err};
 use async_trait::async_trait;
 use futures_channel::mpsc::UnboundedSender;
 use std::{

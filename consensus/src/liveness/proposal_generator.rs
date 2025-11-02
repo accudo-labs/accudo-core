@@ -17,7 +17,6 @@ use crate::{
     payload_client::PayloadClient,
     util::time_service::TimeService,
 };
-use anyhow::{bail, ensure, format_err, Context};
 use accudo_config::config::{
     ChainHealthBackoffValues, ExecutionBackpressureConfig, ExecutionBackpressureMetric,
     PipelineBackpressureValues,
@@ -39,6 +38,7 @@ use accudo_types::{
     block_info::BlockInfo, on_chain_config::ValidatorTxnConfig, validator_txn::ValidatorTransaction,
 };
 use accudo_validator_transaction_pool as vtxn_pool;
+use anyhow::{bail, ensure, format_err, Context};
 use itertools::Itertools;
 use std::{
     collections::{BTreeMap, HashSet},

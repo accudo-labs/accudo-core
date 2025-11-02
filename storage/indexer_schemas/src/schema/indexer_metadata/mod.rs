@@ -9,11 +9,11 @@ use crate::{
     metadata::{MetadataKey, MetadataValue},
     schema::INDEXER_METADATA_CF_NAME,
 };
-use anyhow::Result;
 use accudo_schemadb::{
     define_pub_schema,
     schema::{KeyCodec, ValueCodec},
 };
+use anyhow::Result;
 
 define_pub_schema!(
     IndexerMetadataSchema,

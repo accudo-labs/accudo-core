@@ -3,8 +3,8 @@
 
 use super::{CheckerData, CheckerTrait};
 use crate::endpoints::{AccudoTapError, AccudoTapErrorCode, RejectionReason, RejectionReasonCode};
-use anyhow::Result;
 use accudo_logger::debug;
+use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::{env, str::FromStr};
@@ -84,13 +84,14 @@ impl CheckerTrait for CaptchaChecker {
             })
             .send()
             .await
-            .map_err(|e| AccudoTapError::new_with_error_code(e, AccudoTapErrorCode::CheckerError))?;
+            .map_err(|e| {
+                AccudoTapError::new_with_error_code(e, AccudoTapErrorCode::CheckerError)
+            })?;
 
         let status_code = verify_result.status();
-        let resp = verify_result
-            .text()
-            .await
-            .map_err(|e| AccudoTapError::new_with_error_code(e, AccudoTapErrorCode::CheckerError))?;
+        let resp = verify_result.text().await.map_err(|e| {
+            AccudoTapError::new_with_error_code(e, AccudoTapErrorCode::CheckerError)
+        })?;
         if !status_code.is_success() {
             debug!(
                 message = "Google captcha API returned error status code",

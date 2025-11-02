@@ -8,7 +8,6 @@ use crate::{
     network::{MempoolNetworkInterface, MempoolSyncMsg},
     shared_mempool::use_case_history::UseCaseHistory,
 };
-use anyhow::Result;
 use accudo_config::{
     config::{MempoolConfig, NodeType, TransactionFilterConfig},
     network_id::PeerNetworkId,
@@ -25,6 +24,7 @@ use accudo_types::{
     vm_status::DiscardedVMStatus,
 };
 use accudo_vm_validator::vm_validator::TransactionValidation;
+use anyhow::Result;
 use futures::{
     channel::{mpsc, mpsc::UnboundedSender, oneshot},
     future::Future,

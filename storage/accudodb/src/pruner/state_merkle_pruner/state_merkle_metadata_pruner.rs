@@ -9,10 +9,10 @@ use crate::{
     },
     utils::get_progress,
 };
-use anyhow::Result;
 use accudo_jellyfish_merkle::StaleNodeIndex;
 use accudo_schemadb::{batch::SchemaBatch, schema::KeyCodec, DB};
 use accudo_types::transaction::{AtomicVersion, Version};
+use anyhow::Result;
 use std::{
     cmp::max,
     marker::PhantomData,

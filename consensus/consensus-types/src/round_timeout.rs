@@ -6,11 +6,11 @@ use crate::{
     sync_info::SyncInfo,
     timeout_2chain::TwoChainTimeout,
 };
-use anyhow::{ensure, Context};
 use accudo_bitvec::BitVec;
 use accudo_crypto::bls12381;
 use accudo_short_hex_str::AsShortHexStr;
 use accudo_types::validator_verifier::ValidatorVerifier;
+use anyhow::{ensure, Context};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash, Debug)]

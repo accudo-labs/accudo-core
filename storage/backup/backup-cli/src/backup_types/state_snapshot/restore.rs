@@ -22,7 +22,6 @@ use crate::{
         GlobalRestoreOptions, RestoreRunMode,
     },
 };
-use anyhow::{anyhow, ensure, Result};
 use accudo_db::state_restore::StateSnapshotRestoreMode;
 use accudo_infallible::Mutex;
 use accudo_logger::prelude::*;
@@ -39,7 +38,10 @@ use accudo_types::{
     },
     transaction::Version,
 };
-use accudo_vm_environment::prod_configs::{accudo_prod_verifier_config, LATEST_GAS_FEATURE_VERSION};
+use accudo_vm_environment::prod_configs::{
+    accudo_prod_verifier_config, LATEST_GAS_FEATURE_VERSION,
+};
+use anyhow::{anyhow, ensure, Result};
 use clap::Parser;
 use futures::{stream, TryStreamExt};
 use move_binary_format::CompiledModule;

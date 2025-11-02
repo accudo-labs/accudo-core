@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::event_lookup::get_deposit_dst;
-use anyhow::{anyhow, Result};
 use accudo_sdk::{
     move_types::account_address::AccountAddress,
     rest_client::accudo_api_types::TransactionOnChainData,
@@ -13,6 +12,7 @@ use accudo_sdk::{
         LocalAccount,
     },
 };
+use anyhow::{anyhow, Result};
 use rand::{distributions::Alphanumeric, Rng};
 use std::{fs::read_to_string, path::Path};
 

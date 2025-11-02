@@ -15,12 +15,12 @@ use crate::{
         TestName,
     },
 };
-use anyhow::anyhow;
 use accudo_api_types::{ViewRequest, U64};
 use accudo_logger::error;
 use accudo_rest_client::Client;
 use accudo_sdk::types::LocalAccount;
 use accudo_types::account_address::AccountAddress;
+use anyhow::anyhow;
 
 /// Tests view function use. Checks that:
 ///  - view function returns correct value

@@ -8,9 +8,9 @@ use crate::{
         table::TableHandle,
     },
 };
-use anyhow::Result;
 use accudo_crypto::{hash::CryptoHasher, HashValue};
 use accudo_infallible::RwLock;
+use anyhow::Result;
 use bytes::Bytes;
 use hashbrown::HashMap;
 use move_core_types::{

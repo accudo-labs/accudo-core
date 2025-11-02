@@ -5,7 +5,6 @@ use crate::{
     metrics, network::StorageServiceNetworkEvents, storage::StorageReader, tests::utils,
     StorageServiceServer,
 };
-use anyhow::Result;
 use accudo_channels::{accudo_channel, message_queues::QueueStyle};
 use accudo_config::{
     config::{StateSyncConfig, StorageServiceConfig},
@@ -52,6 +51,7 @@ use accudo_types::{
     write_set::WriteSet,
     PeerId,
 };
+use anyhow::Result;
 use futures::channel::{oneshot, oneshot::Receiver};
 use mockall::mock;
 use rand::{rngs::OsRng, Rng};

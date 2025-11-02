@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::config::TransactionImporterPerNetworkConfig;
-use anyhow::Context;
 use accudo_indexer_grpc_utils::create_data_service_grpc_client;
 use accudo_protos::indexer::v1::GetTransactionsRequest;
+use anyhow::Context;
 use std::{path::Path, time::Duration};
 
 /// GRPC request metadata key for the token ID.

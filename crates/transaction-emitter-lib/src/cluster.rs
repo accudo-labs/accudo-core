@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{emitter::load_specific_account, instance::Instance, ClusterArgs};
-use anyhow::{anyhow, bail, format_err, Result};
 use accudo_crypto::{
     ed25519::{Ed25519PrivateKey, Ed25519PublicKey},
     test_utils::KeyPair,
 };
 use accudo_rest_client::{Client as RestClient, State};
 use accudo_sdk::types::{chain_id::ChainId, AccountKey, LocalAccount};
+use anyhow::{anyhow, bail, format_err, Result};
 use futures::{stream::FuturesUnordered, StreamExt};
 use log::{info, warn};
 use rand::seq::SliceRandom;

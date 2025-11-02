@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::block::Block;
-use anyhow::ensure;
 use accudo_crypto::hash::HashValue;
 use accudo_short_hex_str::AsShortHexStr;
 use accudo_types::validator_verifier::ValidatorVerifier;
+use anyhow::ensure;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 

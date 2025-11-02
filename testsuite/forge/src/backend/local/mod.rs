@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{Factory, GenesisConfig, GenesisConfigFn, NodeConfigFn, Result, Swarm, Version};
-use anyhow::{bail, Context};
 use accudo_config::config::{NodeConfig, OverrideNodeConfig};
 use accudo_framework::ReleaseBundle;
 use accudo_genesis::builder::{InitConfigFn, InitGenesisConfigFn, InitGenesisStakeFn};
 use accudo_infallible::Mutex;
+use anyhow::{bail, Context};
 use rand::rngs::StdRng;
 use std::{
     collections::HashMap,
@@ -60,10 +60,11 @@ impl LocalFactory {
 
     pub fn from_workspace(swarm_dir: Option<String>) -> Result<Self> {
         let mut versions = HashMap::new();
-        let new_version = cargo::get_accudo_node_binary_from_worktree().map(|(revision, bin)| {
-            let version = Version::new(usize::MAX, revision);
-            LocalVersion { bin, version }
-        })?;
+        let new_version =
+            cargo::get_accudo_node_binary_from_worktree().map(|(revision, bin)| {
+                let version = Version::new(usize::MAX, revision);
+                LocalVersion { bin, version }
+            })?;
 
         versions.insert(new_version.version.clone(), new_version);
         Ok(Self::new(versions, swarm_dir))

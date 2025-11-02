@@ -1,8 +1,8 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{Context, Result};
 use accudo_framework::ReleaseTarget;
+use anyhow::{Context, Result};
 use std::{env::current_dir, path::PathBuf};
 
 fn main() -> Result<()> {
@@ -69,7 +69,10 @@ fn main() -> Result<()> {
         );
         println!(
             "cargo:rerun-if-changed={}",
-            prev_dir.join("accudo-framework").join("Move.toml").display()
+            prev_dir
+                .join("accudo-framework")
+                .join("Move.toml")
+                .display()
         );
         println!(
             "cargo:rerun-if-changed={}",

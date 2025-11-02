@@ -47,7 +47,10 @@ struct DagBootstrapUnit {
     df_task_handle: JoinHandle<()>,
     dag_rpc_tx: accudo_channel::Sender<Author, IncomingDAGRequest>,
     network_events: Box<
-        Select<NetworkEvents<ConsensusMsg>, accudo_channels::UnboundedReceiver<Event<ConsensusMsg>>>,
+        Select<
+            NetworkEvents<ConsensusMsg>,
+            accudo_channels::UnboundedReceiver<Event<ConsensusMsg>>,
+        >,
     >,
 }
 
@@ -137,7 +140,10 @@ fn create_network(
 ) -> (
     NetworkSender,
     Box<
-        Select<NetworkEvents<ConsensusMsg>, accudo_channels::UnboundedReceiver<Event<ConsensusMsg>>>,
+        Select<
+            NetworkEvents<ConsensusMsg>,
+            accudo_channels::UnboundedReceiver<Event<ConsensusMsg>>,
+        >,
     >,
 ) {
     let (network_reqs_tx, network_reqs_rx) = accudo_channel::new(QueueStyle::FIFO, 8, None);

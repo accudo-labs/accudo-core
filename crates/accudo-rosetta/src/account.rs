@@ -89,7 +89,9 @@ async fn account_balance(
         metadata: AccountBalanceMetadata {
             sequence_number: sequence_number.into(),
             operators,
-            lockup_expiration_time_utc: accudo_rest_client::accudo_api_types::U64(lockup_expiration),
+            lockup_expiration_time_utc: accudo_rest_client::accudo_api_types::U64(
+                lockup_expiration,
+            ),
         },
     })
 }

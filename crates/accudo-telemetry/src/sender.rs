@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::metrics::{self, increment_log_ingest_failures_by, increment_log_ingest_successes_by};
-use anyhow::{anyhow, Error, Result};
 use accudo_config::config::{NodeConfig, RoleType};
 use accudo_crypto::{
     noise::{self, NoiseConfig},
@@ -16,6 +15,7 @@ use accudo_telemetry_service::types::{
     telemetry::TelemetryDump,
 };
 use accudo_types::{chain_id::ChainId, PeerId};
+use anyhow::{anyhow, Error, Result};
 use flate2::{write::GzEncoder, Compression};
 use prometheus::{default_registry, Registry};
 use reqwest::{header::CONTENT_ENCODING, Response, StatusCode, Url};

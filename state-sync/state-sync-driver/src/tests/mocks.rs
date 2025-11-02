@@ -7,7 +7,6 @@ use crate::{
     storage_synchronizer::{NotificationMetadata, StorageSynchronizerInterface},
     tests::utils::{create_empty_epoch_state, create_epoch_ending_ledger_info},
 };
-use anyhow::Result as AnyhowResult;
 use accudo_crypto::HashValue;
 use accudo_data_streaming_service::{
     data_notification::NotificationId,
@@ -40,6 +39,7 @@ use accudo_types::{
         TransactionOutputListWithProofV2, TransactionWithProof, Version,
     },
 };
+use anyhow::Result as AnyhowResult;
 use async_trait::async_trait;
 use mockall::mock;
 use std::sync::Arc;

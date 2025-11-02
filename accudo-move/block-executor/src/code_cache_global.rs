@@ -237,7 +237,12 @@ pub(crate) fn add_module_write_to_module_cache<T: BlockExecutableTransaction>(
     write: &ModuleWrite<T::Value>,
     txn_idx: TxnIndex,
     runtime_environment: &RuntimeEnvironment,
-    global_module_cache: &GlobalModuleCache<ModuleId, CompiledModule, Module, AccudoModuleExtension>,
+    global_module_cache: &GlobalModuleCache<
+        ModuleId,
+        CompiledModule,
+        Module,
+        AccudoModuleExtension,
+    >,
     per_block_module_cache: &impl ModuleCache<
         Key = ModuleId,
         Deserialized = CompiledModule,

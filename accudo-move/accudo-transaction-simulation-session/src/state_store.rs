@@ -1,7 +1,6 @@
 // Copyright (c) Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{bail, Result};
 use accudo_types::{
     access_path::Path,
     state_store::{
@@ -9,6 +8,7 @@ use accudo_types::{
         table::TableHandle,
     },
 };
+use anyhow::{bail, Result};
 use move_core_types::{
     account_address::AccountAddress, identifier::IdentStr, language_storage::StructTag,
 };

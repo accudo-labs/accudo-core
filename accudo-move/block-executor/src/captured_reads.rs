@@ -6,7 +6,6 @@ use crate::{
     types::InputOutputKey,
     view::{GroupReadResult, LatestView, ReadResult},
 };
-use anyhow::bail;
 use accudo_aggregator::{
     delta_change_set::serialize,
     delta_math::DeltaHistory,
@@ -30,6 +29,7 @@ use accudo_types::{
     write_set::TransactionWrite,
 };
 use accudo_vm_types::resolver::ResourceGroupSize;
+use anyhow::bail;
 use derivative::Derivative;
 use move_binary_format::errors::{PartialVMError, PartialVMResult};
 use move_core_types::value::MoveTypeLayout;

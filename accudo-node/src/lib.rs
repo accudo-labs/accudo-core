@@ -18,7 +18,6 @@ pub mod utils;
 mod tests;
 
 use crate::utils::ensure_max_open_files_limit;
-use anyhow::{anyhow, Context};
 use accudo_admin_service::AdminService;
 use accudo_api::bootstrap as bootstrap_api;
 use accudo_build_info::build_information;
@@ -30,6 +29,7 @@ use accudo_state_sync_driver::driver_factory::StateSyncRuntimes;
 use accudo_types::{
     chain_id::ChainId, keyless::Groth16VerificationKey, on_chain_config::OnChainJWKConsensusConfig,
 };
+use anyhow::{anyhow, Context};
 use clap::Parser;
 use futures::channel::{mpsc, oneshot};
 use hex::{FromHex, FromHexError};

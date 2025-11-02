@@ -12,7 +12,6 @@ use crate::{
     update_certifier::TUpdateCertifier,
     TConsensusManager,
 };
-use anyhow::{anyhow, bail, Context, Result};
 use accudo_channels::{accudo_channel, message_queues::QueueStyle};
 use accudo_crypto::{bls12381::PrivateKey, SigningKey};
 use accudo_logger::{debug, error, info, warn};
@@ -26,6 +25,7 @@ use accudo_types::{
     validator_txn::{Topic, ValidatorTransaction},
 };
 use accudo_validator_transaction_pool::VTxnPoolState;
+use anyhow::{anyhow, bail, Context, Result};
 use futures_channel::oneshot;
 use futures_util::{future::join_all, FutureExt, StreamExt};
 use std::{

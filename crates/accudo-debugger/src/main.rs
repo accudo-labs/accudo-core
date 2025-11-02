@@ -1,10 +1,10 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_debugger::Cmd;
 use accudo_logger::{Level, Logger};
 use accudo_push_metrics::MetricsPusher;
+use anyhow::Result;
 use clap::Parser;
 
 #[cfg(unix)]

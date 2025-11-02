@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::vuf::VUF;
-use anyhow::ensure;
 use accudo_crypto::{
     blstrs::{g1_proj_from_bytes, multi_pairing, random_scalar},
     hash::CryptoHash,
 };
 use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher};
 use accudo_types::keyless::Pepper;
+use anyhow::ensure;
 use blstrs::{self, Compress, G1Affine, G1Projective, G2Affine, G2Projective, Gt, Scalar};
 use group::{prime::PrimeCurveAffine, Group};
 use once_cell::sync::Lazy;

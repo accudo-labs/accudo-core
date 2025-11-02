@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::common::{Author, Round};
-use anyhow::{ensure, Context};
 use accudo_crypto::{bls12381, CryptoMaterialError};
 use accudo_short_hex_str::AsShortHexStr;
 use accudo_types::{
@@ -12,6 +11,7 @@ use accudo_types::{
     validator_signer::ValidatorSigner,
     validator_verifier::ValidatorVerifier,
 };
+use anyhow::{ensure, Context};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display, Formatter};
 

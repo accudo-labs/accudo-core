@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::indexer_api::confirm_metadata_applied;
-use anyhow::{anyhow, Context, Result};
 use accudo_indexer_processor_sdk::{
-    accudo_indexer_transaction_stream::{transaction_stream::get_chain_id, TransactionStreamConfig},
+    accudo_indexer_transaction_stream::{
+        transaction_stream::get_chain_id, TransactionStreamConfig,
+    },
     postgres::processor_metadata_schema::processor_metadata::processor_status,
 };
+use anyhow::{anyhow, Context, Result};
 use diesel::{ExpressionMethods, OptionalExtension, QueryDsl};
 use diesel_async::{pg::AsyncPgConnection, AsyncConnection, RunQueryDsl};
 use reqwest::Url;

@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{quorum_cert::QuorumCert, vote_data::VoteData};
-use anyhow::{ensure, Context};
 use accudo_crypto::hash::CryptoHash;
 use accudo_types::{
     block_info::BlockInfo, ledger_info::LedgerInfoWithSignatures,
     validator_verifier::ValidatorVerifier,
 };
+use anyhow::{ensure, Context};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 

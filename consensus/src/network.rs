@@ -19,7 +19,6 @@ use crate::{
         types::{AugmentedData, FastShare, Share},
     },
 };
-use anyhow::{anyhow, bail, ensure};
 use accudo_channels::{self, accudo_channel, message_queues::QueueStyle};
 use accudo_config::network_id::NetworkId;
 use accudo_consensus_types::{
@@ -45,6 +44,7 @@ use accudo_types::{
     account_address::AccountAddress, epoch_change::EpochChangeProof,
     ledger_info::LedgerInfoWithSignatures, validator_verifier::ValidatorVerifier,
 };
+use anyhow::{anyhow, bail, ensure};
 use async_trait::async_trait;
 use bytes::Bytes;
 use fail::fail_point;

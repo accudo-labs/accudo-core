@@ -9,8 +9,8 @@ use crate::{
         update_binary,
     },
 };
-use anyhow::{Context, Result};
 use accudo_build_info::BUILD_OS;
+use anyhow::{Context, Result};
 use async_trait::async_trait;
 use clap::Parser;
 use move_prover_boogie_backend::options::{

@@ -6,13 +6,15 @@ use crate::{
     smoke_test_environment::{new_local_swarm_with_accudo, SwarmBuilder},
     utils::create_and_fund_account,
 };
-use anyhow::ensure;
 use accudo_forge::{
     args::TransactionTypeArg, emitter::NumAccountsMode, AccountType, EmitJobMode, EmitJobRequest,
     EntryPoints, NodeExt, Result, Swarm, TransactionType, TxnEmitter, TxnStats, WorkflowProgress,
 };
 use accudo_sdk::{transaction_builder::TransactionFactory, types::PeerId};
-use accudo_types::keyless::test_utils::{get_sample_esk, get_sample_exp_date, get_sample_jwt_token};
+use accudo_types::keyless::test_utils::{
+    get_sample_esk, get_sample_exp_date, get_sample_jwt_token,
+};
+use anyhow::ensure;
 use once_cell::sync::Lazy;
 use rand::{rngs::OsRng, SeedableRng};
 use std::{sync::Arc, time::Duration};

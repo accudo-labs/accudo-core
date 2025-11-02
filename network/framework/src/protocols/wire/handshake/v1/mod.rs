@@ -14,10 +14,10 @@
 //! [AccudoNet Handshake v1 Specification]: https://github.com/accudo-labs/accudo-core/blob/main/specifications/network/handshake-v1.md
 
 use crate::counters::{start_serialization_timer, DESERIALIZATION_LABEL, SERIALIZATION_LABEL};
-use anyhow::anyhow;
 use accudo_compression::client::CompressionClient;
 use accudo_config::{config::MAX_APPLICATION_MESSAGE_SIZE, network_id::NetworkId};
 use accudo_types::chain_id::ChainId;
+use anyhow::anyhow;
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest_derive::Arbitrary;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
@@ -394,7 +394,9 @@ pub enum HandshakeError {
         "accudo-handshake: the received message has an different network id: {0}, expected: {1}"
     )]
     InvalidNetworkId(NetworkId, NetworkId),
-    #[error("accudo-handshake: could not find an intersection of supported protocol with the peer")]
+    #[error(
+        "accudo-handshake: could not find an intersection of supported protocol with the peer"
+    )]
     NoCommonProtocols,
 }
 

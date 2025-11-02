@@ -5,7 +5,6 @@
 #[cfg(test)]
 mod mock_vm_test;
 
-use anyhow::Result;
 use accudo_block_executor::txn_provider::{default::DefaultTxnProvider, TxnProvider};
 use accudo_crypto::{ed25519::Ed25519PrivateKey, PrivateKey, Uniform};
 use accudo_types::{
@@ -34,6 +33,7 @@ use accudo_vm::{
     sharded_block_executor::{executor_client::ExecutorClient, ShardedBlockExecutor},
     VMBlockExecutor,
 };
+use anyhow::Result;
 use move_core_types::language_storage::TypeTag;
 use once_cell::sync::Lazy;
 use std::{collections::HashMap, sync::Arc};

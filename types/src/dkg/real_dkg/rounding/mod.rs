@@ -1,8 +1,8 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{bail, ensure};
 use accudo_dkg::pvss::WeightedConfig;
+use anyhow::{bail, ensure};
 use fixed::types::U64F64;
 use once_cell::sync::Lazy;
 use std::{

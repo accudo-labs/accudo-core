@@ -11,11 +11,11 @@ use crate::{
         jellyfish_merkle_node::JellyfishMerkleNodeSchema,
     },
 };
-use anyhow::Result;
 use accudo_jellyfish_merkle::StaleNodeIndex;
 use accudo_logger::info;
 use accudo_schemadb::{batch::SchemaBatch, schema::KeyCodec, DB};
 use accudo_types::transaction::Version;
+use anyhow::Result;
 use std::{marker::PhantomData, sync::Arc};
 
 pub(in crate::pruner) struct StateMerkleShardPruner<S> {

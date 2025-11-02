@@ -99,8 +99,11 @@
 //! let hash_value = hasher.finish();
 //! ```
 #![allow(clippy::arithmetic_side_effects)]
+
+mod lattice;
 use bytes::Bytes;
 use hex::FromHex;
+use lattice::{quantum_hash, LatticeHasher};
 use more_asserts::debug_assert_lt;
 use once_cell::sync::{Lazy, OnceCell};
 #[cfg(any(test, feature = "fuzzing"))]
@@ -121,6 +124,8 @@ use tiny_keccak::{Hasher, Sha3};
 pub(crate) const HASH_PREFIX: &[u8] = b"ACCUDO::";
 
 /// Output value of our hash function. Intentionally opaque for safety and modularity.
+/// The backing hasher combines classical SHA3 with a lattice-based accumulator to
+/// provide post-quantum resistance without changing the existing 32-byte layout.
 #[derive(Clone, Copy, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(Arbitrary))]
 pub struct HashValue {
@@ -150,6 +155,19 @@ impl HashValue {
         self.hash.to_vec()
     }
 
+    /// Returns the underlying bytes as an array.
+    pub fn to_bytes(&self) -> [u8; Self::LENGTH] {
+        let mut out = [0u8; Self::LENGTH];
+        out.copy_from_slice(&self.hash);
+        out
+    }
+
+    pub(crate) fn xor_assign(&mut self, other: &[u8; Self::LENGTH]) {
+        for (dst, src) in self.hash.iter_mut().zip(other.iter()) {
+            *dst ^= *src;
+        }
+    }
+
     /// Creates a zero-initialized instance.
     pub const fn zero() -> Self {
         HashValue {
@@ -177,6 +195,17 @@ impl HashValue {
         let mut sha3 = Sha3::v256();
         sha3.update(buffer);
         HashValue::from_keccak(sha3)
+    }
+
+    /// Computes the combined SHA3 + lattice-based digest of a byte slice.
+    ///
+    /// This is the recommended helper for new call sites that require
+    /// post-quantum hashing behavior outside of the `CryptoHasher` trait.
+    pub fn quantum_safe_of(buffer: &[u8]) -> Self {
+        let mut classical = HashValue::sha3_256_of(buffer);
+        let lattice = quantum_hash(buffer, b"ACCUDO::LATTICE::DIRECT");
+        classical.xor_assign(&lattice);
+        classical
     }
 
     /// Convenience function that sha3_256 the set of buffers
@@ -513,9 +542,12 @@ pub trait CryptoHasher: Default + std::io::Write {
 #[derive(Clone)]
 pub struct DefaultHasher {
     state: Sha3,
+    lattice: LatticeHasher,
 }
 
 impl DefaultHasher {
+    /// Creates a new hasher seeded with both SHA-3 and lattice accumulators
+    /// for the provided type name.
     #[doc(hidden)]
     /// This function does not return a HashValue in the sense of our usual
     /// hashes, but a construction of initial bytes that are fed into any hash
@@ -526,7 +558,12 @@ impl DefaultHasher {
         let salt: Vec<u8> = [HASH_PREFIX, buffer].concat();
         // The seed is a fixed-length hash of the salt, thereby preventing
         // suffix attacks on the domain separation bytes.
-        HashValue::sha3_256_of(&salt[..]).hash
+        let mut base = HashValue::sha3_256_of(&salt[..]).hash;
+        let lattice = quantum_hash(&salt[..], b"ACCUDO::LATTICE::SEED");
+        for (dst, src) in base.iter_mut().zip(lattice.iter()) {
+            *dst ^= *src;
+        }
+        base
     }
 
     #[doc(hidden)]
@@ -535,25 +572,30 @@ impl DefaultHasher {
         if !typename.is_empty() {
             state.update(&Self::prefixed_hash(typename));
         }
-        DefaultHasher { state }
+        let lattice = LatticeHasher::new(typename);
+        DefaultHasher { state, lattice }
     }
 
     #[doc(hidden)]
     pub fn update(&mut self, bytes: &[u8]) {
         self.state.update(bytes);
+        self.lattice.update(bytes);
     }
 
     #[doc(hidden)]
     pub fn finish(self) -> HashValue {
+        let DefaultHasher { state, lattice } = self;
         let mut hasher = HashValue::default();
-        self.state.finalize(hasher.as_ref_mut());
+        state.finalize(hasher.as_ref_mut());
+        let lattice_bytes = lattice.finalize();
+        hasher.xor_assign(&lattice_bytes);
         hasher
     }
 }
 
 impl fmt::Debug for DefaultHasher {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "DefaultHasher: state = Sha3")
+        write!(f, "DefaultHasher: state = Sha3 + Lattice")
     }
 }
 
@@ -703,6 +745,60 @@ pub static GENESIS_BLOCK_ID: Lazy<HashValue> = Lazy::new(|| {
         0xF6, 0xE4,
     ])
 });
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tiny_keccak::Sha3;
+
+    #[test]
+    fn quantum_hash_is_deterministic() {
+        let data = b"deterministic message";
+        let h1 = HashValue::quantum_safe_of(data);
+        let h2 = HashValue::quantum_safe_of(data);
+        assert_eq!(h1, h2);
+    }
+
+    #[test]
+    fn quantum_hash_differs_from_plain_sha3() {
+        let data = b"quantum separation";
+        let classical = HashValue::sha3_256_of(data);
+        let quantum = HashValue::quantum_safe_of(data);
+        assert_ne!(classical.to_bytes(), quantum.to_bytes());
+    }
+
+    #[test]
+    fn prefixed_hash_injects_lattice_entropy() {
+        let domain = b"HasherDomain";
+        let combined = DefaultHasher::prefixed_hash(domain);
+        let salt: Vec<u8> = [HASH_PREFIX, domain].concat();
+        let classical = HashValue::sha3_256_of(&salt);
+        assert_ne!(combined, classical.to_bytes());
+    }
+
+    #[test]
+    fn default_hasher_matches_manual_combination() {
+        let domain = b"AccudoQuantum";
+        let payload = b"payload-bytes";
+
+        let mut hasher = DefaultHasher::new(domain);
+        hasher.update(payload);
+        let combined = hasher.finish();
+
+        let mut sha3_state = Sha3::v256();
+        sha3_state.update(&DefaultHasher::prefixed_hash(domain));
+        sha3_state.update(payload);
+        let mut classical = HashValue::default();
+        sha3_state.finalize(classical.as_ref_mut());
+
+        let mut lattice = LatticeHasher::new(domain);
+        lattice.update(payload);
+        let lattice_bytes = lattice.finalize();
+        classical.xor_assign(&lattice_bytes);
+
+        assert_eq!(combined, classical);
+    }
+}
 
 /// Provides a test_only_hash() method that can be used in tests on types that implement
 /// `serde::Serialize`.

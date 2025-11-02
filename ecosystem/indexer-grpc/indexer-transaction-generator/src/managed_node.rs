@@ -1,7 +1,6 @@
 // Copyright (c) Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Context;
 use accudo::node::local_testnet::{
     faucet::FaucetManager,
     get_derived_test_dir,
@@ -11,6 +10,7 @@ use accudo::node::local_testnet::{
 };
 use accudo_config::config::DEFAULT_GRPC_STREAM_PORT;
 use accudo_faucet_core::server::{FunderKeyEnum, RunConfig};
+use anyhow::Context;
 use rand::{rngs::StdRng, SeedableRng};
 use std::{collections::HashSet, net::Ipv4Addr, path::PathBuf};
 use tokio::{

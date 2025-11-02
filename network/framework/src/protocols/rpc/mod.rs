@@ -57,7 +57,6 @@ use crate::{
     },
     ProtocolId,
 };
-use anyhow::anyhow;
 use accudo_channels::accudo_channel;
 use accudo_config::network_id::NetworkContext;
 use accudo_id_generator::{IdGenerator, U32IdGenerator};
@@ -65,6 +64,7 @@ use accudo_logger::prelude::*;
 use accudo_short_hex_str::AsShortHexStr;
 use accudo_time_service::{timeout, TimeService, TimeServiceTrait};
 use accudo_types::PeerId;
+use anyhow::anyhow;
 use bytes::Bytes;
 use error::RpcError;
 use futures::{

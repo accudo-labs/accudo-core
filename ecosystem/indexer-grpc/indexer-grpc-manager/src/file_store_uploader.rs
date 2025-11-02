@@ -5,7 +5,6 @@ use crate::{
     data_manager::DataManager,
     metrics::{FILE_STORE_UPLOADED_BYTES, FILE_STORE_VERSION, TIMER},
 };
-use anyhow::Result;
 use accudo_indexer_grpc_utils::{
     compression_util::{FileEntry, StorageFormat},
     config::IndexerGrpcFileStoreConfig,
@@ -16,6 +15,7 @@ use accudo_indexer_grpc_utils::{
     },
 };
 use accudo_protos::transaction::v1::Transaction;
+use anyhow::Result;
 use std::{path::PathBuf, sync::Arc, time::Duration};
 use tokio::{
     sync::{mpsc::channel, oneshot::Sender},

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::args::CheckEndpointArgs;
-use anyhow::{bail, Context, Result};
 use accudo_config::{
     config::{Error, RoleType, HANDSHAKE_VERSION},
     network_id::{NetworkContext, NetworkId},
@@ -17,6 +16,7 @@ use accudo_network::{
     },
 };
 use accudo_types::{account_address, chain_id::ChainId, network_address::NetworkAddress, PeerId};
+use anyhow::{bail, Context, Result};
 use futures::{AsyncReadExt, AsyncWriteExt};
 use std::{collections::BTreeMap, sync::Arc};
 use tokio::time::Duration;

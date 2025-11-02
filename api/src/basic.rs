@@ -8,8 +8,8 @@ use crate::{
     response::{InternalError, ServiceUnavailableError},
     ApiTags,
 };
-use anyhow::Context as AnyhowContext;
 use accudo_api_types::AccudoErrorCode;
+use anyhow::Context as AnyhowContext;
 use poem_openapi::{
     param::Query,
     payload::{Html, Json},

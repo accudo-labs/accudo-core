@@ -9,7 +9,6 @@
 //!   3. overriding gas feature version,
 //!   4. changing modules (bytecode, metadata, etc.) and package information.
 
-use anyhow::bail;
 use accudo_framework::{natives::code::PackageRegistry, BuildOptions, BuiltPackage};
 use accudo_gas_schedule::LATEST_GAS_FEATURE_VERSION;
 use accudo_logger::{error, warn};
@@ -17,6 +16,7 @@ use accudo_types::{
     on_chain_config::{FeatureFlag, Features, GasScheduleV2, OnChainConfig},
     state_store::{state_key::StateKey, state_value::StateValue, StateView},
 };
+use anyhow::bail;
 use serde::Serialize;
 use std::{
     collections::{BTreeSet, HashMap},

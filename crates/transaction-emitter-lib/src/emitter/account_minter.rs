@@ -6,7 +6,6 @@ use super::{
     transaction_executor::RestApiReliableTransactionSubmitter,
 };
 use crate::{emitter::create_private_key_account_generator, EmitJobRequest};
-use anyhow::{anyhow, bail, format_err, Context, Result};
 use accudo_config::config::DEFAULT_MAX_SUBMIT_TRANSACTION_BATCH_SIZE;
 use accudo_crypto::{ed25519::Ed25519PrivateKey, encoding_type::EncodingType};
 use accudo_sdk::{
@@ -17,6 +16,7 @@ use accudo_transaction_generator_lib::{
     CounterState, ReliableTransactionSubmitter, RootAccountHandle,
 };
 use accudo_types::account_address::AccountAddress;
+use anyhow::{anyhow, bail, format_err, Context, Result};
 use core::result::Result::{Err, Ok};
 use futures::{future::try_join_all, StreamExt};
 use log::{error, info};

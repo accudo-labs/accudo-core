@@ -21,8 +21,9 @@ pub static PROCESSED_STRUCT_LOG_COUNT: Lazy<IntCounter> = Lazy::new(|| {
 });
 
 /// Counts of logs
-pub static ERROR_LOG_COUNT: Lazy<IntCounter> =
-    Lazy::new(|| register_int_counter!("accudo_error_log_count", "Count of error!() logs").unwrap());
+pub static ERROR_LOG_COUNT: Lazy<IntCounter> = Lazy::new(|| {
+    register_int_counter!("accudo_error_log_count", "Count of error!() logs").unwrap()
+});
 pub static WARN_LOG_COUNT: Lazy<IntCounter> =
     Lazy::new(|| register_int_counter!("accudo_warn_log_count", "Count of warn!() logs").unwrap());
 pub static INFO_LOG_COUNT: Lazy<IntCounter> =

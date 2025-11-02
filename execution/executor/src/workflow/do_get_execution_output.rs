@@ -5,7 +5,6 @@ use crate::{
     metrics,
     metrics::{EXECUTOR_ERRORS, OTHER_TIMERS},
 };
-use anyhow::{anyhow, ensure, Result};
 use accudo_block_executor::txn_provider::default::DefaultTxnProvider;
 #[cfg(feature = "consensus-only-perf-test")]
 use accudo_block_executor::txn_provider::TxnProvider;
@@ -50,6 +49,7 @@ use accudo_types::{
     write_set::{HotStateOp, TransactionWrite, WriteSet},
 };
 use accudo_vm::VMBlockExecutor;
+use anyhow::{anyhow, ensure, Result};
 use itertools::Itertools;
 use std::sync::Arc;
 

@@ -16,7 +16,6 @@ use crate::{
     SubmitTransactionRequest, Transaction, TransactionInfo, TransactionOnChainData,
     TransactionPayload, VersionedEvent, WriteSet, WriteSetChange, WriteSetPayload,
 };
-use anyhow::{bail, ensure, format_err, Context as AnyhowContext, Result};
 use accudo_crypto::{hash::CryptoHash, HashValue};
 use accudo_logger::{sample, sample::SampleRate};
 use accudo_resource_viewer::AccudoValueAnnotator;
@@ -39,6 +38,7 @@ use accudo_types::{
     vm_status::AbortLocation,
     write_set::WriteOp,
 };
+use anyhow::{bail, ensure, format_err, Context as AnyhowContext, Result};
 use bytes::Bytes;
 use move_core_types::{
     account_address::AccountAddress,

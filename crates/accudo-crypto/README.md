@@ -12,9 +12,10 @@ To enforce type-safety for signature schemes, we rely on traits from  [`traits.r
 
 Accudo makes use of several cryptographic algorithms:
 
-- **SHA-3** as the main hash function
-  + Standardized in [FIPS 202](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf)
-  + Based on the [tiny_keccak](https://docs.rs/tiny-keccak/) crate
+- **SHA-3** mixed with a lattice accumulator as the main hash function
+  + SHA-3 standardized in [FIPS 202](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf)
+  + Lattice component implemented in `hash/lattice.rs` to provide post-quantum resistance while keeping 32-byte outputs
+  + Backed by the [tiny_keccak](https://docs.rs/tiny-keccak/) crate for Keccak permutations
 - **HKDF: HMAC-based Extract-and-Expand Key Derivation Function**
   + Standardized in [RFC 5869](https://tools.ietf.org/html/rfc5869)
   + Used to generate keys from a salt (optional), seed, and application-info (optional)
@@ -28,6 +29,15 @@ Accudo makes use of several cryptographic algorithms:
 - **X25519** key exchange
   + Based on the [x25519-dalek](https://docs.rs/x25519-dalek) crate
   + Used in our implementation of the [Noise Protocol Framework](http://www.noiseprotocol.org/)
+- **PQ abstraction layer** under `pq/`
+  + Defines algorithm-agnostic traits and registries so Dilithium/Kyber style primitives can coexist with classical curves during migration
+  + Enable the optional `pq-dilithium` feature to experiment with Dilithium3 signing and verification adapters
+
+## Post-Quantum Posture
+
+Dilithium3 support and the lattice-augmented hash are now compiled in by default;
+callers do not need to toggle any feature flags. Classical-only execution paths
+have been removed from this crate.
 
 ## Traits for safer cryptography implementation
 

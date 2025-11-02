@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::metrics::OTHER_TIMERS;
-use anyhow::{ensure, Result};
 use accudo_crypto::HashValue;
 use accudo_executor_types::{
     execution_output::ExecutionOutput, state_checkpoint_output::StateCheckpointOutput,
@@ -11,6 +10,7 @@ use accudo_metrics_core::TimerHelper;
 use accudo_storage_interface::state_store::state_summary::{
     LedgerStateSummary, ProvableStateSummary,
 };
+use anyhow::{ensure, Result};
 
 pub struct DoStateCheckpoint;
 

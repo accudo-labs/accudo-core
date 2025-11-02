@@ -9,7 +9,6 @@ use crate::{
     on_chain_config::OnChainRandomnessConfig,
     validator_verifier::{ValidatorConsensusInfo, ValidatorVerifier},
 };
-use anyhow::{anyhow, bail, ensure, Context};
 #[cfg(any(test, feature = "testing"))]
 use accudo_crypto::Uniform;
 use accudo_crypto::{bls12381, bls12381::PrivateKey};
@@ -20,6 +19,7 @@ use accudo_dkg::{
         Player,
     },
 };
+use anyhow::{anyhow, bail, ensure, Context};
 use fixed::types::U64F64;
 use move_core_types::account_address::AccountAddress;
 use num_traits::Zero;

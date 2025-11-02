@@ -8,7 +8,6 @@ use crate::{
     state_replication::StateComputer, transaction_deduper::TransactionDeduper,
     transaction_shuffler::TransactionShuffler, txn_notifier::TxnNotifier,
 };
-use anyhow::Result;
 use accudo_config::config::BlockTransactionFilterConfig;
 use accudo_consensus_notifications::ConsensusNotificationSender;
 use accudo_consensus_types::common::Round;
@@ -20,6 +19,7 @@ use accudo_types::{
     epoch_state::EpochState, ledger_info::LedgerInfoWithSignatures,
     on_chain_config::OnChainConsensusConfig, validator_signer::ValidatorSigner,
 };
+use anyhow::Result;
 use fail::fail_point;
 use std::{boxed::Box, sync::Arc, time::Duration};
 use tokio::sync::Mutex as AsyncMutex;

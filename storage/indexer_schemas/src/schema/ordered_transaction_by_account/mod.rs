@@ -12,12 +12,12 @@
 //! ```
 
 use crate::{schema::ORDERED_TRANSACTION_BY_ACCOUNT_CF_NAME, utils::ensure_slice_len_eq};
-use anyhow::Result;
 use accudo_schemadb::{
     define_pub_schema,
     schema::{KeyCodec, ValueCodec},
 };
 use accudo_types::{account_address::AccountAddress, transaction::Version};
+use anyhow::Result;
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use std::{convert::TryFrom, mem::size_of};
 

@@ -8,7 +8,6 @@ use crate::{
     account_address::AccountAddress, aggregate_signature::AggregateSignature,
     ledger_info::SignatureWithStatus, on_chain_config::ValidatorSet,
 };
-use anyhow::{ensure, Result};
 use accudo_bitvec::BitVec;
 use accudo_crypto::{
     bls12381,
@@ -16,6 +15,7 @@ use accudo_crypto::{
     hash::CryptoHash,
     Signature, VerifyingKey,
 };
+use anyhow::{ensure, Result};
 use dashmap::DashSet;
 use derivative::Derivative;
 use itertools::Itertools;

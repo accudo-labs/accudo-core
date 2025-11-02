@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::models::{move_resources::MoveResource, token_models::token_utils::Table};
-use anyhow::{Context, Result};
 use accudo_api_types::{deserialize_from_string, WriteResource};
+use anyhow::{Context, Result};
 use bigdecimal::BigDecimal;
 use serde::{Deserialize, Serialize};
 

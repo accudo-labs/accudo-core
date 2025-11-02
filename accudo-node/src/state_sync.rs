@@ -230,7 +230,8 @@ fn setup_data_streaming_service(
     );
 
     // Start the data streaming service
-    let streaming_service_runtime = accudo_runtimes::spawn_named_runtime("stream-serv".into(), None);
+    let streaming_service_runtime =
+        accudo_runtimes::spawn_named_runtime("stream-serv".into(), None);
     streaming_service_runtime.spawn(data_streaming_service.start_service());
 
     Ok((streaming_service_client, streaming_service_runtime))
@@ -246,7 +247,8 @@ fn setup_accudo_data_client(
     let storage_service_client = StorageServiceClient::new(network_client);
 
     // Create a new runtime for the data client
-    let accudo_data_client_runtime = accudo_runtimes::spawn_named_runtime("data-client".into(), None);
+    let accudo_data_client_runtime =
+        accudo_runtimes::spawn_named_runtime("data-client".into(), None);
 
     // Create the data client and spawn the data poller
     let (accudo_data_client, data_summary_poller) = AccudoDataClient::new(

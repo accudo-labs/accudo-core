@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{components::get_signer_arg, utils::*};
-use anyhow::Result;
 use accudo_crypto::HashValue;
 use accudo_types::on_chain_config::AccudoVersion;
+use anyhow::Result;
 use move_model::{code_writer::CodeWriter, emitln, model::Loc};
 
 pub fn generate_version_upgrade_proposal(

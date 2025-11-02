@@ -9,10 +9,10 @@ use crate::{
     result::TestResult,
     Swarm, SwarmExt, TestReport,
 };
-use anyhow::{bail, Context};
 use accudo::node::analyze::{analyze_validators::AnalyzeValidators, fetch_metadata::FetchMetadata};
 use accudo_logger::info as accudo_logger_info;
 use accudo_transaction_emitter_lib::{TxnStats, TxnStatsRate};
+use anyhow::{bail, Context};
 use log::info;
 use prometheus_http_query::response::Sample;
 use serde_json::json;

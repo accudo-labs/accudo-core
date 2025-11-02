@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::common::Round;
-use anyhow::{ensure, Context};
 use accudo_types::{ledger_info::LedgerInfoWithSignatures, validator_verifier::ValidatorVerifier};
+use anyhow::{ensure, Context};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display, Formatter};
 

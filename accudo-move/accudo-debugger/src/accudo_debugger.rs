@@ -1,7 +1,6 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{bail, format_err};
 use accudo_block_executor::txn_provider::{default::DefaultTxnProvider, TxnProvider};
 use accudo_gas_profiling::{GasProfiler, TransactionGasLog};
 use accudo_rest_client::Client;
@@ -29,6 +28,7 @@ use accudo_vm::{
 use accudo_vm_environment::environment::AccudoEnvironment;
 use accudo_vm_logging::log_schema::AdapterLogSchema;
 use accudo_vm_types::{module_and_script_storage::AsAccudoCodeStorage, output::VMOutput};
+use anyhow::{bail, format_err};
 use itertools::Itertools;
 use std::{path::Path, sync::Arc, time::Instant};
 

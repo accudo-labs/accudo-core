@@ -11,12 +11,12 @@
 //! ```
 
 use crate::schema::EVENT_SEQUENCE_NUMBER_CF_NAME;
-use anyhow::Result;
 use accudo_schemadb::{
     define_pub_schema,
     schema::{KeyCodec, ValueCodec},
 };
 use accudo_types::event::EventKey;
+use anyhow::Result;
 
 define_pub_schema!(
     EventSequenceNumberSchema,

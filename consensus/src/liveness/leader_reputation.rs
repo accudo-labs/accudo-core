@@ -13,7 +13,6 @@ use crate::{
     },
     liveness::proposer_election::{choose_index, ProposerElection},
 };
-use anyhow::{ensure, Result};
 use accudo_bitvec::BitVec;
 use accudo_consensus_types::common::{Author, Round};
 use accudo_crypto::HashValue;
@@ -23,6 +22,7 @@ use accudo_storage_interface::DbReader;
 use accudo_types::{
     account_config::NewBlockEvent, epoch_change::EpochChangeProof, epoch_state::EpochState,
 };
+use anyhow::{ensure, Result};
 use std::{
     cmp::max,
     collections::{HashMap, HashSet},

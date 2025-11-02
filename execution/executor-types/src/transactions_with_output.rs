@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::metrics::TIMER;
-use anyhow::{ensure, Result};
 use accudo_metrics_core::TimerHelper;
 use accudo_storage_interface::state_store::state_update_refs::StateUpdateRefs;
 use accudo_types::transaction::{PersistedAuxiliaryInfo, Transaction, TransactionOutput, Version};
+use anyhow::{ensure, Result};
 use itertools::{izip, Itertools};
 use std::{
     fmt::{Debug, Formatter},

@@ -6,12 +6,12 @@ use crate::{
     error::StateSyncError, network::NetworkSender, payload_manager::TPayloadManager,
     transaction_deduper::TransactionDeduper, transaction_shuffler::TransactionShuffler,
 };
-use anyhow::Result;
 use accudo_consensus_types::pipelined_block::PipelinedBlock;
 use accudo_types::{
     block_executor::config::BlockExecutorConfigFromOnchain, epoch_state::EpochState,
     ledger_info::LedgerInfoWithSignatures, on_chain_config::OnChainConsensusConfig,
 };
+use anyhow::Result;
 use std::{sync::Arc, time::Duration};
 
 pub type StateComputerCommitCallBackType =

@@ -8,7 +8,6 @@ use crate::{
     types::executed_chunk::ExecutedChunk,
     workflow::{do_get_execution_output::DoGetExecutionOutput, ApplyExecutionOutput},
 };
-use anyhow::{anyhow, ensure, format_err, Result};
 use accudo_crypto::HashValue;
 use accudo_logger::prelude::*;
 use accudo_storage_interface::{
@@ -31,6 +30,7 @@ use accudo_types::{
     waypoint::Waypoint,
 };
 use accudo_vm::VMBlockExecutor;
+use anyhow::{anyhow, ensure, format_err, Result};
 use std::sync::Arc;
 
 pub fn generate_waypoint<V: VMBlockExecutor>(

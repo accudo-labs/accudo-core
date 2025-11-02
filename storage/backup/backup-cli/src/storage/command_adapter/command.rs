@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{storage::command_adapter::config::EnvVar, utils::error_notes::ErrorNotes};
-use anyhow::{bail, ensure, Result};
 use accudo_logger::prelude::*;
+use anyhow::{bail, ensure, Result};
 use futures::{
     future::BoxFuture,
     task::{Context, Poll},

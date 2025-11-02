@@ -5,9 +5,9 @@ use crate::{
     pvss::{schnorr, Player},
     utils::HasMultiExp,
 };
-use anyhow::bail;
 use accudo_crypto::bls12381;
 use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher};
+use anyhow::bail;
 use blstrs::Scalar;
 use group::Group;
 use serde::{Deserialize, Serialize};

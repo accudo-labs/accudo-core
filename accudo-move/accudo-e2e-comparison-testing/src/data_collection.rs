@@ -5,7 +5,6 @@ use crate::{
     data_state_view::DataStateView, dump_and_compile_from_package_metadata, is_accudo_package,
     CompilationCache, DataManager, IndexWriter, PackageInfo, TxnIndex,
 };
-use anyhow::{format_err, Result};
 use accudo_block_executor::txn_provider::default::DefaultTxnProvider;
 use accudo_framework::natives::code::PackageMetadata;
 use accudo_rest_client::Client;
@@ -17,8 +16,11 @@ use accudo_types::{
     },
     write_set::TOTAL_SUPPLY_STATE_KEY,
 };
-use accudo_validator_interface::{AccudoValidatorInterface, FilterCondition, RestDebuggerInterface};
+use accudo_validator_interface::{
+    AccudoValidatorInterface, FilterCondition, RestDebuggerInterface,
+};
 use accudo_vm::{accudo_vm::AccudoVMBlockExecutor, VMBlockExecutor};
+use anyhow::{format_err, Result};
 use move_core_types::account_address::AccountAddress;
 use std::{
     collections::HashMap,

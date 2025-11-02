@@ -26,7 +26,6 @@ pub mod two_traffics_test;
 pub mod validator_join_leave_test;
 pub mod validator_reboot_stress_test;
 
-use anyhow::Context;
 use accudo_forge::{
     prometheus_metrics::{fetch_latency_breakdown, LatencyBreakdown},
     EmitJob, EmitJobRequest, NetworkContext, NetworkContextSynchronizer, NetworkTest, NodeExt,
@@ -35,6 +34,7 @@ use accudo_forge::{
 use accudo_logger::warn;
 use accudo_rest_client::Client as RestClient;
 use accudo_sdk::{transaction_builder::TransactionFactory, types::PeerId};
+use anyhow::Context;
 use async_trait::async_trait;
 use futures::future::join_all;
 use log::info;

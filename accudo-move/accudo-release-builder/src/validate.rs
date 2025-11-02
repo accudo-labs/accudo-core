@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{accudo_framework_path, components::ProposalMetadata, ExecutionMode, ReleaseConfig};
-use anyhow::Result;
 use accudo::{
     common::types::CliCommand,
     governance::{ExecuteProposal, SubmitProposal, SubmitVote},
@@ -13,6 +12,7 @@ use accudo_crypto::ed25519::Ed25519PrivateKey;
 use accudo_genesis::keys::PrivateIdentity;
 use accudo_temppath::TempPath;
 use accudo_types::account_address::AccountAddress;
+use anyhow::Result;
 use clap::Parser;
 use std::{
     fs,

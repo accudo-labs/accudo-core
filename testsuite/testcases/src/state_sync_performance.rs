@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::generate_traffic;
-use anyhow::bail;
 use accudo_forge::{
     get_highest_synced_epoch, get_highest_synced_version, NetworkContext,
     NetworkContextSynchronizer, NetworkTest, Result, SwarmExt, Test,
 };
 use accudo_sdk::move_types::account_address::AccountAddress;
+use anyhow::bail;
 use async_trait::async_trait;
 use log::info;
 use std::{ops::DerefMut, time::Instant};

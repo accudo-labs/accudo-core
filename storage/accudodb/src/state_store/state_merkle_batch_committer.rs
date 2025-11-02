@@ -9,12 +9,12 @@ use crate::{
     schema::jellyfish_merkle_node::JellyfishMerkleNodeSchema,
     state_store::{buffered_state::CommitMessage, persisted_state::PersistedState, StateDb},
 };
-use anyhow::{anyhow, ensure, Result};
 use accudo_jellyfish_merkle::node_type::NodeKey;
 use accudo_logger::{info, trace};
 use accudo_metrics_core::TimerHelper;
 use accudo_schemadb::batch::RawBatch;
 use accudo_storage_interface::state_store::{state::State, state_with_summary::StateWithSummary};
+use anyhow::{anyhow, ensure, Result};
 use std::sync::{mpsc::Receiver, Arc};
 
 pub struct StateMerkleBatch {

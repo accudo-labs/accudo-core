@@ -6,7 +6,6 @@ use crate::{
     counters::GLOBAL_MODULE_CACHE_MISS_SECONDS,
     view::{LatestView, ViewState},
 };
-use ambassador::delegate_to_methods;
 use accudo_mvhashmap::types::TxnIndex;
 #[cfg(test)]
 use accudo_types::on_chain_config::CurrentTimeMicroseconds;
@@ -17,6 +16,7 @@ use accudo_types::{
     vm::modules::AccudoModuleExtension,
 };
 use accudo_vm_types::module_and_script_storage::module_storage::AccudoModuleStorage;
+use ambassador::delegate_to_methods;
 #[cfg(test)]
 use fail::fail_point;
 use move_binary_format::{

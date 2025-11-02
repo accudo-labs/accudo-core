@@ -7,7 +7,6 @@ use crate::{
     VALIDATOR_0_DATA_PERSISTENT_VOLUME_CLAIM_PREFIX, VALIDATOR_0_GENESIS_SECRET_PREFIX,
     VALIDATOR_0_STATEFUL_SET_NAME,
 };
-use anyhow::Context;
 use accudo_config::{
     config::{
         ApiConfig, BaseConfig, DiscoveryMethod, ExecutionConfig, NetworkConfig, NodeConfig,
@@ -17,6 +16,7 @@ use accudo_config::{
 };
 use accudo_sdk::types::PeerId;
 use accudo_short_hex_str::AsShortHexStr;
+use anyhow::Context;
 use k8s_openapi::{
     api::{
         apps::v1::{StatefulSet, StatefulSetSpec},

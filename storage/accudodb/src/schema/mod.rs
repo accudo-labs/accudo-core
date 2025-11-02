@@ -32,8 +32,8 @@ pub(crate) mod transaction_summaries_by_account;
 pub(crate) mod version_data;
 pub(crate) mod write_set;
 
-use anyhow::{ensure, Result};
 use accudo_schemadb::ColumnFamilyName;
+use anyhow::{ensure, Result};
 
 pub const BLOCK_BY_VERSION_CF_NAME: ColumnFamilyName = "block_by_version";
 pub const BLOCK_INFO_CF_NAME: ColumnFamilyName = "block_info";

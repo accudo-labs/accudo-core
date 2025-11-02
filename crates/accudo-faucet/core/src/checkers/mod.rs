@@ -25,8 +25,8 @@ use crate::{
     common::{IpRangeManagerConfig, ListManagerConfig},
     endpoints::{AccudoTapError, RejectionReason},
 };
-use anyhow::Result;
 use accudo_sdk::types::account_address::AccountAddress;
+use anyhow::Result;
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 use futures::lock::Mutex;

@@ -6,7 +6,6 @@ use crate::{
     payload::{OptBatches, OptQuorumStorePayload, PayloadExecutionLimit, TxnAndGasLimits},
     proof_of_store::{BatchInfo, ProofCache, ProofOfStore},
 };
-use anyhow::ensure;
 use accudo_crypto::{
     hash::{CryptoHash, CryptoHasher},
     HashValue,
@@ -20,6 +19,7 @@ use accudo_types::{
     vm_status::DiscardedVMStatus,
     PeerId,
 };
+use anyhow::ensure;
 use once_cell::sync::OnceCell;
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};

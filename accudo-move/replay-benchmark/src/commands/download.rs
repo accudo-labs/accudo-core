@@ -5,8 +5,8 @@ use crate::{
     commands::{build_debugger, RestAPI},
     workload::TransactionBlock,
 };
-use anyhow::{anyhow, bail};
 use accudo_types::transaction::{Transaction, Version};
+use anyhow::{anyhow, bail};
 use clap::Parser;
 use std::path::PathBuf;
 use tokio::fs;

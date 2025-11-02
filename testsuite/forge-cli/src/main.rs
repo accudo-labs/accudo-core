@@ -4,9 +4,9 @@
 
 #![allow(clippy::field_reassign_with_default)]
 
-use anyhow::{bail, format_err, Context, Result};
 use accudo_forge::{config::ForgeConfig, Options, *};
 use accudo_logger::Level;
+use anyhow::{bail, format_err, Context, Result};
 use clap::{Parser, Subcommand};
 use futures::{future, FutureExt};
 use rand::{rngs::ThreadRng, seq::SliceRandom, Rng};

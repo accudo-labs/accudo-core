@@ -7,8 +7,8 @@ use super::{
     CommonProviderConfig,
 };
 use crate::checker::CheckResult;
-use anyhow::{anyhow, Context, Result};
 use accudo_logger::warn;
+use anyhow::{anyhow, Context, Result};
 use async_trait::async_trait;
 use prometheus_parse::{Scrape, Value};
 use reqwest::Url;

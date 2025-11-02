@@ -5,7 +5,6 @@
 use crate::{
     common::Author, quorum_cert::QuorumCert, timeout_2chain::TwoChainTimeout, vote_data::VoteData,
 };
-use anyhow::{ensure, Context};
 use accudo_crypto::{bls12381, hash::CryptoHash, CryptoMaterialError};
 use accudo_short_hex_str::AsShortHexStr;
 use accudo_types::{
@@ -13,6 +12,7 @@ use accudo_types::{
     validator_signer::ValidatorSigner,
     validator_verifier::ValidatorVerifier,
 };
+use anyhow::{ensure, Context};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display, Formatter};
 

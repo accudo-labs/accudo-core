@@ -2,7 +2,6 @@
 // Parts of the project are originally copyright © Meta Platforms, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{bail, format_err, Result};
 use accudo_api_types::AsConverter;
 use accudo_block_executor::txn_provider::default::DefaultTxnProvider;
 use accudo_crypto::{
@@ -31,9 +30,12 @@ use accudo_types::{
     },
 };
 use accudo_vm::{accudo_vm::AccudoVMBlockExecutor, VMBlockExecutor};
-use accudo_vm_environment::{environment::AccudoEnvironment, prod_configs::set_paranoid_type_checks};
+use accudo_vm_environment::{
+    environment::AccudoEnvironment, prod_configs::set_paranoid_type_checks,
+};
 use accudo_vm_genesis::GENESIS_KEYPAIR;
 use accudo_vm_types::module_and_script_storage::AsAccudoCodeStorage;
+use anyhow::{bail, format_err, Result};
 use clap::Parser;
 use codespan_reporting::{diagnostic::Severity, term::termcolor::Buffer};
 use move_binary_format::file_format::{CompiledModule, CompiledScript};

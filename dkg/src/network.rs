@@ -5,7 +5,6 @@ use crate::{
     network_interface::{DKGNetworkClient, RPC},
     DKGMessage,
 };
-use anyhow::bail;
 use accudo_channels::{accudo_channel, message_queues::QueueStyle};
 use accudo_config::network_id::NetworkId;
 use accudo_infallible::RwLock;
@@ -16,6 +15,7 @@ use accudo_network::{
     ProtocolId,
 };
 use accudo_reliable_broadcast::RBNetworkSender;
+use anyhow::bail;
 use async_trait::async_trait;
 use bytes::Bytes;
 use futures::{

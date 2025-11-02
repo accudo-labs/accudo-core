@@ -19,7 +19,10 @@ enum Language {
 }
 
 #[derive(Debug, Parser)]
-#[clap(name = "Accudo SDK Builder", about = "Generate boilerplate Accudo SDKs")]
+#[clap(
+    name = "Accudo SDK Builder",
+    about = "Generate boilerplate Accudo SDKs"
+)]
 struct Options {
     /// Path to the directory containing ABI files in BCS encoding.
     abi_directories: Vec<PathBuf>,
@@ -127,18 +130,19 @@ fn main() {
     }
 
     // Transaction builders
-    let installer: Box<dyn accudo_sdk_builder::SourceInstaller<Error = Box<dyn std::error::Error>>> =
-        match options.language {
-            Language::Rust => Box::new(accudo_sdk_builder::rust::Installer::new(
-                install_dir,
-                options.accudo_version_number,
-            )),
-            Language::Go => Box::new(accudo_sdk_builder::golang::Installer::new(
-                install_dir,
-                options.serde_package_name,
-                options.package_name,
-            )),
-        };
+    let installer: Box<
+        dyn accudo_sdk_builder::SourceInstaller<Error = Box<dyn std::error::Error>>,
+    > = match options.language {
+        Language::Rust => Box::new(accudo_sdk_builder::rust::Installer::new(
+            install_dir,
+            options.accudo_version_number,
+        )),
+        Language::Go => Box::new(accudo_sdk_builder::golang::Installer::new(
+            install_dir,
+            options.serde_package_name,
+            options.package_name,
+        )),
+    };
 
     if let Some(ref name) = options.module_name {
         installer

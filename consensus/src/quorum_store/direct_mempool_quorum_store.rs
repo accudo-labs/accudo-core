@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{monitor, quorum_store::counters};
-use anyhow::Result;
 use accudo_consensus_types::{
     common::{Payload, PayloadFilter, TransactionInProgress, TransactionSummary},
     request_response::{GetPayloadCommand, GetPayloadResponse},
@@ -10,6 +9,7 @@ use accudo_consensus_types::{
 use accudo_logger::prelude::*;
 use accudo_mempool::{QuorumStoreRequest, QuorumStoreResponse};
 use accudo_types::transaction::SignedTransaction;
+use anyhow::Result;
 use futures::{
     channel::{
         mpsc::{Receiver, Sender},

@@ -24,7 +24,6 @@ use crate::{
     pipeline::execution_client::TExecutionClient,
     util::calculate_window_start_round,
 };
-use anyhow::{anyhow, bail, ensure, Context};
 use accudo_consensus_types::{
     block::Block,
     block_retrieval::{
@@ -44,6 +43,7 @@ use accudo_types::{
     account_address::AccountAddress, epoch_change::EpochChangeProof,
     ledger_info::LedgerInfoWithSignatures,
 };
+use anyhow::{anyhow, bail, ensure, Context};
 use fail::fail_point;
 use futures::{stream::FuturesUnordered, FutureExt, StreamExt};
 use futures_channel::oneshot;

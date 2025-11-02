@@ -10,7 +10,9 @@ use accudo_rest_client::{
     accudo_api_types::{WriteResource, WriteSetChange},
     Transaction,
 };
-use accudo_types::{account_address::AccountAddress, transaction::authenticator::AuthenticationKey};
+use accudo_types::{
+    account_address::AccountAddress, transaction::authenticator::AuthenticationKey,
+};
 use async_trait::async_trait;
 use clap::Parser;
 use serde::Serialize;

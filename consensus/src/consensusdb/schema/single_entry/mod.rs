@@ -15,11 +15,11 @@
 
 use super::ensure_slice_len_eq;
 use crate::define_schema;
-use anyhow::{format_err, Result};
 use accudo_schemadb::{
     schema::{KeyCodec, ValueCodec},
     ColumnFamilyName,
 };
+use anyhow::{format_err, Result};
 use byteorder::ReadBytesExt;
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};

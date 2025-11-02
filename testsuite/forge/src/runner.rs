@@ -8,12 +8,12 @@ use crate::{
     observer::junit::JunitTestObserver,
     result::{TestResult, TestSummary},
     success_criteria::SuccessCriteriaErrors,
-    AdminContext, AdminTest, AccudoContext, AccudoTest, CoreContext, Factory, NetworkContext,
+    AccudoContext, AccudoTest, AdminContext, AdminTest, CoreContext, Factory, NetworkContext,
     NetworkContextSynchronizer, NetworkTest, ShouldFail, Test, TestReport, Version,
     NAMESPACE_CLEANUP_DURATION_BUFFER_SECS,
 };
-use anyhow::{format_err, Error, Result};
 use accudo_config::config::NodeConfig;
+use anyhow::{format_err, Error, Result};
 use clap::{Parser, ValueEnum};
 use rand::{rngs::OsRng, Rng, SeedableRng};
 use std::{

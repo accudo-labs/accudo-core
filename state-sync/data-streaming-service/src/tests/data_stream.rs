@@ -3486,7 +3486,8 @@ fn create_data_stream(
     let advertised_data = create_advertised_data();
 
     // Create an accudo data client mock and notification generator
-    let accudo_data_client = MockAccudoDataClient::new(data_client_config, true, false, true, false);
+    let accudo_data_client =
+        MockAccudoDataClient::new(data_client_config, true, false, true, false);
     let notification_generator = Arc::new(U64IdGenerator::new());
 
     // Create the data stream and listener pair

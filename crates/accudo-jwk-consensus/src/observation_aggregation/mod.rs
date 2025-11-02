@@ -5,7 +5,6 @@ use crate::{
     mode::TConsensusMode,
     types::{JWKConsensusMsg, ObservedUpdate, ObservedUpdateResponse},
 };
-use anyhow::{anyhow, ensure};
 use accudo_consensus_types::common::Author;
 use accudo_infallible::Mutex;
 use accudo_logger::info;
@@ -16,6 +15,7 @@ use accudo_types::{
     jwks::{ProviderJWKs, QuorumCertifiedUpdate},
     validator_verifier::VerifyError,
 };
+use anyhow::{anyhow, ensure};
 use move_core_types::account_address::AccountAddress;
 use std::{collections::BTreeSet, marker::PhantomData, sync::Arc};
 

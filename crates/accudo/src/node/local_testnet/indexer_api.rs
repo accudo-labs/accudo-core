@@ -10,10 +10,10 @@ use super::{
     traits::{PostHealthyStep, ServiceManager, ShutdownStep},
     RunLocalnet,
 };
-use anyhow::{anyhow, Context, Result};
 pub use accudo_localnet::indexer_api::{
     make_hasura_metadata_request, post_metadata, HASURA_IMAGE, HASURA_METADATA,
 };
+use anyhow::{anyhow, Context, Result};
 use async_trait::async_trait;
 use bollard::{
     container::{Config, CreateContainerOptions, StartContainerOptions, WaitContainerOptions},

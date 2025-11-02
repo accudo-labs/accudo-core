@@ -7,8 +7,8 @@
 
 use super::coin_infos::CoinInfoQuery;
 use crate::schema::coin_supply;
-use anyhow::Context;
 use accudo_api_types::WriteTableItem as APIWriteTableItem;
+use anyhow::Context;
 use bigdecimal::BigDecimal;
 use field_count::FieldCount;
 use serde::{Deserialize, Serialize};

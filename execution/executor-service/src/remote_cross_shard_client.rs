@@ -1,7 +1,9 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 use accudo_secure_net::network_controller::{Message, NetworkController};
-use accudo_types::block_executor::partitioner::{RoundId, ShardId, MAX_ALLOWED_PARTITIONING_ROUNDS};
+use accudo_types::block_executor::partitioner::{
+    RoundId, ShardId, MAX_ALLOWED_PARTITIONING_ROUNDS,
+};
 use accudo_vm::sharded_block_executor::{
     cross_shard_client::CrossShardClient, messages::CrossShardMsg,
 };

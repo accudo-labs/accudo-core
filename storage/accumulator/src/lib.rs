@@ -107,13 +107,13 @@
 #[cfg(any(test, feature = "fuzzing"))]
 pub mod test_helpers;
 
-use anyhow::{ensure, format_err, Result};
 use accudo_crypto::hash::{CryptoHash, CryptoHasher, HashValue, ACCUMULATOR_PLACEHOLDER_HASH};
 use accudo_types::proof::{
     definition::{LeafCount, MAX_ACCUMULATOR_PROOF_DEPTH},
     position::{FrozenSubTreeIterator, FrozenSubtreeSiblingIterator, Position},
     AccumulatorConsistencyProof, AccumulatorProof, AccumulatorRangeProof, MerkleTreeInternalNode,
 };
+use anyhow::{ensure, format_err, Result};
 use std::marker::PhantomData;
 
 /// Defines the interface between `MerkleAccumulator` and underlying storage.

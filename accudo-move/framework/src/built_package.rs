@@ -7,7 +7,6 @@ use crate::{
     natives::code::{ModuleMetadata, PackageDep, PackageMetadata, UpgradePolicy},
     zip_metadata, zip_metadata_str,
 };
-use anyhow::bail;
 use accudo_types::{
     account_address::AccountAddress,
     transaction::EntryABI,
@@ -16,6 +15,7 @@ use accudo_types::{
         METADATA_V1_MIN_FILE_FORMAT_VERSION,
     },
 };
+use anyhow::bail;
 use clap::Parser;
 use codespan_reporting::{
     diagnostic::Severity,

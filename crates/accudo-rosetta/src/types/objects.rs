@@ -21,7 +21,6 @@ use crate::{
     },
     ApiError, RosettaContext,
 };
-use anyhow::anyhow;
 use accudo_cached_packages::accudo_stdlib;
 use accudo_crypto::{ed25519::Ed25519PublicKey, ValidCryptoMaterialStringExt};
 use accudo_logger::warn;
@@ -41,6 +40,7 @@ use accudo_types::{
     transaction::{EntryFunction, TransactionPayload},
     write_set::{WriteOp, WriteSet},
 };
+use anyhow::anyhow;
 use itertools::Itertools;
 use move_core_types::{
     ident_str,
@@ -2632,7 +2632,10 @@ impl InternalOperation {
 
     pub fn payload(
         &self,
-    ) -> ApiResult<(accudo_types::transaction::TransactionPayload, AccountAddress)> {
+    ) -> ApiResult<(
+        accudo_types::transaction::TransactionPayload,
+        AccountAddress,
+    )> {
         Ok(match self {
             InternalOperation::CreateAccount(create_account) => (
                 accudo_stdlib::accudo_account_create_account(create_account.new_account),
@@ -2645,7 +2648,10 @@ impl InternalOperation {
                 // We special case APT, because we don't want the behavior to change
                 if currency == &native_coin() {
                     return Ok((
-                        accudo_stdlib::accudo_account_transfer(transfer.receiver, transfer.amount.0),
+                        accudo_stdlib::accudo_account_transfer(
+                            transfer.receiver,
+                            transfer.amount.0,
+                        ),
                         transfer.sender,
                     ));
                 }

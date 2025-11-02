@@ -14,9 +14,9 @@ use crate::{
         HasMultiExp,
     },
 };
-use anyhow::bail;
 use accudo_crypto::{bls12381, CryptoMaterialError, ValidCryptoMaterial};
 use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher};
+use anyhow::bail;
 use blstrs::{G2Projective, Scalar};
 use rand::thread_rng;
 use serde::{Deserialize, Serialize};

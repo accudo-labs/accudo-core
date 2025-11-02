@@ -15,8 +15,9 @@ use crate::{
         transaction::{authenticator::AuthenticationKey, RawTransaction, SignedTransaction},
     },
 };
-use anyhow::{Context, Result};
-use accudo_crypto::{ed25519::Ed25519Signature, secp256r1_ecdsa, HashValue, PrivateKey, SigningKey};
+use accudo_crypto::{
+    ed25519::Ed25519Signature, secp256r1_ecdsa, HashValue, PrivateKey, SigningKey,
+};
 use accudo_ledger::AccudoLedgerError;
 use accudo_rest_client::{accudo_api_types::MoveStructTag, Client, PepperRequest, ProverRequest};
 pub use accudo_types::*;
@@ -32,6 +33,7 @@ use accudo_types::{
         Auth,
     },
 };
+use anyhow::{Context, Result};
 use bip39::{Language, Mnemonic, Seed};
 use ed25519_dalek_bip32::{DerivationPath, ExtendedSecretKey};
 use keyless::FederatedKeylessPublicKey;
@@ -144,7 +146,8 @@ pub fn get_paired_fa_primary_store_address(
     let mut bytes = address.to_vec();
     bytes.append(&mut fa_metadata_address.to_vec());
     bytes.push(0xFC);
-    AccountAddress::from_bytes(accudo_crypto::hash::HashValue::sha3_256_of(&bytes).to_vec()).unwrap()
+    AccountAddress::from_bytes(accudo_crypto::hash::HashValue::sha3_256_of(&bytes).to_vec())
+        .unwrap()
 }
 
 pub fn get_paired_fa_metadata_address(coin_type_name: &MoveStructTag) -> AccountAddress {
@@ -1287,9 +1290,10 @@ mod tests {
         let esk = Ed25519PrivateKey::try_from(sk_bytes.as_slice()).unwrap();
         let ephemeral_key_pair =
             EphemeralKeyPair::new_ed25519(esk, 1735475012, vec![0; 31]).unwrap();
-        let mut account = derive_keyless_account(&accudo_rest_client, jwt, ephemeral_key_pair, None)
-            .await
-            .unwrap();
+        let mut account =
+            derive_keyless_account(&accudo_rest_client, jwt, ephemeral_key_pair, None)
+                .await
+                .unwrap();
         println!("Address: {}", account.address().to_hex_literal());
         let balance = accudo_rest_client
             .view_apt_account_balance(account.address())

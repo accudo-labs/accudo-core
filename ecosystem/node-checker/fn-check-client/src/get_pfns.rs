@@ -5,11 +5,11 @@
 //! file and converting it into the format check_rxn_info_hashes expects.
 
 use crate::check::{IncompleteNetworkAddress, NodeInfo, SingleCheck, SingleCheckResult};
-use anyhow::{Context, Result};
 use accudo_sdk::{
     crypto::{x25519, ValidCryptoMaterialStringExt},
     types::account_address::AccountAddress,
 };
+use anyhow::{Context, Result};
 use clap::Parser;
 use reqwest::Url;
 use serde::Deserialize;

@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{metrics::backup::BACKUP_TIMER, utils::error_notes::ErrorNotes};
-use anyhow::{bail, Result};
 use accudo_metrics_core::TimerHelper;
+use anyhow::{bail, Result};
 use async_trait::async_trait;
 use bytes::{Bytes, BytesMut};
 use std::convert::TryInto;

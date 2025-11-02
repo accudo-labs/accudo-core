@@ -1,11 +1,11 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::transaction::authenticator::AnyPublicKey;
-use anyhow::{anyhow, Result};
+use crate::{hash_utils::canonical_hash, transaction::authenticator::AnyPublicKey};
 use accudo_crypto::{
-    hash::CryptoHash, secp256r1_ecdsa, signing_message, CryptoMaterialError, HashValue, Signature,
+    hash::CryptoHash, secp256r1_ecdsa, signing_message, CryptoMaterialError, Signature,
 };
+use anyhow::{anyhow, Result};
 use passkey_types::{crypto::sha256, webauthn::CollectedClientData, Bytes};
 use serde::{Deserialize, Serialize};
 
@@ -37,7 +37,7 @@ fn verify_expected_challenge_from_message_matches_actual<T: Serialize + CryptoHa
     // Generate signing_message, which is the BCS encoded bytes of message, prefixed with a hash
     let signing_message_bytes = signing_message(message)?;
     // Expected challenge is SHA3-256 digest of RawTransaction bytes
-    let expected_challenge = HashValue::sha3_256_of(signing_message_bytes.as_slice());
+    let expected_challenge = canonical_hash(signing_message_bytes.as_slice());
 
     expected_challenge
         .to_vec()
@@ -230,13 +230,13 @@ mod tests {
             RawTransaction,
         },
     };
-    use anyhow::anyhow;
     use accudo_crypto::{
         secp256r1_ecdsa,
         secp256r1_ecdsa::{PrivateKey, PublicKey, Signature},
         signing_message, HashValue, PrivateKey as PrivateKeyTrait, Uniform,
         ValidCryptoMaterialStringExt,
     };
+    use anyhow::anyhow;
     use coset::CoseKey;
     use move_core_types::account_address::AccountAddress;
     use p256::pkcs8::DecodePublicKey;
@@ -537,7 +537,7 @@ mod tests {
         let raw_txn_signing_message =
             signing_message(&raw_txn).expect("Unexpected BCS serialization error");
         // then generates the SHA3-256 digest of signing message as the challenge
-        let challenge = HashValue::sha3_256_of(raw_txn_signing_message.as_slice()).to_vec();
+        let challenge = canonical_hash(raw_txn_signing_message.as_slice()).to_vec();
 
         (raw_txn, raw_txn_signing_message, challenge)
     }

@@ -1,7 +1,6 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{anyhow, Result};
 use accudo_backup_service::start_backup_service;
 use accudo_config::{config::NodeConfig, utils::get_genesis_txn};
 use accudo_db::{fast_sync_storage_wrapper::FastSyncStorageWrapper, AccudoDB};
@@ -14,6 +13,7 @@ use accudo_types::{
     ledger_info::LedgerInfoWithSignatures, transaction::Version, waypoint::Waypoint,
 };
 use accudo_vm::accudo_vm::AccudoVMBlockExecutor;
+use anyhow::{anyhow, Result};
 use either::Either;
 use std::{fs, path::Path, sync::Arc, time::Instant};
 use tokio::{

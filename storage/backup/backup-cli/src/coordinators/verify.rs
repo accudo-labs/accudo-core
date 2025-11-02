@@ -16,11 +16,11 @@ use crate::{
     storage::BackupStorage,
     utils::{unix_timestamp_sec, GlobalRestoreOptions, RestoreRunMode, TrustedWaypointOpt},
 };
-use anyhow::Result;
 use accudo_db::state_restore::StateSnapshotRestoreMode;
 use accudo_executor_types::VerifyExecutionMode;
 use accudo_logger::prelude::*;
 use accudo_types::transaction::Version;
+use anyhow::Result;
 use std::{path::PathBuf, sync::Arc};
 
 pub struct VerifyCoordinator {

@@ -11,13 +11,13 @@ use crate::{
         utils::TimeExpirations,
     },
 };
-use anyhow::bail;
 use accudo_consensus_types::proof_of_store::{BatchInfo, SignedBatchInfo};
 use accudo_crypto::{CryptoMaterialError, HashValue};
 use accudo_executor_types::{ExecutorError, ExecutorResult};
 use accudo_infallible::Mutex;
 use accudo_logger::prelude::*;
 use accudo_types::{transaction::SignedTransaction, validator_signer::ValidatorSigner, PeerId};
+use anyhow::bail;
 use dashmap::{
     mapref::entry::Entry::{Occupied, Vacant},
     DashMap,

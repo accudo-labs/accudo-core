@@ -14,8 +14,8 @@ use crate::common::{
     types::{CliCommand, CliTypedResult, PromptOptions},
     utils::cli_build_information,
 };
-use anyhow::{anyhow, Context, Result};
 use accudo_build_info::BUILD_OS;
+use anyhow::{anyhow, Context, Result};
 use async_trait::async_trait;
 use clap::Parser;
 use self_update::{

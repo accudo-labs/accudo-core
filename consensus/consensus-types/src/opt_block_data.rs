@@ -7,11 +7,11 @@ use crate::{
     proposal_ext::OptBlockBody,
     quorum_cert::QuorumCert,
 };
-use anyhow::ensure;
 use accudo_crypto::HashValue;
 use accudo_crypto_derive::CryptoHasher;
 use accudo_infallible::duration_since_epoch;
 use accudo_types::{block_info::BlockInfo, validator_txn::ValidatorTransaction};
+use anyhow::ensure;
 use serde::{Deserialize, Serialize};
 use std::{
     fmt::{Display, Formatter},

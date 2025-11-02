@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::measurements::GasMeasurements;
-use anyhow::{anyhow, Result};
 use accudo_cached_packages::accudo_stdlib;
 use accudo_framework::BuiltPackage;
 use accudo_language_e2e_tests::{
@@ -10,6 +9,7 @@ use accudo_language_e2e_tests::{
     executor::{ExecFuncTimerDynamicArgs, FakeExecutor, GasMeterType},
 };
 use accudo_types::transaction::TransactionPayload;
+use anyhow::{anyhow, Result};
 use move_binary_format::{file_format::SignatureToken, CompiledModule};
 use move_core_types::{
     account_address::AccountAddress,

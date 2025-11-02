@@ -20,9 +20,9 @@ use move_core_types::{
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::{collections::HashMap, fmt, fmt::Debug, str::FromStr, sync::Arc};
 
-mod approved_execution_hashes;
 mod accudo_features;
 mod accudo_version;
+mod approved_execution_hashes;
 mod chain_id;
 mod commit_history;
 mod consensus_config;
@@ -37,11 +37,12 @@ mod transaction_fee;
 mod validator_set;
 
 pub use self::{
-    approved_execution_hashes::ApprovedExecutionHashes,
     accudo_features::*,
     accudo_version::{
-        AccudoVersion, ACCUDO_MAX_KNOWN_VERSION, ACCUDO_VERSION_2, ACCUDO_VERSION_3, ACCUDO_VERSION_4,
+        AccudoVersion, ACCUDO_MAX_KNOWN_VERSION, ACCUDO_VERSION_2, ACCUDO_VERSION_3,
+        ACCUDO_VERSION_4,
     },
+    approved_execution_hashes::ApprovedExecutionHashes,
     commit_history::CommitHistoryResource,
     consensus_config::{
         AnchorElectionMode, ConsensusAlgorithmConfig, ConsensusConfigV1, DagConsensusConfigV1,

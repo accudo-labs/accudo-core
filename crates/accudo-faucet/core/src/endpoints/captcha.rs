@@ -4,7 +4,7 @@
 //! This API is for the in-house TapCaptchaChecker, it doesn't do anything for
 //! the GoogleCaptchaChecker.
 
-use super::{errors::AccudoTapErrorResponse, ApiTags, AccudoTapError, AccudoTapErrorCode};
+use super::{errors::AccudoTapErrorResponse, AccudoTapError, AccudoTapErrorCode, ApiTags};
 use crate::checkers::CaptchaManager;
 use futures::lock::Mutex;
 use poem::Result;
@@ -49,9 +49,11 @@ impl CaptchaApi {
         let (key, image) = match captcha_manager.create_challenge() {
             Ok((key, image)) => (key, image),
             Err(e) => {
-                return Err(
-                    AccudoTapError::new_with_error_code(e, AccudoTapErrorCode::CheckerError).into(),
-                );
+                return Err(AccudoTapError::new_with_error_code(
+                    e,
+                    AccudoTapErrorCode::CheckerError,
+                )
+                .into());
             },
         };
         Ok(Response::new(Binary(image)).header(CAPTCHA_KEY, key))

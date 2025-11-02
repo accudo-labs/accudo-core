@@ -8,13 +8,13 @@ use crate::{
     HealthCheckError, Node, NodeExt, Result, Validator, Version, KUBECTL_BIN, LOCALHOST,
     NODE_METRIC_PORT, REST_API_HAPROXY_SERVICE_PORT, REST_API_SERVICE_PORT,
 };
-use anyhow::{anyhow, format_err};
 use accudo_config::config::NodeConfig;
 use accudo_db::common::{LEDGER_DB_NAME, STATE_MERKLE_DB_NAME};
 use accudo_logger::info;
 use accudo_rest_client::Client as RestClient;
 use accudo_sdk::types::PeerId;
 use accudo_state_sync_driver::metadata_storage::STATE_SYNC_DB_NAME;
+use anyhow::{anyhow, format_err};
 use futures::try_join;
 use k8s_openapi::api::core::v1::Pod;
 use kube::Api;

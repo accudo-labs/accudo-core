@@ -7,8 +7,8 @@ use crate::{
     common::{ListManager, ListManagerConfig},
     firebase_jwt::X_IS_JWT_HEADER,
 };
-use anyhow::Result;
 use accudo_logger::info;
+use anyhow::Result;
 use async_trait::async_trait;
 use poem::http::header::AUTHORIZATION;
 

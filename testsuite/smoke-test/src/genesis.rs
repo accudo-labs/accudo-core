@@ -13,7 +13,6 @@ use crate::{
     workspace_builder,
     workspace_builder::workspace_root,
 };
-use anyhow::anyhow;
 use accudo_config::{
     config::{AdminServiceConfig, InitialSafetyRulesConfig, NodeConfig},
     network_id::NetworkId,
@@ -24,6 +23,7 @@ use accudo_forge::{
 };
 use accudo_temppath::TempPath;
 use accudo_types::{transaction::Transaction, waypoint::Waypoint};
+use anyhow::anyhow;
 use move_core_types::language_storage::CORE_CODE_ADDRESS;
 use regex::Regex;
 use reqwest::Client;

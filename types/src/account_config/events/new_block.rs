@@ -7,8 +7,8 @@ use crate::{
     account_config::CORE_CODE_ADDRESS,
     event::{EventHandle, EventKey},
 };
-use anyhow::Result;
 use accudo_crypto::HashValue;
+use anyhow::Result;
 use move_core_types::{
     ident_str,
     identifier::IdentStr,

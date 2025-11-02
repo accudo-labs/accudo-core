@@ -1,4 +1,3 @@
-use anyhow::bail;
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 use accudo_crypto::ed25519::Ed25519PrivateKey;
@@ -10,6 +9,7 @@ use accudo_types::{
     keyless,
     keyless::{Claims, OpenIdSig, Pepper, ZeroKnowledgeSig},
 };
+use anyhow::bail;
 use async_trait::async_trait;
 use futures::StreamExt;
 use rand::rngs::StdRng;

@@ -3,7 +3,6 @@
 #![allow(clippy::extra_unused_lifetimes)]
 
 use crate::{models::transactions::Transaction, schema::signatures, util::standardize_address};
-use anyhow::{Context, Result};
 use accudo_api_types::{
     AbstractSignature as APIAbstractSignature, AccountSignature as APIAccountSignature,
     Ed25519Signature as APIEd25519Signature, FeePayerSignature as APIFeePayerSignature,
@@ -13,6 +12,7 @@ use accudo_api_types::{
     TransactionSignature as APITransactionSignature,
 };
 use accudo_bitvec::BitVec;
+use anyhow::{Context, Result};
 use field_count::FieldCount;
 use serde::{Deserialize, Serialize};
 

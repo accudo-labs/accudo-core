@@ -15,8 +15,8 @@ use crate::{
         Provider, ProviderCollection,
     },
 };
-use anyhow::{anyhow, Result};
 use accudo_logger::debug;
+use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 
 // TODO: Use the key in crates/accudo-telemetry/src/build_information.rs

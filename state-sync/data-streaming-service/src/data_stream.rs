@@ -562,9 +562,12 @@ impl<T: AccudoDataClientInterface + Send + Clone + 'static> DataStream<T> {
                         .saturating_add(num_transactions as u64)
                         .saturating_sub(1) // first_version + num_txns - 1
                 } else {
-                    return Err(accudo_data_client::error::Error::UnexpectedErrorEncountered(
-                        "The first transaction version is missing from the stream response!".into(),
-                    ));
+                    return Err(
+                        accudo_data_client::error::Error::UnexpectedErrorEncountered(
+                            "The first transaction version is missing from the stream response!"
+                                .into(),
+                        ),
+                    );
                 }
             },
             ResponsePayload::NewTransactionOutputsWithProof((outputs_with_proof, _)) => {
@@ -574,9 +577,11 @@ impl<T: AccudoDataClientInterface + Send + Clone + 'static> DataStream<T> {
                         .saturating_add(num_outputs as u64)
                         .saturating_sub(1) // first_version + num_outputs - 1
                 } else {
-                    return Err(accudo_data_client::error::Error::UnexpectedErrorEncountered(
-                        "The first output version is missing from the stream response!".into(),
-                    ));
+                    return Err(
+                        accudo_data_client::error::Error::UnexpectedErrorEncountered(
+                            "The first output version is missing from the stream response!".into(),
+                        ),
+                    );
                 }
             },
             _ => {
@@ -1449,8 +1454,12 @@ fn spawn_request_task<T: AccudoDataClientInterface + Send + Clone + 'static>(
                 get_states_values_with_proof(accudo_data_client, request, request_timeout_ms).await
             },
             DataClientRequest::SubscribeTransactionsWithProof(request) => {
-                subscribe_to_transactions_with_proof(accudo_data_client, request, request_timeout_ms)
-                    .await
+                subscribe_to_transactions_with_proof(
+                    accudo_data_client,
+                    request,
+                    request_timeout_ms,
+                )
+                .await
             },
             DataClientRequest::SubscribeTransactionOutputsWithProof(request) => {
                 subscribe_to_transaction_outputs_with_proof(

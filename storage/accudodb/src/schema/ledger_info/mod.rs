@@ -15,12 +15,12 @@
 
 use super::LEDGER_INFO_CF_NAME;
 use crate::schema::ensure_slice_len_eq;
-use anyhow::Result;
 use accudo_schemadb::{
     define_schema,
     schema::{KeyCodec, ValueCodec},
 };
 use accudo_types::ledger_info::LedgerInfoWithSignatures;
+use anyhow::Result;
 use byteorder::{BigEndian, ReadBytesExt};
 use std::mem::size_of;
 

@@ -15,8 +15,8 @@ use crate::{
     hash::{CryptoHash, CryptoHasher},
     traits::*,
 };
-use anyhow::{anyhow, Result};
 use accudo_crypto_derive::{DeserializeKey, SerializeKey, SilentDebug, SilentDisplay};
+use anyhow::{anyhow, Result};
 use core::convert::TryFrom;
 use rand::Rng;
 use serde::Serialize;

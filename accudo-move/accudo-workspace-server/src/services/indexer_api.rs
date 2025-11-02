@@ -9,11 +9,11 @@ use crate::{
     common::{make_shared, ArcError, IP_LOCAL_HOST},
     no_panic_println,
 };
-use anyhow::{anyhow, Context, Result};
 use accudo_localnet::{
     health_checker::HealthChecker,
     indexer_api::{post_metadata, HASURA_IMAGE, HASURA_METADATA},
 };
+use anyhow::{anyhow, Context, Result};
 use bollard::{
     container::{CreateContainerOptions, WaitContainerOptions},
     secret::{ContainerInspectResponse, HostConfig, PortBinding},

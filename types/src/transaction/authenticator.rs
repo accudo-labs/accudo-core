@@ -5,6 +5,7 @@
 use crate::{
     account_address::AccountAddress,
     function_info::FunctionInfo,
+    hash_utils::canonical_hash,
     keyless::{
         EphemeralCertificate, FederatedKeylessPublicKey, KeylessPublicKey, KeylessSignature,
         TransactionAndProof,
@@ -13,22 +14,26 @@ use crate::{
         webauthn::PartialAuthenticatorAssertionResponse, RawTransaction, RawTransactionWithData,
     },
 };
-use anyhow::{bail, ensure, Error, Result};
 use accudo_crypto::{
     ed25519::{Ed25519PublicKey, Ed25519Signature},
     hash::CryptoHash,
     multi_ed25519::{MultiEd25519PublicKey, MultiEd25519Signature},
+    pq::{baseline_registry, AlgorithmRegistry, SchemeId, SignatureBundle},
     secp256k1_ecdsa, secp256r1_ecdsa, signing_message,
     traits::Signature,
-    CryptoMaterialError, HashValue, ValidCryptoMaterial, ValidCryptoMaterialStringExt,
+    CryptoMaterialError, ValidCryptoMaterial, ValidCryptoMaterialStringExt,
 };
 use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher, DeserializeKey, SerializeKey};
+use anyhow::{bail, ensure, Error, Result};
+use once_cell::sync::Lazy;
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest_derive::Arbitrary;
 use rand::{rngs::OsRng, Rng};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::{convert::TryFrom, fmt, str::FromStr};
 use thiserror::Error;
+
+static PQ_REGISTRY: Lazy<AlgorithmRegistry> = Lazy::new(baseline_registry);
 
 /// Maximum number of signatures supported in `TransactionAuthenticator`,
 /// across all `AccountAuthenticator`s included.
@@ -372,7 +377,8 @@ impl TransactionAuthenticator {
                         .iter()
                         .map(|sig| AnySignature::ed25519(sig.clone()))
                         .collect();
-                    let signatures_bitmap = accudo_bitvec::BitVec::from(signature.bitmap().to_vec());
+                    let signatures_bitmap =
+                        accudo_bitvec::BitVec::from(signature.bitmap().to_vec());
                     let authenticator = MultiKeyAuthenticator {
                         public_keys,
                         signatures,
@@ -669,14 +675,11 @@ impl AASigningData {
         original_signing_message: Vec<u8>,
         function_info: FunctionInfo,
     ) -> Result<Vec<u8>> {
-        Ok(HashValue::sha3_256_of(
-            signing_message(&AASigningData::V1 {
-                original_signing_message,
-                function_info,
-            })?
-            .as_slice(),
-        )
-        .to_vec())
+        let message = signing_message(&AASigningData::V1 {
+            original_signing_message,
+            function_info,
+        })?;
+        Ok(canonical_hash(message.as_slice()).to_vec())
     }
 }
 
@@ -884,7 +887,7 @@ impl AuthenticationKey {
     /// Create an authentication key from a preimage by taking its sha3 hash
     pub fn from_preimage(mut public_key_bytes: Vec<u8>, scheme: Scheme) -> AuthenticationKey {
         public_key_bytes.push(scheme as u8);
-        AuthenticationKey::new(*HashValue::sha3_256_of(&public_key_bytes).as_ref())
+        AuthenticationKey::new(*canonical_hash(&public_key_bytes).as_ref())
     }
 
     /// Construct a preimage from a transaction-derived AUID as (txn_hash || auid_scheme_id)
@@ -1247,6 +1250,9 @@ pub enum AnySignature {
     Keyless {
         signature: KeylessSignature,
     },
+    PostQuantum {
+        signature: SignatureBundle,
+    },
 }
 
 impl AnySignature {
@@ -1266,12 +1272,17 @@ impl AnySignature {
         Self::Keyless { signature }
     }
 
+    pub fn post_quantum(signature: SignatureBundle) -> Self {
+        Self::PostQuantum { signature }
+    }
+
     pub fn name(&self) -> &'static str {
         match self {
             Self::Ed25519 { .. } => "Ed25519",
             Self::Secp256k1Ecdsa { .. } => "Secp256k1Ecdsa",
             Self::WebAuthn { .. } => "WebAuthn",
             Self::Keyless { .. } => "Keyless",
+            Self::PostQuantum { .. } => "PostQuantum",
         }
     }
 
@@ -1280,6 +1291,19 @@ impl AnySignature {
         public_key: &AnyPublicKey,
         message: &T,
     ) -> Result<()> {
+        #[cfg(feature = "quantum_strict")]
+        {
+            if !matches!(self, Self::PostQuantum { .. }) {
+                bail!(
+                    "classical signatures are disabled in `quantum_strict` builds (saw {})",
+                    self.name()
+                );
+            }
+            if !matches!(public_key, AnyPublicKey::PostQuantum { .. }) {
+                bail!("classical public keys are disabled in `quantum_strict` builds");
+            }
+        }
+
         match (self, public_key) {
             (Self::Ed25519 { signature }, AnyPublicKey::Ed25519 { public_key }) => {
                 signature.verify(message, public_key)
@@ -1293,6 +1317,20 @@ impl AnySignature {
             },
             (Self::Keyless { signature }, AnyPublicKey::FederatedKeyless { public_key: _ }) => {
                 Self::verify_keyless_ephemeral_signature(message, signature)
+            },
+            (Self::PostQuantum { signature }, AnyPublicKey::PostQuantum { scheme, public_key }) => {
+                if signature.scheme != *scheme {
+                    bail!("post-quantum scheme mismatch between key and signature");
+                }
+                let signing_bytes = signing_message(message)?;
+                let adapter = PQ_REGISTRY.signature(signature.scheme).ok_or_else(|| {
+                    Error::msg(format!(
+                        "no post-quantum verifier registered for scheme {}",
+                        signature.scheme
+                    ))
+                })?;
+                adapter.verify(public_key, &signing_bytes, signature.bytes())?;
+                Ok(())
             },
             _ => bail!("Invalid key, signature pairing"),
         }
@@ -1359,6 +1397,11 @@ pub enum AnyPublicKey {
     FederatedKeyless {
         public_key: FederatedKeylessPublicKey,
     },
+    PostQuantum {
+        scheme: SchemeId,
+        #[serde(with = "serde_bytes")]
+        public_key: Vec<u8>,
+    },
 }
 
 impl AnyPublicKey {
@@ -1380,6 +1423,10 @@ impl AnyPublicKey {
 
     pub fn federated_keyless(public_key: FederatedKeylessPublicKey) -> Self {
         Self::FederatedKeyless { public_key }
+    }
+
+    pub fn post_quantum(scheme: SchemeId, public_key: Vec<u8>) -> Self {
+        Self::PostQuantum { scheme, public_key }
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {
@@ -1580,12 +1627,14 @@ mod tests {
         },
         transaction::{webauthn::AssertionSignature, SignedTransaction},
     };
+    use accudo_crypto::pq::Dilithium3KeyPair;
     use accudo_crypto::{
         ed25519::Ed25519PrivateKey,
         secp256k1_ecdsa,
         secp256r1_ecdsa::{PublicKey, Signature},
         PrivateKey, SigningKey, Uniform,
     };
+    use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher};
     use hex::FromHex;
 
     #[test]
@@ -1626,6 +1675,29 @@ mod tests {
         let account_auth = AccountAuthenticator::single_key(sk_auth);
         let signed_txn = SignedTransaction::new_single_sender(raw_txn, account_auth);
         signed_txn.verify_signature().unwrap();
+    }
+
+    #[test]
+    fn verify_post_quantum_single_key_auth() {
+        use serde::Serialize;
+
+        #[derive(Clone, Serialize, CryptoHasher, BCSCryptoHash)]
+        struct DummyPayload {
+            value: u64,
+        }
+
+        let payload = DummyPayload { value: 42 };
+        let signing_bytes = signing_message(&payload).unwrap();
+
+        let keypair = Dilithium3KeyPair::generate().unwrap();
+        let pq_signature = keypair.sign(&signing_bytes).unwrap();
+
+        let sk_auth = SingleKeyAuthenticator::new(
+            AnyPublicKey::post_quantum(SchemeId::Dilithium3, keypair.public_key().to_vec()),
+            AnySignature::post_quantum(pq_signature),
+        );
+
+        sk_auth.verify(&payload).unwrap();
     }
 
     #[test]

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::accudo_debugger::AccudoDebugger;
-use anyhow::Result;
 use accudo_rest_client::Client;
 use accudo_types::transaction::SignedTransaction;
+use anyhow::Result;
 use clap::Parser;
 use regex::Regex;
 use std::io;

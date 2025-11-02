@@ -28,10 +28,10 @@ use crate::{
     },
     schema::{KeyCodec, Schema, SeekKeyCodec, ValueCodec},
 };
-use anyhow::format_err;
 use accudo_logger::prelude::*;
 use accudo_metrics_core::TimerHelper;
 use accudo_storage_interface::{AccudoDbError, Result as DbResult};
+use anyhow::format_err;
 use batch::{IntoRawBatch, NativeBatch, WriteBatch};
 use iterator::{ScanDirection, SchemaIterator};
 /// Type alias to `rocksdb::ReadOptions`. See [`rocksdb doc`](https://github.com/pingcap/rust-rocksdb/blob/master/src/rocksdb_options.rs)

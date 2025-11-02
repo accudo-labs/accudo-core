@@ -1,7 +1,6 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{bail, Error};
 use accudo_consensus::{
     persistent_liveness_storage::PersistentLivenessStorage,
     quorum_store::quorum_store_db::QuorumStoreStorage, util::db_tool::extract_txns_from_block,
@@ -10,6 +9,7 @@ use accudo_crypto::HashValue;
 use accudo_logger::info;
 use accudo_system_utils::utils::{reply_with, reply_with_status, spawn_blocking};
 use accudo_types::transaction::Transaction;
+use anyhow::{bail, Error};
 use http::header::{HeaderValue, CONTENT_LENGTH};
 use hyper::{Body, Request, Response, StatusCode};
 use std::{collections::HashMap, sync::Arc};

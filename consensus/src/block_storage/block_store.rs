@@ -20,7 +20,6 @@ use crate::{
     },
     util::time_service::TimeService,
 };
-use anyhow::{bail, ensure, format_err, Context};
 use accudo_bitvec::BitVec;
 use accudo_config::config::BlockTransactionFilterConfig;
 use accudo_consensus_types::{
@@ -39,6 +38,7 @@ use accudo_logger::prelude::*;
 use accudo_types::{
     ledger_info::LedgerInfoWithSignatures, proof::accumulator::InMemoryTransactionAccumulator,
 };
+use anyhow::{bail, ensure, format_err, Context};
 use futures::executor::block_on;
 #[cfg(any(test, feature = "fuzzing"))]
 use std::collections::VecDeque;

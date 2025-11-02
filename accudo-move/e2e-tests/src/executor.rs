@@ -11,8 +11,8 @@ use crate::{
 use accudo_abstract_gas_usage::CalibrationAlgebra;
 use accudo_bitvec::BitVec;
 use accudo_block_executor::{
-    code_cache_global_manager::AccudoModuleCacheManager, txn_commit_hook::NoOpTransactionCommitHook,
-    txn_provider::default::DefaultTxnProvider,
+    code_cache_global_manager::AccudoModuleCacheManager,
+    txn_commit_hook::NoOpTransactionCommitHook, txn_provider::default::DefaultTxnProvider,
 };
 use accudo_crypto::HashValue;
 use accudo_framework::ReleaseBundle;

@@ -12,8 +12,8 @@ use crate::{
     jwks::ObservedJWKsUpdated,
     transaction::Version,
 };
-use anyhow::{bail, Error, Result};
 use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher};
+use anyhow::{bail, Error, Result};
 use move_core_types::{
     ident_str,
     language_storage::{StructTag, TypeTag, CORE_CODE_ADDRESS},

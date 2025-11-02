@@ -12,12 +12,12 @@ pub mod in_memory_cache;
 pub mod status_page;
 pub mod types;
 
-use anyhow::{Context, Result};
 use accudo_protos::{
     indexer::v1::raw_data_client::RawDataClient,
     internal::fullnode::v1::fullnode_data_client::FullnodeDataClient, transaction::v1::Transaction,
     util::timestamp::Timestamp,
 };
+use anyhow::{Context, Result};
 use prost::Message;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tonic::codec::CompressionEncoding;

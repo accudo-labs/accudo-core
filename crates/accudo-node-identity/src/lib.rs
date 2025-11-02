@@ -1,8 +1,8 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{format_err, Result};
 use accudo_types::{chain_id::ChainId, PeerId};
+use anyhow::{format_err, Result};
 use once_cell::sync::OnceCell;
 use std::sync::Arc;
 

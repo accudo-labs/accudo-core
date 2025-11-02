@@ -1078,8 +1078,11 @@ impl ConsensusObserver {
         let sk = Arc::new(bls12381::PrivateKey::genesis());
         let signer = Arc::new(ValidatorSigner::new(AccountAddress::ZERO, sk.clone()));
         let dummy_signer = Arc::new(DagCommitSigner::new(signer.clone()));
-        let (_, rand_msg_rx) =
-            accudo_channel::new::<AccountAddress, IncomingRandGenRequest>(QueueStyle::FIFO, 1, None);
+        let (_, rand_msg_rx) = accudo_channel::new::<AccountAddress, IncomingRandGenRequest>(
+            QueueStyle::FIFO,
+            1,
+            None,
+        );
         self.execution_client
             .start_epoch(
                 sk,

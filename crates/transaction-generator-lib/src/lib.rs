@@ -3,7 +3,6 @@
 
 #![forbid(unsafe_code)]
 
-use anyhow::Result;
 use accudo_infallible::{RwLock, RwLockWriteGuard};
 use accudo_logger::{sample, sample::SampleRate};
 use accudo_sdk::{
@@ -11,6 +10,7 @@ use accudo_sdk::{
     transaction_builder::{accudo_stdlib, TransactionFactory},
     types::{transaction::SignedTransaction, LocalAccount},
 };
+use anyhow::Result;
 use async_trait::async_trait;
 use clap::{Parser, ValueEnum};
 use log::{info, warn};

@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{config::LIVE_DATA_SERVICE, connection_manager::ConnectionManager};
-use anyhow::Result;
 use accudo_indexer_grpc_utils::timestamp_now_proto;
 use accudo_protos::indexer::v1::{
     data_service_server::DataService, ping_data_service_response::Info, raw_data_server::RawData,
     GetTransactionsRequest, HistoricalDataServiceInfo, LiveDataServiceInfo, PingDataServiceRequest,
     PingDataServiceResponse, StreamInfo, TransactionsResponse,
 };
+use anyhow::Result;
 use futures::{Stream, StreamExt};
 use std::{pin::Pin, sync::Arc};
 use tokio::sync::mpsc::{channel, Sender};

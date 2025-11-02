@@ -8,8 +8,8 @@ use crate::{
     traits,
     traits::{CryptoMaterialError, ValidCryptoMaterial, ValidCryptoMaterialStringExt},
 };
-use anyhow::{anyhow, Result};
 use accudo_crypto_derive::{key_name, DeserializeKey, SerializeKey, SilentDebug, SilentDisplay};
+use anyhow::{anyhow, Result};
 use core::convert::TryFrom;
 use serde::Serialize;
 

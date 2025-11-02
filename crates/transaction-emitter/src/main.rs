@@ -4,12 +4,12 @@
 
 mod diag;
 
-use anyhow::{Context, Result};
 use accudo_logger::{Level, Logger};
 use accudo_transaction_emitter_lib::{
     create_accounts_command, emit_transactions, Cluster, ClusterArgs, CreateAccountsArgs, EmitArgs,
 };
 use accudo_transaction_workloads_lib::args::EmitWorkloadArgs;
+use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use diag::diag;
 

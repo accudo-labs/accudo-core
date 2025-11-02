@@ -6,8 +6,8 @@ use crate::{
     no_panic_println,
     services::docker_common::{create_docker_volume, create_start_and_inspect_container},
 };
-use anyhow::{anyhow, Context, Result};
 use accudo_localnet::health_checker::HealthChecker;
+use anyhow::{anyhow, Context, Result};
 use bollard::{
     container::{CreateContainerOptions, WaitContainerOptions},
     secret::{ContainerInspectResponse, HostConfig, PortBinding},

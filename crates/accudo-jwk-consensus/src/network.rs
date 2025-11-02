@@ -5,7 +5,6 @@ use crate::{
     network_interface::{JWKConsensusNetworkClient, RPC},
     types::JWKConsensusMsg,
 };
-use anyhow::bail;
 use accudo_channels::{accudo_channel, message_queues::QueueStyle};
 use accudo_config::network_id::NetworkId;
 use accudo_consensus_types::common::Author;
@@ -19,6 +18,7 @@ use accudo_network::{
 };
 use accudo_reliable_broadcast::RBNetworkSender;
 use accudo_types::account_address::AccountAddress;
+use anyhow::bail;
 use bytes::Bytes;
 use futures::Stream;
 use futures_channel::oneshot;

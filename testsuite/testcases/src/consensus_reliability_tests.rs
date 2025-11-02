@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{LoadDestination, NetworkLoadTest};
-use anyhow::{anyhow, bail, Context};
 use accudo_forge::{
     test_utils::consensus_utils::{
         test_consensus_fault_tolerance, FailPointFailureInjection, NodeState,
@@ -10,6 +9,7 @@ use accudo_forge::{
     NetworkContext, NetworkContextSynchronizer, NetworkTest, Result, Swarm, SwarmExt, Test,
     TestReport,
 };
+use anyhow::{anyhow, bail, Context};
 use async_trait::async_trait;
 use log::{info, warn};
 use rand::Rng;

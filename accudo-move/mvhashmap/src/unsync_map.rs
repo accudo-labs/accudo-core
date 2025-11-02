@@ -5,7 +5,6 @@ use crate::{
     types::{TxnIndex, UnsyncGroupError, ValueWithLayout},
     BlockStateStats,
 };
-use anyhow::anyhow;
 use accudo_aggregator::types::DelayedFieldValue;
 use accudo_types::{
     error::{code_invariant_error, PanicError},
@@ -14,6 +13,7 @@ use accudo_types::{
     write_set::TransactionWrite,
 };
 use accudo_vm_types::{resolver::ResourceGroupSize, resource_group_adapter::group_size_as_sum};
+use anyhow::anyhow;
 use move_binary_format::{file_format::CompiledScript, CompiledModule};
 use move_core_types::{language_storage::ModuleId, value::MoveTypeLayout};
 use move_vm_runtime::{Module, Script};
@@ -45,8 +45,13 @@ pub struct UnsyncMap<
     delayed_field_map: RefCell<HashMap<I, DelayedFieldValue>>,
 
     // Code caches for modules and scripts.
-    module_cache:
-        UnsyncModuleCache<ModuleId, CompiledModule, Module, AccudoModuleExtension, Option<TxnIndex>>,
+    module_cache: UnsyncModuleCache<
+        ModuleId,
+        CompiledModule,
+        Module,
+        AccudoModuleExtension,
+        Option<TxnIndex>,
+    >,
     script_cache: UnsyncScriptCache<[u8; 32], CompiledScript, Script>,
 
     total_base_resource_size: AtomicU64,

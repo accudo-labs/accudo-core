@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{errors::FilterError, traits::Filterable};
-use anyhow::Error;
 use accudo_protos::transaction::v1::{transaction::TransactionType, Transaction};
+use anyhow::Error;
 use serde::{Deserialize, Serialize};
 
 /// Example:

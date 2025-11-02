@@ -107,7 +107,8 @@ pub enum BenchmarkWorkload {
 
 enum InitializedBenchmarkWorkload {
     TransactionMix {
-        transaction_generators: Vec<Box<dyn accudo_transaction_generator_lib::TransactionGenerator>>,
+        transaction_generators:
+            Vec<Box<dyn accudo_transaction_generator_lib::TransactionGenerator>>,
         phase: Arc<AtomicUsize>,
         workload_name: String,
     },

@@ -19,7 +19,6 @@
 //! its numeric value.
 
 use crate::schema::{ensure_slice_len_eq, ensure_slice_len_gt, STALE_STATE_VALUE_INDEX_CF_NAME};
-use anyhow::Result;
 use accudo_schemadb::{
     define_schema,
     schema::{KeyCodec, SeekKeyCodec, ValueCodec},
@@ -28,6 +27,7 @@ use accudo_types::{
     state_store::{state_key::StateKey, state_value::StaleStateValueIndex},
     transaction::Version,
 };
+use anyhow::Result;
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use std::{io::Write, mem::size_of};
 

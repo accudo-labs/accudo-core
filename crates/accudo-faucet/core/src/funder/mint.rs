@@ -4,7 +4,6 @@
 
 use super::{FunderHealthMessage, FunderTrait};
 use crate::endpoints::{AccudoTapError, AccudoTapErrorCode};
-use anyhow::{Context, Result};
 use accudo_logger::info;
 use accudo_sdk::{
     crypto::ed25519::Ed25519PublicKey,
@@ -19,6 +18,7 @@ use accudo_sdk::{
         LocalAccount,
     },
 };
+use anyhow::{Context, Result};
 use async_trait::async_trait;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
@@ -182,9 +182,11 @@ impl MintFunder {
             let faucet_account = self.faucet_account.write().await;
             client
                 .submit_and_wait(&faucet_account.sign_with_transaction_builder(
-                    transaction_factory.payload(accudo_stdlib::accudo_coin_delegate_mint_capability(
-                        delegated_account.address(),
-                    )),
+                    transaction_factory.payload(
+                        accudo_stdlib::accudo_coin_delegate_mint_capability(
+                            delegated_account.address(),
+                        ),
+                    ),
                 ))
                 .await
                 .context("Failed to delegate minting to the new account")?;

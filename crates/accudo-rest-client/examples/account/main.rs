@@ -1,10 +1,10 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{Context, Result};
 use accudo_logger::{debug, info};
 use accudo_rest_client::Client;
 use accudo_types::{account_address::AccountAddress, chain_id::ChainId};
+use anyhow::{Context, Result};
 use clap::Parser;
 use reqwest::Url;
 

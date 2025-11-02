@@ -1,9 +1,9 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{bail, format_err, Result};
 use accudo_sdk::transaction_builder::TransactionFactory;
 use accudo_transaction_emitter_lib::{query_sequence_number, Cluster, TxnEmitter};
+use anyhow::{bail, format_err, Result};
 use futures::future::join_all;
 use rand::{rngs::StdRng, SeedableRng};
 use std::{

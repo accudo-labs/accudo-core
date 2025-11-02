@@ -52,12 +52,14 @@ fn execution_limit_reached() {
 fn bounded_execution_time() {
     let mut h = MoveHarness::new();
 
-    h.modify_gas_schedule(|gas_params: &mut accudo_gas_schedule::AccudoGasParameters| {
-        assert!(
-            gas_params.vm.txn.max_execution_gas
-                < gas_params.vm.instr.add * GasQuantity::from(10_000_000)
-        )
-    });
+    h.modify_gas_schedule(
+        |gas_params: &mut accudo_gas_schedule::AccudoGasParameters| {
+            assert!(
+                gas_params.vm.txn.max_execution_gas
+                    < gas_params.vm.instr.add * GasQuantity::from(10_000_000)
+            )
+        },
+    );
 }
 
 #[test]

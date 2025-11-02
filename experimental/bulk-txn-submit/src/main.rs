@@ -1,7 +1,6 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{Context, Result};
 use accudo_experimental_bulk_txn_submit::{
     coordinator::{
         create_sample_addresses, execute_return_worker_funds, execute_submit,
@@ -15,6 +14,7 @@ use accudo_experimental_bulk_txn_submit::{
 use accudo_logger::{Level, Logger};
 use accudo_sdk::move_types::account_address::AccountAddress;
 use accudo_transaction_emitter_lib::Cluster;
+use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use rand::{seq::SliceRandom, thread_rng};
 use std::collections::HashSet;

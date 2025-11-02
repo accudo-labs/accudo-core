@@ -36,8 +36,8 @@ use crate::{
         processors::ProcessorManager, ready_server::ReadyServerManager, traits::ShutdownStep,
     },
 };
-use anyhow::{Context, Result};
 use accudo_indexer_grpc_server_framework::setup_logging;
+use anyhow::{Context, Result};
 use async_trait::async_trait;
 use clap::Parser;
 pub use health_checker::HealthChecker;

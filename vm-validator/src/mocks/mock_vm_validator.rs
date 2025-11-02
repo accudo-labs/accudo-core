@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::vm_validator::TransactionValidation;
-use anyhow::Result;
 use accudo_types::{
     account_address::AccountAddress,
     state_store::StateView,
@@ -11,6 +10,7 @@ use accudo_types::{
     vm_status::StatusCode,
 };
 use accudo_vm::VMValidator;
+use anyhow::Result;
 use move_vm_runtime::ModuleStorage;
 
 pub const ACCOUNT_DNE_TEST_ADD: AccountAddress =

@@ -6,7 +6,6 @@ use crate::{
     metrics::{spawn_async_tracking, Tracking},
     workloads::SignedTransactionBuilder,
 };
-use anyhow::{bail, Result};
 use accudo_config::config::DEFAULT_MAX_SUBMIT_TRANSACTION_BATCH_SIZE;
 use accudo_logger::{error, info, sample, sample::SampleRate, warn};
 use accudo_sdk::{
@@ -31,6 +30,7 @@ use accudo_transaction_emitter_lib::{
     Cluster, ClusterArgs,
 };
 use accudo_transaction_generator_lib::ReliableTransactionSubmitter;
+use anyhow::{bail, Result};
 use clap::Parser;
 use futures::{future::join_all, StreamExt};
 use rand::{rngs::StdRng, seq::SliceRandom, Rng, SeedableRng};

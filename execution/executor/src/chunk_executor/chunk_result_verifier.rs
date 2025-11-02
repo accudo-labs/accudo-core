@@ -1,7 +1,6 @@
 // Copyright (c) Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{ensure, Result};
 use accudo_executor_types::LedgerUpdateOutput;
 use accudo_experimental_runtimes::thread_manager::THREAD_MANAGER;
 use accudo_types::{
@@ -10,6 +9,7 @@ use accudo_types::{
     proof::{accumulator::InMemoryTransactionAccumulator, TransactionInfoListWithProof},
     transaction::TransactionInfo,
 };
+use anyhow::{ensure, Result};
 
 pub trait ChunkResultVerifier {
     fn verify_chunk_result(

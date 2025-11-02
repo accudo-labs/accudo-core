@@ -9,12 +9,12 @@ use crate::{
     dag::{CertifiedNode, Node, NodeId, Vote},
     define_schema,
 };
-use anyhow::Result;
 use accudo_crypto::HashValue;
 use accudo_schemadb::{
     schema::{KeyCodec, ValueCodec},
     ColumnFamilyName,
 };
+use anyhow::Result;
 use std::mem::size_of;
 
 pub const NODE_CF_NAME: ColumnFamilyName = "node";

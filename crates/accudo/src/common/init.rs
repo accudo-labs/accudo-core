@@ -141,13 +141,11 @@ impl CliCommand<()> for InitTool {
         // Ensure that there is at least a REST URL set for the network
         match network {
             Network::Mainnet => {
-                profile_config.rest_url =
-                    Some("https://fullnode.mainnet.accudo.org".to_string());
+                profile_config.rest_url = Some("https://fullnode.mainnet.accudo.org".to_string());
                 profile_config.faucet_url = None;
             },
             Network::Testnet => {
-                profile_config.rest_url =
-                    Some("https://fullnode.testnet.accudo.org".to_string());
+                profile_config.rest_url = Some("https://fullnode.testnet.accudo.org".to_string());
                 // The faucet in testnet is only accessible with some kind of bypass.
                 // For regular users this can only really mean an auth token. So if
                 // there is no auth token set, we don't set the faucet URL. If the user

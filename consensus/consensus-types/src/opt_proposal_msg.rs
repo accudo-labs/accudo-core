@@ -5,8 +5,8 @@
 use crate::{
     common::Author, opt_block_data::OptBlockData, proof_of_store::ProofCache, sync_info::SyncInfo,
 };
-use anyhow::{ensure, Context, Result};
 use accudo_types::validator_verifier::ValidatorVerifier;
+use anyhow::{ensure, Context, Result};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]

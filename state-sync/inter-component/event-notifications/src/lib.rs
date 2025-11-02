@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #![forbid(unsafe_code)]
-use anyhow::{anyhow, Result};
 use accudo_channels::{accudo_channel, message_queues::QueueStyle};
 use accudo_id_generator::{IdGenerator, U64IdGenerator};
 use accudo_infallible::RwLock;
@@ -19,6 +18,7 @@ use accudo_types::{
     state_store::state_key::StateKey,
     transaction::Version,
 };
+use anyhow::{anyhow, Result};
 use futures::{channel::mpsc::SendError, stream::FusedStream, Stream};
 use serde::{Deserialize, Serialize};
 use std::{

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{batch_update, generate_traffic};
-use anyhow::bail;
 use accudo_forge::{
     NetworkContextSynchronizer, NetworkTest, Result, SwarmExt, Test, DEFAULT_ROOT_PRIV_KEY,
     FORGE_KEY_SEED,
@@ -12,6 +11,7 @@ use accudo_release_builder::ReleaseConfig;
 use accudo_sdk::crypto::{ed25519::Ed25519PrivateKey, PrivateKey};
 use accudo_temppath::TempPath;
 use accudo_types::transaction::authenticator::AuthenticationKey;
+use anyhow::bail;
 use async_trait::async_trait;
 use log::info;
 use std::{ops::DerefMut, path::Path};

@@ -11,9 +11,11 @@ use crate::{
     },
     keys::ConfigKey,
 };
-use anyhow::bail;
 use accudo_crypto::{bls12381, Uniform};
-use accudo_types::{chain_id::ChainId, network_address::NetworkAddress, waypoint::Waypoint, PeerId};
+use accudo_types::{
+    chain_id::ChainId, network_address::NetworkAddress, waypoint::Waypoint, PeerId,
+};
+use anyhow::bail;
 use rand::rngs::StdRng;
 use serde::{Deserialize, Serialize};
 use std::{

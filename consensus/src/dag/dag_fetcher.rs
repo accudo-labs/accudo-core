@@ -9,13 +9,13 @@ use crate::dag::{
     types::{CertifiedNode, FetchResponse, Node, NodeMetadata, RemoteFetchRequest},
     RpcHandler, RpcWithFallback,
 };
-use anyhow::{bail, ensure};
 use accudo_bitvec::BitVec;
 use accudo_config::config::DagFetcherConfig;
 use accudo_consensus_types::common::{Author, Round};
 use accudo_logger::{debug, error, info};
 use accudo_time_service::TimeService;
 use accudo_types::epoch_state::EpochState;
+use anyhow::{bail, ensure};
 use async_trait::async_trait;
 use futures::{future::Shared, stream::FuturesUnordered, Future, FutureExt, Stream, StreamExt};
 use std::{

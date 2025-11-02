@@ -11,8 +11,8 @@ use crate::{
     serialize,
     transaction::authenticator::EphemeralPublicKey,
 };
-use anyhow::bail;
 use accudo_crypto::{poseidon_bn254, poseidon_bn254::pad_and_hash_string, CryptoMaterialError};
+use anyhow::bail;
 use ark_bn254::{Fq, Fq2, Fr, G1Affine, G1Projective, G2Affine, G2Projective};
 use ark_ff::PrimeField;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};

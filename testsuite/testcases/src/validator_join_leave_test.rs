@@ -9,7 +9,9 @@ use accudo_forge::{
 };
 use accudo_keygen::KeyGen;
 use accudo_sdk::crypto::{ed25519::Ed25519PrivateKey, PrivateKey};
-use accudo_types::{account_address::AccountAddress, transaction::authenticator::AuthenticationKey};
+use accudo_types::{
+    account_address::AccountAddress, transaction::authenticator::AuthenticationKey,
+};
 use async_trait::async_trait;
 use log::info;
 use std::{sync::Arc, time::Duration};

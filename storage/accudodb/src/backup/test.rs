@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::db::{test_helper::arb_blocks_to_commit, AccudoDB};
-use anyhow::Result;
 use accudo_temppath::TempPath;
 use accudo_types::transaction::Version;
+use anyhow::Result;
 use proptest::prelude::*;
 
 proptest! {

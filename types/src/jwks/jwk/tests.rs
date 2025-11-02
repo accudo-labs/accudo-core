@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{
+    hash_utils::canonical_hash,
     jwks::{
         jwk::{JWKMoveStruct, JWK},
         rsa::RSA_JWK,
@@ -9,7 +10,6 @@ use crate::{
     },
     move_any::{Any as MoveAny, AsMoveAny},
 };
-use accudo_crypto::HashValue;
 use std::str::FromStr;
 
 #[test]
@@ -89,7 +89,7 @@ fn convert_json_value_to_jwk() {
     let json = serde_json::Value::from_str(compact_json_str).unwrap();
     let actual = JWK::from(json);
     let expected_payload = compact_json_str.as_bytes().to_vec();
-    let expected_id = HashValue::sha3_256_of(expected_payload.as_slice()).to_vec();
+    let expected_id = canonical_hash(expected_payload.as_slice()).to_vec();
     let expected = JWK::Unsupported(UnsupportedJWK {
         id: expected_id,
         payload: expected_payload,

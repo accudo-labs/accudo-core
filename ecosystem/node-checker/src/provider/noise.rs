@@ -9,12 +9,12 @@ use super::{
     traits::{Provider, ProviderError},
     CommonProviderConfig,
 };
-use anyhow::Result;
 use accudo_network_checker::{
     args::{CheckEndpointArgs, HandshakeArgs, NodeAddressArgs},
     check_endpoint::check_endpoint,
 };
 use accudo_sdk::types::{chain_id::ChainId, network_address::NetworkAddress};
+use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;

@@ -100,8 +100,10 @@ pub trait StorageReaderInterface: Clone + Send + 'static {
     ) -> accudo_storage_service_types::Result<TransactionDataWithProofResponse, Error>;
 
     /// Returns the number of states in the state tree at the specified version.
-    fn get_number_of_states(&self, version: u64)
-        -> accudo_storage_service_types::Result<u64, Error>;
+    fn get_number_of_states(
+        &self,
+        version: u64,
+    ) -> accudo_storage_service_types::Result<u64, Error>;
 
     /// Returns a chunk holding a list of state values starting at the
     /// specified `start_index` and ending at `end_index` (inclusive). In

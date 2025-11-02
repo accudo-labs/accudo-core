@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::metrics::{METADATA_UPLOAD_FAILURE_COUNT, PROCESSED_VERSIONS_COUNT};
-use anyhow::{ensure, Context, Result};
 use accudo_indexer_grpc_utils::{
     cache_operator::CacheOperator,
     compression_util::{FileStoreMetadata, StorageFormat, FILE_ENTRY_TRANSACTION_COUNT},
@@ -12,6 +11,7 @@ use accudo_indexer_grpc_utils::{
     types::RedisUrl,
 };
 use accudo_moving_average::MovingAverage;
+use anyhow::{ensure, Context, Result};
 use std::time::Duration;
 use tracing::debug;
 

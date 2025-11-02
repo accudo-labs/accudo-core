@@ -1,9 +1,9 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_indexer_grpc_cache_worker::IndexerGrpcCacheWorkerConfig;
 use accudo_indexer_grpc_server_framework::ServerArgs;
+use anyhow::Result;
 use clap::Parser;
 
 #[cfg(unix)]

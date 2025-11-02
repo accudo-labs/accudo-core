@@ -25,8 +25,8 @@ use crate::{
     signing_message, traits, CryptoMaterialError, Length, ValidCryptoMaterial,
     ValidCryptoMaterialStringExt,
 };
-use anyhow::{anyhow, Result};
 use accudo_crypto_derive::{DeserializeKey, SerializeKey};
+use anyhow::{anyhow, Result};
 use blst::BLST_ERROR;
 use serde::Serialize;
 use std::{convert::TryFrom, fmt};

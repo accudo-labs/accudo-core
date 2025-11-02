@@ -5,7 +5,6 @@ use crate::{
     mode::TConsensusMode, observation_aggregation::ObservationAggregationState,
     types::JWKConsensusMsg,
 };
-use anyhow::Context;
 use accudo_channels::accudo_channel;
 use accudo_logger::error;
 use accudo_reliable_broadcast::ReliableBroadcast;
@@ -13,6 +12,7 @@ use accudo_types::{
     epoch_state::EpochState,
     jwks::{ProviderJWKs, QuorumCertifiedUpdate},
 };
+use anyhow::Context;
 use futures_util::future::{AbortHandle, Abortable};
 use std::sync::Arc;
 use tokio_retry::strategy::ExponentialBackoff;

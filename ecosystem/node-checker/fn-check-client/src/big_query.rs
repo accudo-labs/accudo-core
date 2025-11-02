@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::check::SingleCheck;
-use anyhow::{bail, Context, Result};
 use accudo_logger::info;
 use accudo_sdk::types::account_address::AccountAddress;
+use anyhow::{bail, Context, Result};
 use clap::Parser;
 use gcp_bigquery_client::{
     error::BQError,

@@ -1,7 +1,6 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{bail, Context};
 use accudo_crypto::{ed25519::Ed25519PrivateKey, ValidCryptoMaterialStringExt};
 use accudo_framework::natives::code::PackageRegistry;
 use accudo_gas_schedule::LATEST_GAS_FEATURE_VERSION;
@@ -18,6 +17,7 @@ use accudo_types::{
     jwks,
     jwks::{ObservedJWKs, SupportedOIDCProviders},
 };
+use anyhow::{bail, Context};
 use clap::{Parser, Subcommand};
 use std::{path::PathBuf, str::FromStr};
 use url::Url;
@@ -392,7 +392,11 @@ async fn main() -> anyhow::Result<()> {
                 }
             }
 
-            print_configs!(OnChainConsensusConfig, OnChainExecutionConfig, AccudoVersion);
+            print_configs!(
+                OnChainConsensusConfig,
+                OnChainExecutionConfig,
+                AccudoVersion
+            );
 
             if print_gas_schedule {
                 print_configs!(GasScheduleV2, StorageGasSchedule);

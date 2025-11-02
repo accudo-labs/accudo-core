@@ -25,8 +25,8 @@ use crate::{
     CryptoMaterialError, Genesis, Length, Uniform, ValidCryptoMaterial,
     ValidCryptoMaterialStringExt, VerifyingKey,
 };
-use anyhow::{anyhow, Result};
 use accudo_crypto_derive::{DeserializeKey, SerializeKey, SilentDebug, SilentDisplay};
+use anyhow::{anyhow, Result};
 use serde::Serialize;
 use std::{convert::TryFrom, fmt};
 

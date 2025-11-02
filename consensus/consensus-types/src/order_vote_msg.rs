@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{common::Author, order_vote::OrderVote, quorum_cert::QuorumCert};
-use anyhow::{ensure, Context};
 use accudo_types::validator_verifier::ValidatorVerifier;
+use anyhow::{ensure, Context};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 

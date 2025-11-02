@@ -20,7 +20,6 @@ use crate::{
     },
     state_merkle_db::StateMerkleDb,
 };
-use anyhow::anyhow;
 use accudo_experimental_runtimes::thread_manager::THREAD_MANAGER;
 use accudo_jellyfish_merkle::{node_type::NodeKey, StaleNodeIndex};
 use accudo_logger::info;
@@ -28,6 +27,7 @@ use accudo_metrics_core::TimerHelper;
 use accudo_schemadb::{schema::KeyCodec, DB};
 use accudo_storage_interface::Result;
 use accudo_types::transaction::{AtomicVersion, Version};
+use anyhow::anyhow;
 use rayon::prelude::*;
 use std::{
     marker::PhantomData,

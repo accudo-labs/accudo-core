@@ -9,7 +9,6 @@ use crate::{
         IS_FILE_STORE_LAGGING, MAX_CACHE_SIZE, TARGET_CACHE_SIZE, TIMER,
     },
 };
-use anyhow::{bail, ensure, Result};
 use accudo_indexer_grpc_utils::{
     config::IndexerGrpcFileStoreConfig, file_store_operator_v2::file_store_reader::FileStoreReader,
 };
@@ -19,6 +18,7 @@ use accudo_protos::{
     },
     transaction::v1::Transaction,
 };
+use anyhow::{bail, ensure, Result};
 use futures::StreamExt;
 use prost::Message;
 use std::{

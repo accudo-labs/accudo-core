@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::state_store::HumanReadable;
-use anyhow::{bail, Result};
 use accudo_resource_viewer::AccudoValueAnnotator;
 use accudo_types::{
     access_path::Path as AccessPath,
@@ -10,6 +9,7 @@ use accudo_types::{
     state_store::{state_key::inner::StateKeyInner, StateView},
     write_set::{PersistedWriteOp, WriteSet},
 };
+use anyhow::{bail, Result};
 use move_core_types::language_storage::{StructTag, TypeTag};
 use serde_json::json;
 use std::{collections::BTreeMap, path::Path};

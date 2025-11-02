@@ -291,7 +291,8 @@ fn test_new_genesis() {
 
     println!("FINAL TRANSFER");
     // Transfer some money.
-    let txn = get_accudo_coin_transfer_transaction(account1, 0, &account1_key, account2, 50_000_000);
+    let txn =
+        get_accudo_coin_transfer_transaction(account1, 0, &account1_key, account2, 50_000_000);
     execute_and_commit(vec![txn], &db, &signer);
 
     // And verify.

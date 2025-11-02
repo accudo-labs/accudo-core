@@ -8,7 +8,6 @@ use crate::{
         LedgerRecoveryData, PersistentLivenessStorage, RecoveryData, RootMetadata,
     },
 };
-use anyhow::Result;
 use accudo_consensus_types::{
     block::Block, quorum_cert::QuorumCert, timeout_2chain::TwoChainTimeoutCertificate, vote::Vote,
 };
@@ -21,6 +20,7 @@ use accudo_types::{
     ledger_info::{LedgerInfo, LedgerInfoWithSignatures},
     on_chain_config::{ValidatorSet, DEFAULT_ENABLED_WINDOW_SIZE},
 };
+use anyhow::Result;
 use std::{collections::HashMap, sync::Arc};
 
 pub struct MockSharedStorage {

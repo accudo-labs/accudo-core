@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::AccudoPublicInfo;
-use anyhow::Result;
 use accudo_rest_client::Client as RestClient;
 use accudo_sdk::{
     transaction_builder::TransactionFactory,
     types::{chain_id::ChainId, LocalAccount},
 };
+use anyhow::Result;
 use reqwest::Url;
 use std::sync::Arc;
 

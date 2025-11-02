@@ -33,7 +33,6 @@ use crate::{
     rand::rand_gen::types::{FastShare, RandConfig, Share, TShare},
     util::is_vtxn_expected,
 };
-use anyhow::{bail, ensure, Context};
 use accudo_channels::accudo_channel;
 use accudo_config::config::{BlockTransactionFilterConfig, ConsensusConfig};
 use accudo_consensus_types::{
@@ -74,6 +73,7 @@ use accudo_types::{
     validator_verifier::ValidatorVerifier,
     PeerId,
 };
+use anyhow::{bail, ensure, Context};
 use fail::fail_point;
 use futures::{channel::oneshot, stream::FuturesUnordered, Future, FutureExt, SinkExt, StreamExt};
 use lru::LruCache;

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{log::TransactionGasLog, render::Render};
-use anyhow::Result;
 use accudo_gas_algebra::{Fee, InternalGas};
+use anyhow::Result;
 use handlebars::Handlebars;
 use serde_json::{json, Map, Value};
 use std::{

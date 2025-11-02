@@ -8,7 +8,6 @@ use crate::{
         types::PersistedValue,
     },
 };
-use anyhow::Result;
 use accudo_crypto::HashValue;
 use accudo_logger::prelude::*;
 use accudo_schemadb::{
@@ -17,6 +16,7 @@ use accudo_schemadb::{
     Options, DB,
 };
 use accudo_types::quorum_store::BatchId;
+use anyhow::Result;
 use std::{collections::HashMap, path::Path, time::Instant};
 
 pub trait QuorumStoreStorage: Sync + Send {

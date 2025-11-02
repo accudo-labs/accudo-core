@@ -9,7 +9,6 @@ use crate::{
         randomness_config::ReleaseFriendlyRandomnessConfig,
     },
 };
-use anyhow::{anyhow, bail, Context, Result};
 use accudo::governance::GenerateExecutionHash;
 use accudo_crypto::HashValue;
 use accudo_gas_schedule::LATEST_GAS_FEATURE_VERSION;
@@ -24,6 +23,7 @@ use accudo_types::{
         OnChainRandomnessConfig, RandomnessConfigMoveStruct, TransactionShufflerType,
     },
 };
+use anyhow::{anyhow, bail, Context, Result};
 use futures::executor::block_on;
 use handlebars::Handlebars;
 use move_binary_format::file_format_common::VERSION_DEFAULT_LANG_V2;

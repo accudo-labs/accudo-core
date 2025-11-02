@@ -19,11 +19,11 @@ use crate::{
     tokenv1_client::TokenClient,
     utils::TestFailure,
 };
-use anyhow::anyhow;
 use accudo_api_types::HexEncodedBytes;
 use accudo_rest_client::Client;
 use accudo_sdk::types::LocalAccount;
 use accudo_types::account_address::AccountAddress;
+use anyhow::anyhow;
 use futures::Future;
 use tokio::time::{sleep, Instant};
 

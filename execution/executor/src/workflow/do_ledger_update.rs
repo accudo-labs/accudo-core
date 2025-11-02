@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::metrics::OTHER_TIMERS;
-use anyhow::Result;
 use accudo_crypto::{hash::CryptoHash, HashValue};
 use accudo_executor_types::{
     execution_output::ExecutionOutput, state_checkpoint_output::StateCheckpointOutput,
@@ -14,6 +13,7 @@ use accudo_types::{
     proof::accumulator::{InMemoryEventAccumulator, InMemoryTransactionAccumulator},
     transaction::{PersistedAuxiliaryInfo, TransactionInfo, TransactionOutput},
 };
+use anyhow::Result;
 use itertools::{izip, Itertools};
 use rayon::prelude::*;
 use std::sync::Arc;

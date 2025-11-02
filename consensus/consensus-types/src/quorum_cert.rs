@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{vote_data::VoteData, wrapped_ledger_info::WrappedLedgerInfo};
-use anyhow::{ensure, Context};
 use accudo_bitvec::BitVec;
 use accudo_crypto::{hash::CryptoHash, HashValue};
 use accudo_types::{
@@ -12,6 +11,7 @@ use accudo_types::{
     ledger_info::{LedgerInfo, LedgerInfoWithSignatures},
     validator_verifier::ValidatorVerifier,
 };
+use anyhow::{ensure, Context};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 

@@ -1,9 +1,9 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_faucet_core::server::Server;
 use accudo_logger::info;
+use anyhow::Result;
 use clap::Parser;
 
 #[derive(Clone, Debug, Parser)]

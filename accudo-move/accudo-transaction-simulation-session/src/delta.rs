@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::state_store::HumanReadable;
-use anyhow::Result;
 use accudo_types::state_store::{state_key::StateKey, state_value::StateValue};
+use anyhow::Result;
 use std::{
     collections::{BTreeMap, HashMap},
     path::Path,

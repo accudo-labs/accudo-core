@@ -13,12 +13,12 @@
 //! numeric value.
 
 use crate::schema::{ensure_slice_len_eq, PERSISTED_AUXILIARY_INFO_CF_NAME};
-use anyhow::Result;
 use accudo_schemadb::{
     define_schema,
     schema::{KeyCodec, ValueCodec},
 };
 use accudo_types::transaction::{PersistedAuxiliaryInfo, Version};
+use anyhow::Result;
 use byteorder::{BigEndian, ReadBytesExt};
 use std::mem::size_of;
 

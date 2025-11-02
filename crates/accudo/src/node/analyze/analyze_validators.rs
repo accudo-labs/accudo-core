@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::fetch_metadata::ValidatorInfo;
-use anyhow::Result;
 use accudo_bitvec::BitVec;
 use accudo_logger::error;
 use accudo_rest_client::VersionedNewBlockEvent;
@@ -11,6 +10,7 @@ use accudo_types::{
     account_address::AccountAddress,
     account_config::{new_block_event_key, NewBlockEvent},
 };
+use anyhow::Result;
 use itertools::Itertools;
 use std::{
     cmp::Ordering,
@@ -308,7 +308,10 @@ pub struct AnalyzeValidators {}
 
 impl AnalyzeValidators {
     /// Fetch all events from a single epoch from DB.
-    pub fn fetch_epoch(epoch: u64, accudo_db: &dyn DbReader) -> Result<Vec<VersionedNewBlockEvent>> {
+    pub fn fetch_epoch(
+        epoch: u64,
+        accudo_db: &dyn DbReader,
+    ) -> Result<Vec<VersionedNewBlockEvent>> {
         let batch = 100;
 
         let mut cursor = u64::MAX;

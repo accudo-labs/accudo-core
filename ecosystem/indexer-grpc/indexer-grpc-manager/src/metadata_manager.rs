@@ -5,7 +5,6 @@ use crate::{
     config::{GrpcAddress, MAX_MESSAGE_SIZE},
     metrics::{CONNECTED_INSTANCES, COUNTER, KNOWN_LATEST_VERSION, TIMER},
 };
-use anyhow::{bail, Result};
 use accudo_indexer_grpc_utils::timestamp_now_proto;
 use accudo_protos::{
     indexer::v1::{
@@ -20,6 +19,7 @@ use accudo_protos::{
     },
     util::timestamp::Timestamp,
 };
+use anyhow::{bail, Result};
 use dashmap::DashMap;
 use rand::{prelude::*, thread_rng};
 use std::{

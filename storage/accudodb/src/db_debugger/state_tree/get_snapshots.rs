@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::db_debugger::common::{DbDir, PAGE_SIZE};
-use anyhow::Result;
 use accudo_types::transaction::Version;
+use anyhow::Result;
 use clap::Parser;
 
 #[derive(Parser)]

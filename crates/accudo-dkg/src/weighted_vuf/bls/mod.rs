@@ -8,8 +8,8 @@ use crate::{
     utils::{g1_multi_exp, HasMultiExp},
     weighted_vuf::traits::WeightedVUF,
 };
-use anyhow::bail;
 use accudo_crypto::blstrs::{multi_pairing, random_scalar};
+use anyhow::bail;
 use blstrs::{G1Projective, G2Projective, Gt, Scalar};
 use ff::Field;
 use group::Group;

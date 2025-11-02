@@ -18,7 +18,6 @@ use crate::{
         TestName,
     },
 };
-use anyhow::{anyhow, Result};
 use accudo_api_types::{HexEncodedBytes, U64};
 use accudo_cached_packages::accudo_stdlib::EntryFunctionCall;
 use accudo_framework::{BuildOptions, BuiltPackage};
@@ -29,6 +28,7 @@ use accudo_types::{
     account_address::AccountAddress,
     transaction::{EntryFunction, TransactionPayload},
 };
+use anyhow::{anyhow, Result};
 use move_core_types::{ident_str, language_storage::ModuleId};
 use std::{collections::BTreeMap, path::PathBuf};
 

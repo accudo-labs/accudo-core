@@ -1,8 +1,10 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{jwks::KID, move_any::AsMoveAny, move_utils::as_move_value::AsMoveValue};
-use accudo_crypto::HashValue;
+use crate::{
+    hash_utils::canonical_hash, jwks::KID, move_any::AsMoveAny,
+    move_utils::as_move_value::AsMoveValue,
+};
 use move_core_types::value::{MoveStruct, MoveValue};
 use poem_openapi_derive::Object;
 use serde::{Deserialize, Serialize};
@@ -36,7 +38,7 @@ impl UnsupportedJWK {
 
     #[cfg(any(test, feature = "fuzzing"))]
     pub fn new_with_payload(payload: &str) -> Self {
-        let id = HashValue::sha3_256_of(payload.as_bytes()).to_vec();
+        let id = canonical_hash(payload.as_bytes()).to_vec();
         Self {
             id,
             payload: payload.as_bytes().to_vec(),
@@ -52,7 +54,7 @@ impl From<serde_json::Value> for UnsupportedJWK {
     fn from(json_value: serde_json::Value) -> Self {
         let payload = json_value.to_string().into_bytes(); //TODO: canonical to_string.
         Self {
-            id: HashValue::sha3_256_of(payload.as_slice()).to_vec(),
+            id: canonical_hash(payload.as_slice()).to_vec(),
             payload,
         }
     }

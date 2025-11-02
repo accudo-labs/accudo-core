@@ -13,8 +13,8 @@ use crate::{
     transaction::Version,
     waypoint::Waypoint,
 };
-use anyhow::{bail, ensure, format_err, Result};
 use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher};
+use anyhow::{bail, ensure, format_err, Result};
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest_derive::Arbitrary;
 use serde::{Deserialize, Serialize};

@@ -11,7 +11,6 @@ use crate::{
     txn_notifier::TxnNotifier,
     IntGaugeGuard,
 };
-use anyhow::anyhow;
 use accudo_consensus_notifications::ConsensusNotificationSender;
 use accudo_consensus_types::{
     block::Block,
@@ -48,6 +47,7 @@ use accudo_types::{
     vm::module_metadata::get_randomness_annotation_for_entry_function,
 };
 use accudo_vm_validator::vm_validator::ValidationState;
+use anyhow::anyhow;
 use futures::FutureExt;
 use move_core_types::account_address::AccountAddress;
 use move_vm_runtime::ModuleStorage;

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::traits::ShutdownStep;
-use anyhow::{Context, Result};
 pub use accudo_localnet::docker::get_docker;
+use anyhow::{Context, Result};
 use async_trait::async_trait;
 use bollard::{
     container::{RemoveContainerOptions, StopContainerOptions},

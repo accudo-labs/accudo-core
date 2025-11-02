@@ -1,9 +1,9 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{bail, Context, Result};
 use accudo_config::network_id::NetworkId;
 use accudo_types::{chain_id::ChainId, network_address::NetworkAddress};
+use anyhow::{bail, Context, Result};
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;

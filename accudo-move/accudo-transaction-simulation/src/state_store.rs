@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{genesis::GENESIS_CHANGE_SET_HEAD, Account, AccountData};
-use anyhow::{anyhow, bail, Result};
 use accudo_types::{
     account_config::{
         primary_apt_store, CoinStoreResource, FungibleStoreResource, ObjectGroupResource,
@@ -17,6 +16,7 @@ use accudo_types::{
     write_set::{TransactionWrite, WriteSet},
     AccudoCoinType,
 };
+use anyhow::{anyhow, bail, Result};
 use bytes::Bytes;
 use move_binary_format::{deserializer::DeserializerConfig, CompiledModule};
 use move_core_types::{

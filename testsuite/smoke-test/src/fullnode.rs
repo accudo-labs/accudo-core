@@ -7,7 +7,6 @@ use crate::{
     state_sync_utils::create_fullnode,
     utils::{create_test_accounts, execute_transactions, MAX_HEALTHY_WAIT_SECS},
 };
-use anyhow::bail;
 use accudo_cached_packages::accudo_stdlib;
 use accudo_config::config::{BootstrappingMode, NodeConfig, OverrideNodeConfig};
 use accudo_db_indexer_schemas::{
@@ -19,6 +18,7 @@ use accudo_indexer_grpc_table_info::internal_indexer_db_service::InternalIndexer
 use accudo_rest_client::Client as RestClient;
 use accudo_schemadb::DB;
 use accudo_types::{account_address::AccountAddress, state_store::state_key::StateKey};
+use anyhow::bail;
 use std::{
     collections::HashSet,
     sync::Arc,

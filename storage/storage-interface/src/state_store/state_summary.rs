@@ -9,7 +9,6 @@ use crate::{
     },
     DbReader,
 };
-use anyhow::Result;
 use accudo_crypto::{
     hash::{CryptoHash, CORRUPTION_SENTINEL},
     HashValue,
@@ -17,6 +16,7 @@ use accudo_crypto::{
 use accudo_metrics_core::TimerHelper;
 use accudo_scratchpad::{ProofRead, SparseMerkleTree};
 use accudo_types::{proof::SparseMerkleProofExt, transaction::Version};
+use anyhow::Result;
 use derive_more::Deref;
 use itertools::Itertools;
 use rayon::prelude::*;

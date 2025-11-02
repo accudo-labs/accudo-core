@@ -2,7 +2,6 @@
 // Parts of the project are originally copyright © Meta Platforms, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::{bail, Error, Ok, Result};
 use accudo_backup_cli::utils::{ReplayConcurrencyLevelOpt, RocksdbOpt};
 use accudo_block_executor::txn_provider::default::DefaultTxnProvider;
 use accudo_config::config::{
@@ -28,6 +27,7 @@ use accudo_types::{
 };
 use accudo_vm::{accudo_vm::AccudoVMBlockExecutor, AccudoVM, VMBlockExecutor};
 use accudo_vm_environment::prod_configs::{set_layout_caches, set_paranoid_type_checks};
+use anyhow::{bail, Error, Ok, Result};
 use clap::Parser;
 use rayon::{iter::ParallelIterator, prelude::IntoParallelIterator};
 use std::{
@@ -321,7 +321,9 @@ impl Verifier {
 
         let db_end = accudo_db
             .get_synced_version()?
-            .ok_or(AccudoDbError::NotFound("Synced version is None".to_string()))?;
+            .ok_or(AccudoDbError::NotFound(
+                "Synced version is None".to_string(),
+            ))?;
         let end = std::cmp::min(end_version, db_end);
 
         let limit = if start <= end {

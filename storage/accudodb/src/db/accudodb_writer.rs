@@ -619,7 +619,10 @@ impl AccudoDB {
                 update_sender
                     .send((Instant::now(), version))
                     .map_err(|err| {
-                        AccudoDbError::Other(format!("Failed to send update to subscriber: {}", err))
+                        AccudoDbError::Other(format!(
+                            "Failed to send update to subscriber: {}",
+                            err
+                        ))
                     })?;
             }
             // Activate the ledger pruner and state kv pruner.

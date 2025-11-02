@@ -6,7 +6,6 @@ use crate::{
     ChainInfo, FullNode, HealthCheckError, LocalNode, LocalVersion, Node, Swarm, SwarmChaos,
     SwarmExt, Validator, Version,
 };
-use anyhow::{anyhow, bail, Result};
 use accudo_config::{
     config::{NetworkConfig, NodeConfig, OverrideNodeConfig, PersistableConfig},
     keys::ConfigKey,
@@ -25,6 +24,7 @@ use accudo_sdk::{
         PeerId,
     },
 };
+use anyhow::{anyhow, bail, Result};
 use prometheus_http_query::response::{PromqlResult, Sample};
 use std::{
     collections::HashMap,

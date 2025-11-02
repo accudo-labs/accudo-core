@@ -2,7 +2,9 @@
 // Copyright (c) Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use accudo_consensus::transaction_shuffler_fuzzing::use_case_aware::{Config, UseCaseAwareShuffler};
+use accudo_consensus::transaction_shuffler_fuzzing::use_case_aware::{
+    Config, UseCaseAwareShuffler,
+};
 use accudo_types::transaction::use_case::{UseCaseAwareTransaction, UseCaseKey};
 use arbitrary::Arbitrary;
 use libfuzzer_sys::fuzz_target;

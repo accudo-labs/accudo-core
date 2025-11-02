@@ -1,8 +1,8 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_gas_schedule_updator::{generate_update_proposal, GenArgs};
+use anyhow::Result;
 use clap::Parser;
 
 fn main() -> Result<()> {

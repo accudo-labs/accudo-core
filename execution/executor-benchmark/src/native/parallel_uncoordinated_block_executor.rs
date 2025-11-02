@@ -7,7 +7,6 @@ use crate::{
     metrics::TIMER,
     native::{native_config::NATIVE_EXECUTOR_POOL, native_transaction::NativeTransaction},
 };
-use anyhow::{bail, Result};
 use accudo_block_executor::{
     counters::BLOCK_EXECUTOR_INNER_EXECUTE_BLOCK, txn_provider::default::DefaultTxnProvider,
 };
@@ -38,6 +37,7 @@ use accudo_types::{
     AccudoCoinType,
 };
 use accudo_vm::VMBlockExecutor;
+use anyhow::{bail, Result};
 use dashmap::{
     mapref::one::{Ref, RefMut},
     DashMap,
@@ -918,9 +918,11 @@ impl CommonNativeRawTransactionExecutor for NativeValueCacheRawTransactionExecut
             let entry =
                 self.cache_get_mut_or_init(&self.db_util.common.apt_coin_info_resource, |key| {
                     CachedResource::AptCoinInfo(
-                        DbAccessUtil::get_value::<CoinInfoResource<AccudoCoinType>>(key, state_view)
-                            .unwrap()
-                            .unwrap(),
+                        DbAccessUtil::get_value::<CoinInfoResource<AccudoCoinType>>(
+                            key, state_view,
+                        )
+                        .unwrap()
+                        .unwrap(),
                     )
                 });
 

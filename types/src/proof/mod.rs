@@ -23,7 +23,6 @@ use crate::{
     ledger_info::LedgerInfo,
     transaction::{TransactionInfo, Version},
 };
-use anyhow::{ensure, Result};
 use accudo_crypto::{
     hash::{
         CryptoHash, CryptoHasher, EventAccumulatorHasher, SparseMerkleInternalHasher,
@@ -32,6 +31,7 @@ use accudo_crypto::{
     HashValue,
 };
 use accudo_crypto_derive::CryptoHasher;
+use anyhow::{ensure, Result};
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest_derive::Arbitrary;
 use serde::{Deserialize, Serialize};

@@ -12,7 +12,6 @@ use crate::{
         },
     },
 };
-use anyhow::ensure;
 use accudo_consensus_types::common::Author;
 use accudo_infallible::Mutex;
 use accudo_logger::info;
@@ -20,6 +19,7 @@ use accudo_reliable_broadcast::BroadcastStatus;
 use accudo_types::{
     aggregate_signature::PartialSignatures, epoch_state::EpochState, randomness::RandMetadata,
 };
+use anyhow::ensure;
 use std::{collections::HashSet, sync::Arc};
 
 pub struct AugDataCertBuilder<D> {

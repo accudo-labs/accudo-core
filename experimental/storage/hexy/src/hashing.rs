@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::ARITY;
-use anyhow::{ensure, Result};
 use accudo_crypto::{
     hash::{CryptoHasher, HexyHasher},
     HashValue,
 };
+use anyhow::{ensure, Result};
 
 #[derive(Default)]
 pub struct HexyHashBuilder {

@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{db_access::DbAccessUtil, transaction_generator::create_block_metadata_transaction};
-use anyhow::Result;
 use accudo_storage_interface::{
     state_store::state_view::db_state_view::LatestDbStateCheckpointView, DbReaderWriter,
 };
@@ -14,6 +13,7 @@ use accudo_types::{
     state_store::MoveResourceExt,
     transaction::{SignedTransaction, Transaction},
 };
+use anyhow::Result;
 use async_trait::async_trait;
 use std::{
     collections::HashMap,

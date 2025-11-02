@@ -6,7 +6,6 @@ use crate::schema::{
     transaction_accumulator::TransactionAccumulatorSchema,
     transaction_accumulator_root_hash::TransactionAccumulatorRootHashSchema,
 };
-use anyhow::anyhow;
 use accudo_accumulator::{HashReader, MerkleAccumulator};
 use accudo_crypto::{
     hash::{CryptoHash, TransactionAccumulatorHasher},
@@ -21,6 +20,7 @@ use accudo_types::{
     },
     transaction::{TransactionInfo, Version},
 };
+use anyhow::anyhow;
 use std::{borrow::Borrow, path::Path, sync::Arc};
 
 pub(crate) type Accumulator =

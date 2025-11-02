@@ -1,7 +1,6 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_types::{
     account_address::AccountAddress,
     account_config::{
@@ -14,6 +13,7 @@ use accudo_types::{
     write_set::TOTAL_SUPPLY_STATE_KEY,
     AccudoCoinType, CoinType,
 };
+use anyhow::Result;
 use itertools::Itertools;
 use move_core_types::{
     identifier::Identifier,

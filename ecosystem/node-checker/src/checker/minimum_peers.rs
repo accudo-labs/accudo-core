@@ -94,7 +94,9 @@ impl MinimumPeersChecker {
                 50,
                 format!("{} {}", explanation, additional_info),
             )
-            .links(vec!["https://accudo.dev/issues-and-workarounds/".to_string()])
+            .links(vec![
+                "https://accudo.dev/issues-and-workarounds/".to_string()
+            ])
         }
     }
 }

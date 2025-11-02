@@ -42,8 +42,8 @@ use crate::{
     account_address::AccountAddress,
     state_store::state_key::{inner::StateKeyInner, StateKey},
 };
-use anyhow::{Error, Result};
 use accudo_crypto::hash::HashValue;
+use anyhow::{Error, Result};
 use move_core_types::language_storage::{ModuleId, StructTag};
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest::prelude::*;

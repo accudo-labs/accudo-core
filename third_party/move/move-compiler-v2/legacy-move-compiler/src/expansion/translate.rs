@@ -478,7 +478,8 @@ fn module_is_in_accudo_libs(module_address: Option<Spanned<Address>>) -> bool {
                 {
                     Some(spanned_symbol) => {
                         ((&spanned_symbol.value as &str) == ACCUDO_STDLIB_NAME
-                            && (spanned_numerical_address.value == *ACCUDO_STDLIB_NUMERICAL_ADDRESS))
+                            && (spanned_numerical_address.value
+                                == *ACCUDO_STDLIB_NUMERICAL_ADDRESS))
                             || ((&spanned_symbol.value as &str) == ACCUDO_FRAMEWORK_NAME
                                 && (spanned_numerical_address.value
                                     == *ACCUDO_FRAMEWORK_NUMERICAL_ADDRESS))

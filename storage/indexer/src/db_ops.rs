@@ -1,11 +1,11 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use anyhow::Result;
 use accudo_config::config::RocksdbConfig;
 use accudo_db_indexer_schemas::schema::{column_families, internal_indexer_column_families};
 use accudo_rocksdb_options::gen_rocksdb_options;
 use accudo_schemadb::DB;
+use anyhow::Result;
 use std::{mem, path::Path};
 
 const INTERNAL_INDEXER_DB_NAME: &str = "internal_indexer_db";

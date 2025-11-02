@@ -20,10 +20,9 @@ use crate::{
     view_function::convert_view_function_error,
     ApiTags,
 };
-use anyhow::Context as AnyhowContext;
 use accudo_api_types::{
     transaction::{PersistedAuxiliaryInfo, TransactionSummary},
-    verify_function_identifier, verify_module_identifier, Address, AccudoError, AccudoErrorCode,
+    verify_function_identifier, verify_module_identifier, AccudoError, AccudoErrorCode, Address,
     AsConverter, EncodeSubmissionRequest, GasEstimation, GasEstimationBcs, HashValue,
     HexEncodedBytes, LedgerInfo, MoveType, PendingTransaction, SubmitTransactionRequest,
     Transaction, TransactionData, TransactionOnChainData, TransactionsBatchSingleSubmissionFailure,
@@ -43,6 +42,7 @@ use accudo_types::{
     AccudoCoinType, CoinType,
 };
 use accudo_vm::{AccudoSimulationVM, AccudoVM};
+use anyhow::Context as AnyhowContext;
 use move_core_types::{ident_str, language_storage::ModuleId, vm_status::VMStatus};
 use poem_openapi::{
     param::{Path, Query},
@@ -1403,7 +1403,10 @@ impl TransactionsApi {
             .await
             .context("Mempool failed to initially evaluate submitted transaction")
             .map_err(|err| {
-                accudo_api_types::AccudoError::new_with_error_code(err, AccudoErrorCode::InternalError)
+                accudo_api_types::AccudoError::new_with_error_code(
+                    err,
+                    AccudoErrorCode::InternalError,
+                )
             })?;
         match mempool_status.code {
             MempoolStatusCode::Accepted => Ok(()),

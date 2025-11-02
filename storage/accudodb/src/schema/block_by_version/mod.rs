@@ -10,12 +10,12 @@
 //! ```
 
 use crate::schema::{ensure_slice_len_eq, BLOCK_BY_VERSION_CF_NAME};
-use anyhow::Result;
 use accudo_schemadb::{
     define_schema,
     schema::{KeyCodec, ValueCodec},
 };
 use accudo_types::{block_info::BlockHeight, transaction::Version};
+use anyhow::Result;
 use byteorder::{BigEndian, ReadBytesExt};
 use std::mem::size_of;
 

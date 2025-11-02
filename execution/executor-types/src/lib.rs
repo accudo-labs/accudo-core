@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 #![forbid(unsafe_code)]
 
-use anyhow::Result;
 use accudo_crypto::HashValue;
 use accudo_scratchpad::SparseMerkleTree;
 use accudo_storage_interface::state_store::state_view::cached_state_view::CachedStateView;
@@ -24,6 +23,7 @@ use accudo_types::{
     },
     write_set::WriteSet,
 };
+use anyhow::Result;
 pub use error::{ExecutorError, ExecutorResult};
 pub use ledger_update_output::LedgerUpdateOutput;
 use state_compute_result::StateComputeResult;

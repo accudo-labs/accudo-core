@@ -30,7 +30,7 @@
 // TODO: https://github.com/accudo-labs/accudo-core/issues/2279
 
 use super::{accept_type::AcceptType, bcs_payload::Bcs};
-use accudo_api_types::{Address, AccudoError, AccudoErrorCode, HashValue, LedgerInfo};
+use accudo_api_types::{AccudoError, AccudoErrorCode, Address, HashValue, LedgerInfo};
 use move_core_types::{
     identifier::{IdentStr, Identifier},
     language_storage::StructTag,

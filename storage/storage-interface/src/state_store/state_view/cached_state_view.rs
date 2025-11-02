@@ -14,7 +14,6 @@ use crate::{
     },
     DbReader,
 };
-use anyhow::Result;
 use accudo_metrics_core::{IntCounterVecHelper, TimerHelper};
 use accudo_types::{
     state_store::{
@@ -24,6 +23,7 @@ use accudo_types::{
     },
     transaction::Version,
 };
+use anyhow::Result;
 use core::fmt;
 use dashmap::{mapref::entry::Entry, DashMap};
 use once_cell::sync::Lazy;
