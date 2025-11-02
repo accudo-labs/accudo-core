@@ -1,0 +1,9 @@
+[package]
+name = "pack_rand"
+version = "0.0.0"
+
+[dependencies]
+AccudoFramework = { local = "../../../../../accudo-move/framework/accudo-framework" }
+
+[addresses]
+addr = "_"

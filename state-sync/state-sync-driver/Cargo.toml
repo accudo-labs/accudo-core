@@ -1,0 +1,64 @@
+[package]
+name = "accudo-state-sync-driver"
+description = "The driver for state sync"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-config = { workspace = true }
+accudo-consensus-notifications = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-data-client = { workspace = true }
+accudo-data-streaming-service = { workspace = true }
+accudo-event-notifications = { workspace = true }
+accudo-executor-types = { workspace = true }
+accudo-infallible = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-mempool-notifications = { workspace = true }
+accudo-metrics-core = { workspace = true }
+accudo-runtimes = { workspace = true }
+accudo-schemadb = { workspace = true }
+accudo-storage-interface = { workspace = true }
+accudo-storage-service-notifications = { workspace = true }
+accudo-time-service = { workspace = true }
+accudo-types = { workspace = true }
+async-trait = { workspace = true }
+bcs = { workspace = true }
+futures = { workspace = true }
+once_cell = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tokio-stream = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+accudo-channels = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-db = { workspace = true }
+accudo-executor = { workspace = true }
+accudo-executor-test-helpers = { workspace = true }
+accudo-genesis = { workspace = true, features = ["testing"] }
+accudo-network = { workspace = true }
+accudo-storage-service-client = { workspace = true }
+accudo-storage-service-types = { workspace = true }
+accudo-temppath = { workspace = true }
+accudo-time-service = { workspace = true, features = ["async", "testing"] }
+accudo-vm = { workspace = true }
+accudo-vm-genesis = { workspace = true }
+async-trait = { workspace = true }
+bcs = { workspace = true }
+claims = { workspace = true }
+mockall = { workspace = true }
+move-core-types = { workspace = true }
+ntest = { workspace = true }
+rand = { workspace = true }

@@ -1,0 +1,6 @@
+[package]
+name = 'do-nothing'
+version = '1.0.0'
+[dependencies]
+AccudoFramework = { local = "../../../framework/accudo-framework" }
+AccudoStdlib = { local = "../../../framework/accudo-stdlib" }

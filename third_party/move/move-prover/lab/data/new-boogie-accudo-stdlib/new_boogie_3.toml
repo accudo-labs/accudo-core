@@ -1,0 +1,15 @@
+move_named_address_values = [
+    "std=0x1",
+    "accudo_std=0x1",
+    "accudo_framework=0x1",
+    "accudo_token=0x3",
+    "core_resources=0xA550C18",
+    "vm_reserved=0x0",
+    "Extensions=0x1",
+    "vm=0x0",
+    "accudo_fungible_asset=0xA"
+]
+move_deps = [
+    "../../../../../../accudo-move/framework/move-stdlib/sources",
+    "../../../../../../accudo-move/framework/accudo-stdlib/sources",
+]

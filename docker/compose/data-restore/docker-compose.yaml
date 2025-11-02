@@ -1,0 +1,40 @@
+# This compose file can be used to restore data for a fullnode.
+# You will need to provide the restore data source in the configuration.
+version: "3.8"
+services:
+  restore:
+    image: accudolabs/tools:nightly
+    volumes:
+      - type: volume
+        source: db
+        target: /opt/accudo/data
+      - type: volume
+        source: tmp
+        target: /tmp
+      # Depends on which cloud backup data you use, replace this with either:
+      # `s3.yaml` (AWS S3)
+      # `gcs.yaml` (GCP GCS)
+      # You can update the yaml file to specify where you want to download data from,
+      # default data resource is hosted by AccudoLabs.
+      - type: bind
+        source: ./s3.yaml
+        target: /opt/accudo/etc/restore.yaml
+        read_only: true
+    environment:
+      - HOME=/tmp
+      - RUST_LOG=debug
+    command: >
+      sh -c "
+      /usr/local/bin/accudo-debugger accudo-db restore bootstrap-db --concurrent-downloads 2 \
+        --target-db-dir /opt/accudo/data/db
+        --metadata-cache-dir /tmp/accudo-restore-metadata \
+        --command-adapter-config /opt/accudo/etc/restore.yaml
+      "
+
+# update the db volume name to the one you want to restore if needed
+# docker-compose usually add the project name (default is the directory name) as prefix of the volume name.
+# so make sure you start this docker compose using same project name as the db you want to restore.
+volumes:
+  db:
+    name: accudo-validator
+  tmp:

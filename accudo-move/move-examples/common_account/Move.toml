@@ -1,0 +1,9 @@
+[package]
+name = "CommonAccount"
+version = "1.0.0"
+
+[dependencies]
+AccudoFramework = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-framework", rev = "mainnet" }
+
+[addresses]
+common_account = "_"

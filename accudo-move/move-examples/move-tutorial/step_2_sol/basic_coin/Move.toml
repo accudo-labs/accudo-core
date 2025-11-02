@@ -1,0 +1,11 @@
+[package]
+name = "basic_coin"
+version = "0.0.0"
+
+[addresses]
+named_addr = "0xCAFE"
+
+[dependencies.AccudoStdlib]
+git = 'https://github.com/accudo-labs/accudo-framework.git'
+rev = 'main'
+subdir = 'accudo-stdlib'

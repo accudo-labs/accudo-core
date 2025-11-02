@@ -1,0 +1,6 @@
+[package]
+name = "Pack"
+version = "0.1.2"
+
+[dependencies]
+MoveStdlib = { git = "https://github.com/accudo-labs/accudo-framework", rev = "main", subdir = "does-not-exist" }

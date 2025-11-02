@@ -1,0 +1,14 @@
+[package]
+name = "DrandLottery"
+version = "0.0.1"
+
+[dependencies]
+AccudoFramework = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-framework", rev = "mainnet" }
+#AccudoStdlib = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-stdlib", rev = "mainnet" }
+
+
+[addresses]
+std = "0x1"
+accudo_std = "0x1"
+accudo_framework = "0x1"
+drand = "_"

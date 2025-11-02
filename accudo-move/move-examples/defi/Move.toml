@@ -1,0 +1,9 @@
+[package]
+name = "Examples"
+version = "0.0.0"
+
+[addresses]
+defi = "_"
+
+[dependencies]
+AccudoFramework = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-framework", rev = "mainnet" }

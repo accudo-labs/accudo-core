@@ -1,0 +1,8 @@
+apiVersion: v2
+name: accudo-node
+version: 1.0.0
+appVersion: 1.0.0
+description: Accudo blockchain node deployment
+home: https://accudo.org/
+sources:
+- https://github.com/accudo-labs/accudo-core

@@ -1,0 +1,37 @@
+[package]
+name = "accudo-db-indexer-schemas"
+description = "AccudoDB Internal Indexer DB schemas"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-schemadb = { workspace = true }
+accudo-storage-interface = { workspace = true }
+accudo-types = { workspace = true }
+bcs = { workspace = true }
+byteorder = { workspace = true }
+proptest = { workspace = true, optional = true }
+proptest-derive = { workspace = true, optional = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+accudo-proptest-helpers = { workspace = true }
+accudo-schemadb = { workspace = true, features = ["fuzzing"] }
+accudo-types = { workspace = true, features = ["fuzzing"] }
+proptest = { workspace = true }
+proptest-derive = { workspace = true }
+rand = { workspace = true }
+
+[features]
+default = []
+fuzzing = ["proptest", "proptest-derive", "accudo-types/fuzzing", "accudo-schemadb/fuzzing"]

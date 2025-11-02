@@ -1,0 +1,9 @@
+[package]
+name = "pack_function_values"
+version = "0.0.0"
+
+[dependencies]
+AccudoFramework = { local = "../../../../../accudo-move/framework/accudo-framework" }
+
+[addresses]
+account = "_"

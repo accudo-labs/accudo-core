@@ -1,0 +1,75 @@
+[package]
+name = "accudo-executor-benchmark"
+description = "Accudo executor benchmark"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-aggregator = { workspace = true }
+accudo-block-executor = { workspace = true }
+accudo-block-partitioner = { workspace = true }
+accudo-config = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-db = { workspace = true }
+accudo-executor = { workspace = true }
+accudo-executor-service = { workspace = true }
+accudo-executor-types = { workspace = true }
+accudo-experimental-ptx-executor = { workspace = true }
+accudo-experimental-runtimes = { workspace = true }
+accudo-genesis = { workspace = true, features = ["testing"] }
+accudo-infallible = { workspace = true }
+accudo-jellyfish-merkle = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-metrics-core = { workspace = true }
+accudo-mvhashmap = { workspace = true }
+accudo-node-resource-metrics = { workspace = true }
+accudo-push-metrics =  { workspace = true }
+accudo-sdk = { workspace = true }
+accudo-storage-interface = { workspace = true }
+accudo-transaction-generator-lib = { workspace = true }
+accudo-transaction-workloads-lib = { workspace = true }
+accudo-types = { workspace = true }
+accudo-vm = { workspace = true }
+accudo-vm-environment = { workspace = true }
+accudo-vm-logging = { workspace = true }
+accudo-vm-types = { workspace = true }
+async-trait = { workspace = true }
+bcs = { workspace = true }
+bytes = { workspace = true }
+chrono = { workspace = true }
+clap = { workspace = true }
+dashmap = { workspace = true }
+derivative = { workspace = true }
+indicatif = { workspace = true }
+itertools = { workspace = true }
+move-core-types = { workspace = true }
+move-vm-types = { workspace = true }
+num_cpus = { workspace = true }
+once_cell = { workspace = true }
+rand = { workspace = true }
+rayon = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thread_local = { workspace = true }
+tokio = { workspace = true }
+toml = { workspace = true }
+
+[target.'cfg(unix)'.dependencies]
+accudo-profiler = { workspace = true }
+jemallocator = { workspace = true }
+
+[dev-dependencies]
+accudo-temppath = { workspace = true }
+
+[features]
+default = []
+fuzzing = ["accudo-config/fuzzing", "accudo-crypto/fuzzing", "accudo-types/fuzzing"]

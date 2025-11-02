@@ -1,0 +1,8 @@
+apiVersion: v2
+name: testnet-addons
+version: "0.1"
+appVersion: 0.1.0
+description: Additional components for accudo-nodes testnet
+home: https://accudo.org/
+sources:
+  - https://github.com/accudo-labs/accudo-core

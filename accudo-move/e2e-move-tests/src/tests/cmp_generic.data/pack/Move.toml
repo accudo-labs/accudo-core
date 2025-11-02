@@ -1,0 +1,6 @@
+[package]
+name = "generic_cmp"
+version = "0.0.0"
+
+[dependencies]
+AccudoFramework = { local = "../../../../../framework/accudo-framework" }

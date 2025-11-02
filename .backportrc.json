@@ -1,0 +1,12 @@
+{
+    "repoOwner": "accudo-labs",
+    "repoName": "accudo-core",
+
+    "branchLabelMapping": {
+        "^v(\\d+).(\\d+)$": "accudo-release-v$1.$2"
+    },
+    "commitConflicts": true,
+    "prTitle": "[cp][{{targetBranch}}] {{sourcePullRequest.title}}",
+    "targetPRLabels": ["cherry-pick"],
+    "assignees": ["thepomeranian"]
+}

@@ -1,0 +1,3 @@
+[submodule "ecosystem/indexer-grpc/indexer-grpc-parser/accudo-indexer-processors"]
+	path = ecosystem/indexer-grpc/indexer-grpc-parser/accudo-indexer-processors
+	url = https://github.com/accudo-labs/accudo-indexer-processors.git

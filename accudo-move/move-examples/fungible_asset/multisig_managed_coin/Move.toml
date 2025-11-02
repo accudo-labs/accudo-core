@@ -1,0 +1,11 @@
+[package]
+name = "MultisigManagedCoin"
+version = "0.0.0"
+
+[addresses]
+accudo_framework = "0x1"
+example_addr = "_"
+
+[dependencies]
+AccudoFramework = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-framework", rev = "mainnet" }
+ManagedFungibleAsset = { local = "../managed_fungible_asset" }

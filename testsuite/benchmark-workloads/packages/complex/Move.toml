@@ -1,0 +1,9 @@
+[package]
+name = 'complex'
+version = '1.0.0'
+
+[dependencies]
+AccudoFramework = { local = "../../../../accudo-move/framework/accudo-framework" }
+
+[addresses]
+publisher_address = "0xABCD"

@@ -1,0 +1,11 @@
+[package]
+name = "DataStructure"
+version = "0.0.1"
+
+[dependencies]
+AccudoStdlib = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-stdlib", rev = "mainnet" }
+AccudoFramework = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-framework", rev = "mainnet" }
+
+
+[addresses]
+std = "0x1"

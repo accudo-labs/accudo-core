@@ -1,0 +1,6 @@
+[package]
+name = "Pack"
+version = "0.1.2"
+
+[dependencies]
+MoveStdlib = { accudo = "https://bad-network.mainnet.accudo.org", address = "0x1" }

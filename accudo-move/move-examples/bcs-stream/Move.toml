@@ -1,0 +1,9 @@
+[package]
+name = "bcs_stream"
+version = "0.0.0"
+
+[addresses]
+bcs_stream = "0xCAFE"
+
+[dependencies]
+AccudoStdlib = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-stdlib", rev = "mainnet" }

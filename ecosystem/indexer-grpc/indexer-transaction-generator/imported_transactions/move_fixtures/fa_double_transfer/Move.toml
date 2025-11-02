@@ -1,0 +1,9 @@
+[package]
+name = "fa_double_transfer"
+version = "1.0.0"
+authors = []
+
+[addresses]
+
+[dependencies]
+AccudoFramework = { local = "../../../../../../accudo-move/framework/accudo-framework" }

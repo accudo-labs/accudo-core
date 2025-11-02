@@ -1,0 +1,12 @@
+[package]
+name = "CliArgs"
+version = "0.1.0"
+upgrade_policy = "compatible"
+
+[addresses]
+test_account = "_"
+
+[dependencies.AccudoFramework]
+git = "https://github.com/accudo-labs/accudo-framework.git"
+subdir = "accudo-framework"
+rev = "mainnet"

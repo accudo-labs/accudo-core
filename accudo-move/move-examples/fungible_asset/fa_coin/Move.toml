@@ -1,0 +1,10 @@
+[package]
+name = "Examples"
+version = "0.0.0"
+
+[addresses]
+accudo_framework = "0x1"
+FACoin = "_"
+
+[dependencies]
+AccudoFramework = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-framework", rev = "mainnet" }

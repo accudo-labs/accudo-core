@@ -1,0 +1,21 @@
+name: "Bump accudo-node cargo version"
+description: |
+  Bumps the accudo-node cargo version against the accudo-core branch name.
+inputs:
+  release_tag:
+    description: "The release tag which includes the version to bump"
+    required: true
+  accudo_node_cargo_toml:
+    description: "The path to the accudo-node Cargo.toml file"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Bump accudo-node-version
+      shell: bash
+      run: |
+        python3 ${{ github.action_path }}/bump_accudo_node_version.py
+      env:
+        RELEASE_TAG: ${{ inputs.release_tag }}
+        ACCUDO_NODE_CARGO_TOML: ${{ inputs.accudo_node_cargo_toml }}

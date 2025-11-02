@@ -1,0 +1,9 @@
+[package]
+name = "RingDeque"
+version = "0.0.0"
+
+[dependencies]
+AccudoFramework = { local = "../../framework/accudo-framework" }
+
+[addresses]
+ring_deque = "_"

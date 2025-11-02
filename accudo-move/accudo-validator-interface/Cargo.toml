@@ -1,0 +1,29 @@
+[package]
+name = "accudo-validator-interface"
+description = "Defines interfaces between the accudo nodes and local move infrastructure"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-api-types = { workspace = true }
+accudo-config = { workspace = true }
+accudo-db = { workspace = true }
+accudo-framework = { workspace = true }
+accudo-rest-client = { workspace = true }
+accudo-storage-interface = { workspace = true }
+accudo-types = { workspace = true }
+async-recursion = { workspace = true }
+async-trait = { workspace = true }
+bcs = { workspace = true }
+lru = { workspace = true }
+move-core-types = { workspace = true }
+tokio = { workspace = true }

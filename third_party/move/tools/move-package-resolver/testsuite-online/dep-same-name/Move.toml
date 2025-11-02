@@ -1,0 +1,7 @@
+[package]
+name = "Pack"
+version = "0.1.2"
+
+[dependencies]
+AccudoStdlib = { git = "https://github.com/accudo-labs/accudo-framework", rev = "main", subdir = "accudo-stdlib" }
+MoveStdlib = { git = "https://github.com/accudo-labs/accudo-framework", rev = "testnet", subdir = "move-stdlib" }

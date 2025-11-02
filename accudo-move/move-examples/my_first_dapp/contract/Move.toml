@@ -1,0 +1,12 @@
+[package]
+name = "TodoList"
+version = "1.0.0"
+authors = []
+
+[addresses]
+todolist_addr='_'
+
+[dependencies]
+AccudoFramework = { git = "https://github.com/accudo-labs/accudo-framework.git", rev = "mainnet", subdir = "accudo-framework" }
+
+[dev-dependencies]

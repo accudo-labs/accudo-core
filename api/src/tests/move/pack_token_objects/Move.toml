@@ -1,0 +1,10 @@
+[package]
+name = "pack_token_objects"
+version = "0.0.0"
+
+[dependencies]
+AccudoFramework = { local = "../../../../../accudo-move/framework/accudo-framework" }
+AccudoTokenObjects = { local = "../../../../../accudo-move/framework/accudo-token-objects" }
+
+[addresses]
+addr = "_"

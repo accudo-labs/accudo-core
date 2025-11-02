@@ -1,0 +1,19 @@
+[package]
+name = "cli_e2e_tests"
+version = "0.0.1"
+
+[addresses]
+addr = "_"
+
+[dev-addresses]
+addr = "0x12345"
+
+[dependencies.AccudoFramework]
+git = "https://github.com/accudo-labs/accudo-framework.git"
+rev = "mainnet"
+subdir = "accudo-framework"
+
+[dependencies.AccudoTokenObjects]
+git = "https://github.com/accudo-labs/accudo-framework.git"
+rev = "mainnet"
+subdir = "accudo-token-objects"

@@ -1,0 +1,11 @@
+[package]
+name = "exceed_limit"
+version = "0.0.0"
+
+[dependencies]
+MoveStdlib = { local = "../../../../../accudo-move/framework/move-stdlib" }
+AccudoFramework = { local = "../../../../../accudo-move/framework/accudo-framework" }
+AccudoToken = { local = "../../../../../accudo-move/framework/accudo-token" }
+
+[addresses]
+addr = "_"

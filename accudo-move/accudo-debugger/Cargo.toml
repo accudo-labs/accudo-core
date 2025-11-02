@@ -1,0 +1,38 @@
+[package]
+name = "accudo-move-debugger"
+version = "0.1.0"
+description = "A tool to replay transactions on chain and to execute transactions locally."
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-block-executor = { workspace = true }
+accudo-consensus = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-gas-profiling = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-rest-client = { workspace = true }
+accudo-types = { workspace = true }
+accudo-validator-interface = { workspace = true }
+accudo-vm = { workspace = true }
+accudo-vm-environment = { workspace = true }
+accudo-vm-logging = { workspace = true }
+accudo-vm-types = { workspace = true }
+bcs = { workspace = true }
+clap = { workspace = true }
+itertools = { workspace = true }
+regex = { workspace = true }
+reqwest = { workspace = true }
+tokio = { workspace = true }
+url = { workspace = true }
+
+[[bin]]
+name = "remote-gas-profiler"

@@ -1,0 +1,16 @@
+[package]
+name = "B"
+version = "1.0.0"
+authors = []
+
+[addresses]
+B = "0x43"
+
+[dev-addresses]
+
+[dependencies.AccudoFramework]
+git = "https://github.com/accudo-labs/accudo-framework.git"
+rev = "mainnet"
+subdir = "accudo-framework"
+
+[dev-dependencies]

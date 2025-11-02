@@ -1,0 +1,52 @@
+[package]
+name = "accudo-storage-service-server"
+description = "The Accudo storage service (server-side)"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-channels = { workspace = true }
+accudo-config = { workspace = true }
+accudo-infallible = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-metrics-core = { workspace = true }
+accudo-network = { workspace = true }
+accudo-storage-interface = { workspace = true }
+accudo-storage-service-notifications = { workspace = true }
+accudo-storage-service-types = { workspace = true }
+accudo-time-service = { workspace = true }
+accudo-types = { workspace = true }
+arc-swap = { workspace = true }
+bcs = { workspace = true }
+bytes = { workspace = true }
+dashmap = { workspace = true }
+futures = { workspace = true }
+itertools = { workspace = true }
+mini-moka = { workspace = true }
+once_cell = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+accudo-bitvec = { workspace = true }
+accudo-config = { workspace = true, features = ["fuzzing"] }
+accudo-crypto = { workspace = true }
+accudo-netcore = { workspace = true }
+accudo-storage-interface = { workspace = true }
+accudo-time-service = { workspace = true, features = ["async", "testing"] }
+accudo-types = { workspace = true, features = ["testing"] }
+claims = { workspace = true }
+maplit = { workspace = true }
+mockall = { workspace = true }
+rand = { workspace = true }

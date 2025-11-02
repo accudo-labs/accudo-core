@@ -1,0 +1,12 @@
+[package]
+name = "AccudoToken"
+version = "1.0.0"
+
+[addresses]
+std = "0x1"
+accudo_framework = "0x1"
+accudo_token = "0x3"
+
+[dependencies]
+MoveStdlib = { local = "../move-stdlib" }
+AccudoFramework = { local = "../accudo-framework"}

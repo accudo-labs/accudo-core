@@ -1,0 +1,45 @@
+[package]
+name = "accudo-vm-validator"
+description = "Accudo vm validator"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-storage-interface = { workspace = true }
+accudo-types = { workspace = true }
+accudo-vm = { workspace = true }
+accudo-vm-environment = { workspace = true }
+accudo-vm-logging = { workspace = true }
+fail = { workspace = true }
+move-binary-format = { workspace = true }
+move-core-types = { workspace = true }
+move-vm-runtime = { workspace = true }
+move-vm-types = { workspace = true }
+rand = { workspace = true }
+
+[dev-dependencies]
+accudo-cached-packages = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-db = { workspace = true }
+accudo-executor-test-helpers = { workspace = true }
+accudo-gas-schedule = { workspace = true, features = ["testing"] } 
+accudo-temppath = { workspace = true }
+accudo-types = { workspace = true, features = ["testing"] }
+accudo-vm-genesis = { workspace = true }
+move-vm-types = { workspace = true, features = ["testing"] }
+rand = { workspace = true }
+
+[features]
+default = []
+failpoints = ["fail/failpoints"]
+fuzzing = ["accudo-types/fuzzing", "accudo-crypto/fuzzing", "accudo-db/fuzzing"]

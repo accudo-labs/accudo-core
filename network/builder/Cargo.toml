@@ -1,0 +1,31 @@
+[package]
+name = "accudo-network-builder"
+description = "Accudo network builder for constructing a network"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+accudo-channels = { workspace = true }
+accudo-config = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-event-notifications = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-netcore = { workspace = true }
+accudo-network = { workspace = true }
+accudo-network-discovery = { workspace = true }
+accudo-time-service = { workspace = true }
+accudo-types = { workspace = true }
+bcs = { workspace = true }
+futures = { workspace = true }
+maplit = { workspace = true }
+rand = { workspace = true }
+serde = { workspace = true }
+tokio = { workspace = true }

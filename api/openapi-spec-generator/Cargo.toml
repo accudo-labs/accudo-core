@@ -1,0 +1,22 @@
+[package]
+name = "accudo-openapi-spec-generator"
+description = "Accudo API OpenAPI Spec Generator"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-api = { workspace = true }
+accudo-config = { workspace = true }
+accudo-mempool = { workspace = true, features = ["fuzzing"] }
+accudo-storage-interface = { workspace = true }
+accudo-types = { workspace = true }
+clap = { workspace = true }

@@ -1,0 +1,103 @@
+[package]
+name = "accudo-node"
+description = "Accudo node"
+version = "0.0.0-main"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-admin-service = { workspace = true }
+accudo-api = { workspace = true }
+accudo-backup-service = { workspace = true }
+accudo-build-info = { workspace = true }
+accudo-cached-packages = { workspace = true }
+accudo-channels = { workspace = true }
+accudo-config = { workspace = true }
+accudo-consensus = { workspace = true }
+accudo-consensus-notifications = { workspace = true }
+accudo-crash-handler = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-data-client = { workspace = true }
+accudo-data-streaming-service = { workspace = true }
+accudo-db = { workspace = true }
+accudo-db-indexer = { workspace = true }
+accudo-dkg-runtime = { workspace = true }
+accudo-event-notifications = { workspace = true }
+accudo-executor = { workspace = true }
+accudo-framework = { workspace = true }
+accudo-genesis = { workspace = true }
+accudo-indexer = { workspace = true, optional = true }
+accudo-indexer-grpc-fullnode = { workspace = true }
+accudo-indexer-grpc-table-info = { workspace = true }
+accudo-infallible = { workspace = true }
+accudo-inspection-service = { workspace = true }
+accudo-jwk-consensus = { workspace = true }
+accudo-logger = { workspace = true, features = ["node-identity"] }
+accudo-mempool = { workspace = true }
+accudo-mempool-notifications = { workspace = true }
+accudo-network = { workspace = true }
+accudo-network-benchmark = { workspace = true }
+accudo-network-builder = { workspace = true }
+accudo-node-identity = { workspace = true }
+accudo-peer-monitoring-service-client = { workspace = true }
+accudo-peer-monitoring-service-server = { workspace = true }
+accudo-peer-monitoring-service-types = { workspace = true }
+accudo-runtimes = { workspace = true }
+accudo-state-sync-driver = { workspace = true }
+accudo-storage-interface = { workspace = true }
+accudo-storage-service-client = { workspace = true }
+accudo-storage-service-notifications = { workspace = true }
+accudo-storage-service-server = { workspace = true }
+accudo-storage-service-types = { workspace = true }
+accudo-telemetry = { workspace = true }
+accudo-temppath = { workspace = true }
+accudo-time-service = { workspace = true }
+accudo-types = { workspace = true }
+accudo-validator-transaction-pool = { workspace = true }
+accudo-vm = { workspace = true }
+accudo-vm-environment = { workspace = true }
+bcs = { workspace = true }
+clap = { workspace = true }
+either = { workspace = true }
+fail = { workspace = true }
+futures = { workspace = true }
+hex = { workspace = true }
+move-vm-runtime = { workspace = true }
+move-vm-types = { workspace = true }
+num_cpus = { workspace = true }
+rand = { workspace = true }
+rayon = { workspace = true }
+rlimit = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+tokio = { workspace = true }
+ureq = { workspace = true }
+url = { workspace = true }
+
+[target.'cfg(unix)'.dependencies]
+jemallocator = { workspace = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+rstack-self = { workspace = true }
+
+[features]
+assert-private-keys-not-cloneable = ["accudo-crypto/assert-private-keys-not-cloneable"]
+check-vm-features = []
+consensus-only-perf-test = ["accudo-executor/consensus-only-perf-test", "accudo-mempool/consensus-only-perf-test", "accudo-db/consensus-only-perf-test"]
+default = []
+failpoints = ["fail/failpoints", "accudo-consensus/failpoints", "accudo-executor/failpoints", "accudo-mempool/failpoints", "accudo-api/failpoints", "accudo-config/failpoints"]
+indexer = ["accudo-indexer"]
+tokio-console = ["accudo-logger/tokio-console", "accudo-config/tokio-console"]
+smoke-test = ["accudo-jwk-consensus/smoke-test", "accudo-dkg-runtime/smoke-test"]
+
+[package.metadata.cargo-machete]
+ignored = ["accudo-crypto", "move-vm-types"]

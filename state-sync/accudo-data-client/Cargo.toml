@@ -1,0 +1,59 @@
+[package]
+name = "accudo-data-client"
+description = "The Accudo data client"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+accudo-config = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-id-generator = { workspace = true }
+accudo-infallible = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-metrics-core = { workspace = true }
+accudo-netcore = { workspace = true }
+accudo-network = { workspace = true }
+accudo-storage-interface = { workspace = true }
+accudo-storage-service-client = { workspace = true }
+accudo-storage-service-types = { workspace = true }
+accudo-time-service = { workspace = true }
+accudo-types = { workspace = true }
+arc-swap = { workspace = true }
+async-trait = { workspace = true }
+dashmap = { workspace = true }
+futures = { workspace = true }
+itertools = { workspace = true }
+maplit = { workspace = true }
+ordered-float = { workspace = true }
+# Note: we cannot rely on the workspace version of rand because it's out-of-date
+# and does not provide the necessary interfaces for weighted sampling. Similarly,
+# it's not trivial to update rand on the workspace because of several dependency
+# issues (e.g., other outdated crate versions). This is why we fix the version here.
+# Eventually we'll need to update the workspace to use the latest version of rand.
+# See also https://github.com/accudo-labs/accudo-core/issues/13031
+rand = "0.8.5"
+serde = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+accudo-channels = { workspace = true }
+accudo-network = { workspace = true, features = ["fuzzing"] }
+accudo-peer-monitoring-service-types = { workspace = true }
+accudo-storage-service-server = { workspace = true }
+accudo-time-service = { workspace = true, features = ["async", "testing"] }
+async-trait = { workspace = true }
+bcs = { workspace = true }
+claims = { workspace = true }
+maplit = { workspace = true }
+mockall = { workspace = true }
+tokio = { workspace = true }

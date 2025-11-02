@@ -1,0 +1,16 @@
+[package]
+name = "empty"
+version = "1.0.0"
+authors = []
+
+[addresses]
+empty = "0xcafe"
+
+[dev-addresses]
+
+[dependencies.AccudoFramework]
+git = "https://github.com/accudo-labs/accudo-framework.git"
+rev = "mainnet"
+subdir = "accudo-framework"
+
+[dev-dependencies]

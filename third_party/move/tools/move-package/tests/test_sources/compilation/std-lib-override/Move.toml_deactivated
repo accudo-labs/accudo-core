@@ -1,0 +1,19 @@
+[package]
+name = "std-lib-conflicts"
+version = "1.0.0"
+authors = []
+
+[addresses]
+A = "0x42"
+
+[dev-addresses]
+
+[dependencies.AccudoFramework]
+git = "https://github.com/accudo-labs/accudo-core.git"
+rev = "devnet"
+subdir = "accudo-move/framework/accudo-framework"
+
+[dependencies.B]
+local = "./deps_only"
+
+[dev-dependencies]

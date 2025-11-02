@@ -1,0 +1,9 @@
+[package]
+name = "test_option"
+version = "0.0.0"
+
+[dependencies]
+AccudoFramework = { local = "../../../../../accudo-move/framework/accudo-framework" }
+
+[addresses]
+account = "_"

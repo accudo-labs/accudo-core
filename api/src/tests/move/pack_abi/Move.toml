@@ -1,0 +1,9 @@
+[package]
+name = "pack_abi"
+version = "0.0.0"
+
+[dependencies]
+AccudoFramework = { local = "../../../../../accudo-move/framework/accudo-framework" }
+
+[addresses]
+abi = "_"

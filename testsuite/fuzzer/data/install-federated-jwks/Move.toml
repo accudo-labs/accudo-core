@@ -1,0 +1,16 @@
+[package]
+name = "install-federated-jwks"
+version = "1.0.0"
+authors = []
+
+[addresses]
+named_addr = "0xFED"
+
+[dev-addresses]
+
+[dependencies.AccudoFramework]
+git = "https://github.com/accudo-labs/accudo-core.git"
+rev = "mainnet"
+subdir = "accudo-move/framework/accudo-framework"
+
+[dev-dependencies]

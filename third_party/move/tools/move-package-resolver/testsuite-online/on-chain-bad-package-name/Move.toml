@@ -1,0 +1,6 @@
+[package]
+name = "Pack"
+version = "0.1.2"
+
+[dependencies]
+DoesNotExist = { accudo = "https://fullnode.mainnet.accudo.org", address = "0x1" }

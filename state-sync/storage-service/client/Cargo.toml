@@ -1,0 +1,19 @@
+[package]
+name = "accudo-storage-service-client"
+description = "The Accudo storage service (client-side)"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+accudo-config = { workspace = true }
+accudo-network = { workspace = true }
+accudo-storage-service-types = { workspace = true }
+thiserror = { workspace = true }

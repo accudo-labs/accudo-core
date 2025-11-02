@@ -1,0 +1,9 @@
+apiVersion: v2
+name: chaos
+description: Chaos Mesh for Accudo
+version: 2.5.2+accudo0
+
+dependencies:
+  - name: chaos-mesh
+    version: 2.5.2+accudo0
+    repository: "https://charts.chaos-mesh.org"

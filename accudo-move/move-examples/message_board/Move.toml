@@ -1,0 +1,10 @@
+[package]
+name = "MessageBoard"
+version = "0.0.1"
+
+[dependencies]
+AccudoFramework = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-framework", rev = "mainnet" }
+
+[addresses]
+std = "0x1"
+message_board = "_"

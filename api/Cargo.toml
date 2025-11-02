@@ -1,0 +1,74 @@
+[package]
+name = "accudo-api"
+description = "Accudo REST API"
+version = "0.2.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-api-types = { workspace = true }
+accudo-bcs-utils = { workspace = true }
+accudo-build-info = { workspace = true }
+accudo-config = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-gas-schedule = { workspace = true }
+accudo-global-constants = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-mempool = { workspace = true }
+accudo-metrics-core = { workspace = true }
+accudo-runtimes = { workspace = true }
+accudo-sdk = { workspace = true }
+accudo-storage-interface = { workspace = true }
+accudo-types = { workspace = true }
+accudo-vm = { workspace = true }
+bcs = { workspace = true }
+bytes = { workspace = true }
+fail = { workspace = true }
+futures = { workspace = true }
+hex = { workspace = true }
+itertools = { workspace = true }
+mime = { workspace = true }
+mini-moka = { workspace = true }
+move-core-types = { workspace = true }
+num_cpus = { workspace = true }
+once_cell = { workspace = true }
+paste = { workspace = true }
+poem = { workspace = true }
+poem-openapi = { workspace = true }
+regex = { workspace = true }
+rstest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+
+[dev-dependencies]
+accudo-api-test-context = { workspace = true }
+accudo-cached-packages = { workspace = true }
+accudo-framework = { workspace = true }
+accudo-gas-meter = { workspace = true }
+accudo-gas-schedule = { workspace = true, features = ["testing"] }
+accudo-move-stdlib = { workspace = true }
+accudo-proptest-helpers = { workspace = true }
+accudo-transaction-filters = { workspace = true, features = ["fuzzing"] }
+move-package = { workspace = true }
+passkey-types = { workspace = true }
+percent-encoding = { workspace = true }
+proptest = { workspace = true }
+rand = { workspace = true }
+regex = { workspace = true }
+reqwest = { workspace = true }
+warp = { workspace = true }
+
+[features]
+failpoints = ["fail/failpoints"]
+
+[package.metadata.cargo-machete]
+ignored = ["mime"]

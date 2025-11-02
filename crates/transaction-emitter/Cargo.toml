@@ -1,0 +1,25 @@
+[package]
+name = "accudo-transaction-emitter"
+description = "Accudo transaction emitter for testing"
+version = "0.0.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-global-constants = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-sdk = { workspace = true }
+accudo-transaction-emitter-lib = { workspace = true }
+accudo-transaction-workloads-lib = { workspace = true }
+clap = { workspace = true }
+futures = { workspace = true }
+rand = { workspace = true }
+tokio = { workspace = true }

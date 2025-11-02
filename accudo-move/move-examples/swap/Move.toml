@@ -1,0 +1,11 @@
+[package]
+name = "swap"
+version = "0.0.0"
+
+[addresses]
+accudo_framework = "0x1"
+deployer = "_"
+swap = "_"
+
+[dependencies]
+AccudoFramework = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-framework", rev = "mainnet" }

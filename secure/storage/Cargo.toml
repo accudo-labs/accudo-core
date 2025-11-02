@@ -1,0 +1,38 @@
+[package]
+name = "accudo-secure-storage"
+description = "Accudo's Persistent, Secure Storage"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+accudo-crypto = { workspace = true }
+accudo-infallible = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-temppath = { workspace = true }
+accudo-time-service = { workspace = true }
+accudo-vault-client = { workspace = true }
+base64 = { workspace = true }
+bcs = { workspace = true }
+chrono = { workspace = true }
+enum_dispatch = { workspace = true }
+rand = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+accudo-crypto = { workspace = true, features = ["fuzzing"] }
+accudo-crypto-derive = { workspace = true }
+rand = { workspace = true }
+
+[features]
+fuzzing = ["accudo-crypto/fuzzing"]
+testing = []

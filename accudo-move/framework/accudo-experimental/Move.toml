@@ -1,0 +1,9 @@
+[package]
+name = "AccudoExperimental"
+version = "1.0.0"
+
+[addresses]
+accudo_experimental = "0x7"
+
+[dependencies]
+AccudoFramework = { local = "../accudo-framework" }

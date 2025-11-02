@@ -1,0 +1,12 @@
+[package]
+name = "serialize_internal"
+version = "1.0.0"
+authors = []
+
+[addresses]
+poc = "0xcaffe"
+
+[dependencies]
+MoveStdlib = { local = "../../../../../../accudo-move/framework/move-stdlib" }
+AccudoFramework = { local = "../../../../../../accudo-move/framework/accudo-framework" }
+AccudoStdlib = { local = "../../../../../../accudo-move/framework/accudo-stdlib" } 

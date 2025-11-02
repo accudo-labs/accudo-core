@@ -1,0 +1,80 @@
+[package]
+name = "accudo-network"
+description = "Accudo networking stack"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-bitvec = { workspace = true }
+accudo-channels = { workspace = true }
+accudo-compression = { workspace = true }
+accudo-config = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-id-generator = { workspace = true }
+accudo-infallible = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-memsocket = { workspace = true, optional = true }
+accudo-metrics-core = { workspace = true }
+accudo-netcore = { workspace = true }
+accudo-num-variants = { workspace = true }
+accudo-peer-monitoring-service-types = { workspace = true }
+accudo-proptest-helpers = { workspace = true, optional = true }
+accudo-short-hex-str = { workspace = true }
+accudo-time-service = { workspace = true }
+accudo-types = { workspace = true }
+arc-swap = { workspace = true }
+async-trait = { workspace = true }
+bcs = { workspace = true }
+bytes = { workspace = true }
+futures = { workspace = true }
+futures-util = { workspace = true }
+hex = { workspace = true }
+itertools = { workspace = true }
+maplit = { workspace = true }
+once_cell = { workspace = true }
+ordered-float = { workspace = true }
+pin-project = { workspace = true }
+proptest = { workspace = true, optional = true }
+proptest-derive = { workspace = true, optional = true }
+rand = { workspace = true, features = ["small_rng"] }
+# Note: we cannot rely on the workspace version of rand. So we use this workaround. See:
+# https://github.com/accudo-labs/accudo-core/blob/main/state-sync/accudo-data-client/Cargo.toml#L41.
+# See also https://github.com/accudo-labs/accudo-core/issues/13031
+rand_latest = { package = "rand", version = "0.8.5" }
+serde = { workspace = true }
+serde_bytes = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tokio-retry = { workspace = true }
+tokio-stream = { workspace = true }
+tokio-util = { workspace = true }
+
+[dev-dependencies]
+accudo-bitvec = { workspace = true, features = ["fuzzing"] }
+accudo-config = { workspace = true, features = ["testing"] }
+accudo-memsocket = { workspace = true }
+accudo-netcore = { workspace = true, features = ["testing"] }
+accudo-proptest-helpers = { workspace = true }
+accudo-time-service = { workspace = true, features = ["testing"] }
+accudo-types = { workspace = true, features = ["fuzzing"] }
+proptest = { workspace = true }
+proptest-derive = { workspace = true }
+rand_core = { workspace = true }
+
+[features]
+default = []
+fuzzing = ["accudo-bitvec/fuzzing", "accudo-config/fuzzing", "accudo-crypto/fuzzing", "accudo-types/fuzzing", "accudo-proptest-helpers", "accudo-time-service/testing", "accudo-types/fuzzing", "accudo-memsocket/testing", "accudo-netcore/fuzzing", "proptest", "proptest-derive"]
+testing = ["accudo-config/testing", "accudo-time-service/testing", "accudo-memsocket/testing", "accudo-netcore/testing"]
+
+[package.metadata.cargo-machete]
+ignored = ["serde_bytes"]

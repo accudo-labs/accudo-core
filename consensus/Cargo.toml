@@ -1,0 +1,127 @@
+[package]
+name = "accudo-consensus"
+description = "Accudo consensus"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-bitvec = { workspace = true }
+accudo-bounded-executor = { workspace = true }
+accudo-channels = { workspace = true }
+accudo-collections = { workspace = true }
+accudo-config = { workspace = true }
+accudo-consensus-notifications = { workspace = true }
+accudo-consensus-types = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-crypto-derive = { workspace = true }
+accudo-dkg = { workspace = true }
+accudo-enum-conversion-derive = { workspace = true }
+accudo-event-notifications = { workspace = true }
+accudo-executor = { workspace = true }
+accudo-executor-types = { workspace = true }
+accudo-experimental-runtimes = { workspace = true }
+accudo-fallible = { workspace = true }
+accudo-infallible = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-mempool = { workspace = true }
+accudo-metrics-core = { workspace = true }
+accudo-network = { workspace = true }
+accudo-peer-monitoring-service-types = { workspace = true }
+accudo-reliable-broadcast = { workspace = true }
+accudo-runtimes = { workspace = true }
+accudo-safety-rules = { workspace = true }
+accudo-schemadb = { workspace = true }
+accudo-secure-storage = { workspace = true }
+accudo-short-hex-str = { workspace = true }
+accudo-storage-interface = { workspace = true }
+accudo-temppath = { workspace = true }
+accudo-time-service = { workspace = true }
+accudo-transaction-filters = { workspace = true }
+accudo-types = { workspace = true }
+accudo-validator-transaction-pool = { workspace = true }
+accudo-vm = { workspace = true }
+accudo-vm-validator = { workspace = true }
+async-trait = { workspace = true }
+bcs = { workspace = true }
+byteorder = { workspace = true }
+bytes = { workspace = true }
+chrono = { workspace = true }
+claims = { workspace = true }
+clap = { workspace = true }
+dashmap = { workspace = true }
+enum_dispatch = { workspace = true }
+fail = { workspace = true }
+futures = { workspace = true }
+futures-channel = { workspace = true }
+hex = { workspace = true }
+itertools = { workspace = true }
+lru = { workspace = true }
+maplit = { workspace = true }
+mini-moka = { workspace = true }
+mirai-annotations = { workspace = true }
+move-core-types = { workspace = true }
+move-vm-runtime = { workspace = true }
+num-derive = { workspace = true }
+num-traits = { workspace = true }
+once_cell = { workspace = true }
+ordered-float = { workspace = true }
+rand = { workspace = true }
+rayon = { workspace = true }
+scopeguard = { workspace = true }
+serde = { workspace = true }
+serde_bytes = { workspace = true }
+serde_json = { workspace = true }
+sha3 = { workspace = true }
+strum = { workspace = true }
+strum_macros = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tokio-retry = { workspace = true }
+tokio-stream = { workspace = true }
+
+[dev-dependencies]
+accudo-cached-packages = { workspace = true }
+accudo-config = { workspace = true, features = ["fuzzing"] }
+accudo-consensus-types = { workspace = true, features = ["fuzzing"] }
+accudo-executor-test-helpers = { workspace = true }
+accudo-keygen = { workspace = true }
+accudo-mempool = { workspace = true, features = ["fuzzing"] }
+accudo-netcore = { workspace = true }
+accudo-network = { workspace = true, features = ["fuzzing"] }
+accudo-safety-rules = { workspace = true, features = ["testing"] }
+accudo-transaction-filters = { workspace = true, features = ["fuzzing"] }
+accudo-types = { workspace = true, features = ["testing"] }
+accudo-vm = { workspace = true, features = ["fuzzing"] }
+claims = { workspace = true }
+mockall = { workspace = true }
+move-core-types = { workspace = true }
+proptest = { workspace = true }
+proptest-derive = { workspace = true }
+tempfile = { workspace = true }
+
+[features]
+default = []
+fuzzing = [
+    "accudo-consensus-types/fuzzing",
+    "accudo-config/fuzzing",
+    "accudo-crypto/fuzzing",
+    "accudo-mempool/fuzzing",
+    "accudo-types/fuzzing",
+    "accudo-safety-rules/testing",
+]
+failpoints = ["fail/failpoints"]
+
+[package.metadata.cargo-machete]
+ignored = ["serde_bytes"]
+
+[lints.clippy]
+unwrap_used = "deny"

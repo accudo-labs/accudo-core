@@ -1,0 +1,8 @@
+apiVersion: v2
+name: accudo-genesis
+version: 0.1.0
+appVersion: 0.1.0
+description: Accudo blockchain automated genesis ceremony for testnets
+home: https://accudo.org/
+sources:
+- https://github.com/accudo-labs/accudo-core

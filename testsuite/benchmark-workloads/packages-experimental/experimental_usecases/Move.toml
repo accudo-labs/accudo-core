@@ -1,0 +1,13 @@
+[package]
+name = "experimental_usecases"
+version = "0.0.0"
+
+[dependencies]
+AccudoFramework = { local = "../../../../accudo-move/framework/accudo-framework" }
+AccudoExperimental = { local = "../../../../accudo-move/framework/accudo-experimental" }
+AccudoToken = { local = "../../../../accudo-move/framework/accudo-token" }
+AccudoTokenObjects = { local = "../../../../accudo-move/framework/accudo-token-objects" }
+
+# testing exchanging of constant address works as well.
+[addresses]
+publisher_address = "0xABCD"

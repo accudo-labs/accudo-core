@@ -1,0 +1,11 @@
+# Exercise 1
+accudo move test --dump
+
+# Exercise 2
+accudo move test --coverage
+
+Followed by:
+
+accudo move coverage summary
+accudo move coverage summary --summarize-functions
+accudo move coverage source --module basic_coin

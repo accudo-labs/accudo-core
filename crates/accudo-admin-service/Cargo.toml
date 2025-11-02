@@ -1,0 +1,37 @@
+[package]
+name = "accudo-admin-service"
+description = "The Admin Service"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-config = { workspace = true }
+accudo-consensus = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-infallible = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-mempool = { workspace = true }
+accudo-runtimes = { workspace = true }
+accudo-storage-interface = { workspace = true }
+accudo-system-utils = { workspace = true }
+accudo-types = { workspace = true }
+bcs = { workspace = true }
+futures-channel = { workspace = true }
+http = { workspace = true }
+hyper = { workspace = true }
+sha256 = { workspace = true }
+tokio = { workspace = true }
+url = { workspace = true }
+
+[target.'cfg(unix)'.dependencies]
+jemalloc-ctl = { workspace = true }
+jemalloc-sys = { workspace = true }

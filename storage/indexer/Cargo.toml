@@ -1,0 +1,40 @@
+[package]
+name = "accudo-db-indexer"
+description = "AccudoDB Internal Indexer"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-config = { workspace = true }
+accudo-db-indexer-schemas = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-metrics-core = { workspace = true }
+accudo-resource-viewer = { workspace = true }
+accudo-rocksdb-options = { workspace = true }
+accudo-schemadb = { workspace = true }
+accudo-storage-interface = { workspace = true }
+accudo-types = { workspace = true }
+bcs = { workspace = true }
+bytes = { workspace = true }
+dashmap = { workspace = true }
+move-core-types = { workspace = true }
+once_cell = { workspace = true }
+
+[dev-dependencies]
+accudo-proptest-helpers = { workspace = true }
+accudo-schemadb = { workspace = true, features = ["fuzzing"] }
+accudo-types = { workspace = true, features = ["fuzzing"] }
+rand = { workspace = true }
+
+[features]
+default = []
+fuzzing = ["accudo-types/fuzzing", "accudo-schemadb/fuzzing"]

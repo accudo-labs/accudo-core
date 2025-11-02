@@ -1,0 +1,46 @@
+[package]
+name = "accudo-vm-profiling"
+version = "0.1.0"
+authors = ["Accudo Labs <opensource@accudo.org>"]
+repository = "https://github.com/accudo-labs/accudo-core"
+homepage = "https://accudo.org"
+license = "Apache-2.0"
+publish = false
+edition = { workspace = true }
+default-run = "main"
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+glob = { workspace = true }
+once_cell = { workspace = true }
+smallvec = { workspace = true }
+
+accudo-block-executor = { workspace = true }
+accudo-cached-packages = { workspace = true }
+accudo-gas-schedule = { workspace = true }
+accudo-move-stdlib = { workspace = true }
+accudo-native-interface = { workspace = true }
+accudo-table-natives = { workspace = true }
+accudo-transaction-simulation = { workspace = true }
+accudo-types = { workspace = true }
+accudo-vm = { workspace = true }
+
+move-binary-format = { workspace = true }
+move-core-types = { workspace = true }
+move-ir-compiler = { workspace = true }
+move-vm-runtime = { workspace = true }
+move-vm-test-utils = { workspace = true }
+move-vm-types = { workspace = true }
+
+[[bin]]
+name = "main"
+path  = "src/main.rs"
+
+[[bin]]
+name = "run-move"
+path = "src/bins/run_move.rs"
+
+[[bin]]
+name = "run-accudo-p2p"
+path = "src/bins/run_accudo_p2p.rs"

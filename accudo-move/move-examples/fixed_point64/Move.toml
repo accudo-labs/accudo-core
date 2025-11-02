@@ -1,0 +1,16 @@
+[package]
+name = "fixed_point64"
+version = "1.0.0"
+authors = []
+
+[addresses]
+fixed_point64 = "0xdeadbeef"
+
+[dev-addresses]
+
+[dependencies.AccudoFramework]
+git = "https://github.com/accudo-labs/accudo-framework.git"
+rev = "mainnet"
+subdir = "accudo-framework"
+
+[dev-dependencies]

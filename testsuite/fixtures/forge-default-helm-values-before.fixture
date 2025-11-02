@@ -1,0 +1,21 @@
+{
+  "enabled_clusters": [
+    "banana"
+  ],
+  "all_clusters": [
+    "banana",
+    "apple"
+  ],
+  "default_helm_values": {
+    "accudo-genesis": {
+      "image": {
+        "repo": "apple"
+      }
+    },
+    "accudo-node": {
+      "image": {
+        "repo": "banana"
+      }
+    }
+  }
+}

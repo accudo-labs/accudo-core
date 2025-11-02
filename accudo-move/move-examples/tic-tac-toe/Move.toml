@@ -1,0 +1,9 @@
+[package]
+name = 'tic-tac-toe'
+version = '1.0.0'
+
+[addresses]
+tic_tac_toe = "_"
+
+[dependencies]
+AccudoFramework = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-framework", rev = "mainnet" }

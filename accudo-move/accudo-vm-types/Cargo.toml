@@ -1,0 +1,39 @@
+[package]
+name = "accudo-vm-types"
+description = "Accudo VM types"
+version = "0.0.1"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = "2021"
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+ambassador = { workspace = true }
+anyhow = { workspace = true }
+accudo-aggregator = { workspace = true }
+accudo-gas-algebra = { workspace = true }
+accudo-gas-schedule = { workspace = true }
+accudo-types = { workspace = true }
+bcs = { workspace = true }
+bytes = { workspace = true }
+claims = { workspace = true }
+either = { workspace = true }
+move-binary-format = { workspace = true }
+move-core-types = { workspace = true }
+move-vm-runtime = { workspace = true }
+move-vm-types = { workspace = true }
+rand = { workspace = true }
+serde = { workspace = true }
+triomphe = { workspace = true }
+
+[dev-dependencies]
+accudo-aggregator = { workspace = true, features = ["testing"] }
+accudo-gas-schedule = { workspace = true, features = ["testing"] }
+accudo-transaction-simulation = { workspace = true }
+accudo-vm = { workspace = true }
+test-case = { workspace = true }

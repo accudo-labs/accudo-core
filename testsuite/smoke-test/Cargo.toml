@@ -1,0 +1,88 @@
+[package]
+name = "smoke-test"
+description = "Accudo end to end tests"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo = { workspace = true, features = ["fuzzing"] }
+accudo-api-types = { workspace = true }
+accudo-bitvec = { path = "../../crates/accudo-bitvec" }
+accudo-cached-packages = { workspace = true }
+accudo-config = { workspace = true, features = ["smoke-test"] }
+accudo-consensus = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-db = { workspace = true }
+accudo-db-indexer-schemas = { workspace = true }
+accudo-dkg = { workspace = true }
+accudo-faucet-core = { workspace = true }
+accudo-forge = { workspace = true }
+accudo-framework = { workspace = true }
+accudo-gas-algebra = { workspace = true }
+accudo-gas-schedule = { workspace = true, features = ["testing"] }
+accudo-global-constants = { workspace = true }
+accudo-indexer = { workspace = true }
+accudo-indexer-grpc-table-info = { workspace = true }
+accudo-inspection-service = { workspace = true }
+accudo-keygen = { workspace = true }
+accudo-move-debugger = { workspace = true }
+accudo-release-builder = { workspace = true }
+accudo-rest-client = { workspace = true }
+accudo-rosetta = { workspace = true }
+accudo-schemadb = { workspace = true }
+accudo-sdk = { workspace = true }
+accudo-storage-interface = { workspace = true }
+accudo-temppath = { workspace = true }
+accudo-transaction-filters = { workspace = true }
+accudo-types = { workspace = true }
+accudo-vm = { workspace = true }
+bcs = { workspace = true }
+blake2-rfc = { workspace = true }
+diesel = { workspace = true, features = [
+    "chrono",
+    "postgres",
+    "r2d2",
+    "numeric",
+    "serde_json",
+] }
+digest = { workspace = true }
+ethers = { workspace = true }
+hex = { workspace = true }
+hyper = { workspace = true }
+move-binary-format = { workspace = true }
+move-core-types = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+url = { workspace = true }
+walkdir = { workspace = true }
+
+[dev-dependencies]
+accudo-backup-cli = { workspace = true }
+accudo-db-indexer = { workspace = true, features = ["fuzzing"] }
+accudo-genesis = { workspace = true }
+accudo-infallible = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-secure-storage = { workspace = true }
+accudo-time-service = { workspace = true }
+accudo-vault-client = { workspace = true }
+base64 = { workspace = true }
+futures = { workspace = true }
+itertools = { workspace = true }
+num_cpus = { workspace = true }
+once_cell = { workspace = true }
+rand = { workspace = true }
+regex = { workspace = true }
+reqwest = { workspace = true }
+serde_yaml = { workspace = true }
+tempfile = { workspace = true }

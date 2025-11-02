@@ -1,0 +1,12 @@
+[package]
+name = "ManagedFungibleAsset"
+version = "0.0.0"
+
+[addresses]
+accudo_framework = "0x1"
+accudo_token_objects = "0x4"
+example_addr = "_"
+
+[dependencies]
+AccudoFramework = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-framework", rev = "mainnet" }
+AccudoTokenObjects = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-token-objects", rev = "mainnet" }

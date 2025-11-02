@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions and Help (on Accudo Developer Discussions)
+    url: (https://github.com/accudo-labs/accudo-developer-discussions/discussions
+    about: Support and other Questions are handled by the team and the community on Accudo Developer Discussions.
+  - name: Questions, Help and Chat (on Discord)
+    url: https://discord.gg/accudonetwork
+    about: Contact the development team, contributors and community on Discord

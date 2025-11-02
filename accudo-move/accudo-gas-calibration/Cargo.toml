@@ -1,0 +1,23 @@
+[package]
+name = "accudo-gas-calibration"
+version = "0.1.0"
+edition = { workspace = true }
+license = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-abstract-gas-usage = { workspace = true }
+accudo-cached-packages = { workspace = true }
+accudo-framework = { workspace = true }
+accudo-gas-algebra = { workspace = true }
+accudo-gas-schedule = { workspace = true }
+accudo-language-e2e-tests = { workspace = true }
+accudo-types = { workspace = true }
+bcs = { workspace = true }
+clap = { workspace = true }
+float-cmp = { workspace = true }
+move-binary-format = { workspace = true }
+move-core-types = { workspace = true }
+move-ir-compiler = { workspace = true }
+nalgebra = { workspace = true }
+walkdir = { workspace = true }

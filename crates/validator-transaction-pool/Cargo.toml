@@ -1,0 +1,27 @@
+[package]
+name = "accudo-validator-transaction-pool"
+description = "Accudo Validator Transaction Pool"
+version = "0.1.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+accudo-channels = { workspace = true }
+accudo-crypto = { workspace = true }
+accudo-infallible = { workspace = true }
+accudo-types = { workspace = true }
+futures-util = { workspace = true }
+tokio = { workspace = true }
+
+[dev-dependencies]
+accudo-types = { workspace = true, features = ["fuzzing"] }
+
+[features]
+fuzzing = []

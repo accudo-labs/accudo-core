@@ -1,0 +1,49 @@
+[package]
+name = "accudo-testcases"
+description = "Accudo compatibility tests"
+version = "0.0.0"
+
+# Workspace inherited keys
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo = { workspace = true, features = ["fuzzing"] }
+accudo-config = { workspace = true }
+accudo-forge = { workspace = true }
+accudo-global-constants = { workspace = true }
+accudo-keygen = { workspace = true }
+accudo-logger = { workspace = true }
+accudo-release-builder = { workspace = true }
+accudo-rest-client = { workspace = true }
+accudo-runtimes = { workspace = true }
+accudo-sdk = { workspace = true }
+accudo-temppath = { workspace = true }
+accudo-types = { workspace = true }
+async-trait = { workspace = true }
+bcs = { workspace = true }
+csv = { workspace = true }
+futures = { workspace = true }
+hex = { workspace = true }
+itertools = { workspace = true }
+log = { workspace = true }
+rand = { workspace = true }
+reqwest = { workspace = true }
+tokio = { workspace = true }
+
+[dev-dependencies]
+assert_approx_eq = { workspace = true }
+
+[[test]]
+name = "forge-local-compatibility"
+harness = false
+
+[[test]]
+name = "forge-local-performance"
+harness = false

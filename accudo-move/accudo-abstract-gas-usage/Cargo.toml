@@ -1,0 +1,13 @@
+[package]
+name = "accudo-abstract-gas-usage"
+version = "0.1.0"
+edition = { workspace = true }
+license = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+accudo-gas-algebra = { workspace = true }
+accudo-gas-meter = { workspace = true }
+accudo-gas-schedule = { workspace = true }
+accudo-vm-types = { workspace = true }
+move-binary-format = { workspace = true }

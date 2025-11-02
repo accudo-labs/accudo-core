@@ -1,0 +1,10 @@
+[package]
+name = "LargePackageExample"
+version = "1.0.0"
+upgrade_policy = "compatible"
+
+[dependencies]
+AccudoFramework = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-framework", rev = "mainnet" }
+
+[addresses]
+large_package_example = "_"

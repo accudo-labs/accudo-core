@@ -1,0 +1,10 @@
+[package]
+name = 'token_lockup'
+version = '1.0.0'
+
+[addresses]
+token_lockup = "_"
+
+[dependencies]
+AccudoFramework = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-framework", rev = "mainnet" }
+AccudoTokenObjects = { git = "https://github.com/accudo-labs/accudo-framework.git", subdir = "accudo-token-objects", rev = "mainnet" }

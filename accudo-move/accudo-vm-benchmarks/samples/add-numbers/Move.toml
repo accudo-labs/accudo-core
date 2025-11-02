@@ -1,0 +1,6 @@
+[package]
+name = 'add-numbers'
+version = '1.0.0'
+[dependencies.AccudoFramework]
+local = '../../../..'
+subdir = 'accudo-move/framework/accudo-framework'
