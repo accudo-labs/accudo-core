@@ -198,14 +198,18 @@ pub static ACCUDO_NETWORK_DISCOVERY_NOTES: Lazy<IntGaugeVec> = Lazy::new(|| {
 });
 
 pub static ACCUDO_NETWORK_RPC_MESSAGES: Lazy<IntCounterVec> = Lazy::new(|| {
-    register_int_counter_vec!("accudo_network_rpc_messages", "Number of RPC messages", &[
-        "role_type",
-        "network_id",
-        "peer_id",
-        "message_type",
-        "message_direction",
-        "state"
-    ])
+    register_int_counter_vec!(
+        "accudo_network_rpc_messages",
+        "Number of RPC messages",
+        &[
+            "role_type",
+            "network_id",
+            "peer_id",
+            "message_type",
+            "message_direction",
+            "state"
+        ]
+    )
     .unwrap()
 });
 

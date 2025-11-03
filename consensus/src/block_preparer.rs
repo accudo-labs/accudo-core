@@ -10,7 +10,8 @@ use crate::{
 use accudo_config::config::BlockTransactionFilterConfig;
 use accudo_consensus_types::{block::Block, quorum_cert::QuorumCert};
 use accudo_crypto::HashValue;
-use accudo_executor_types::ExecutorResult;
+use accudo_executor_types::{ExecutorError, ExecutorResult};
+use accudo_logger::prelude::*;
 use accudo_types::transaction::SignedTransaction;
 use fail::fail_point;
 use futures::future::Shared;
@@ -62,6 +63,23 @@ impl BlockPreparer {
                    result
                 }
         }?;
+
+        if let Some((idx, txn)) = txns
+            .iter()
+            .enumerate()
+            .find(|(_, txn)| !txn.has_post_quantum_signature())
+        {
+            warn!(
+                "[BlockPreparer] block {} contains transaction {} without post-quantum signature",
+                block.id(),
+                txn.committed_hash()
+            );
+            return Err(ExecutorError::internal_err(format!(
+                "block {} contains txn at index {} missing post-quantum signature",
+                block.id(),
+                idx
+            )));
+        }
 
         let txn_filter_config = self.txn_filter_config.clone();
         let txn_deduper = self.txn_deduper.clone();

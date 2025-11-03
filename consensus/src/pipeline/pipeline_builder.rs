@@ -26,7 +26,9 @@ use accudo_consensus_types::{
     wrapped_ledger_info::WrappedLedgerInfo,
 };
 use accudo_crypto::HashValue;
-use accudo_executor_types::{state_compute_result::StateComputeResult, BlockExecutorTrait};
+use accudo_executor_types::{
+    state_compute_result::StateComputeResult, BlockExecutorTrait, ExecutorError,
+};
 use accudo_experimental_runtimes::thread_manager::optimal_min_len;
 use accudo_infallible::Mutex;
 use accudo_logger::{error, info, trace, warn};
@@ -597,13 +599,20 @@ impl PipelineBuilder {
         let (input_txns, block_gas_limit) = loop {
             match preparer.prepare_block(&block, qc_rx.clone()).await {
                 Ok(input_txns) => break input_txns,
+                Err(ExecutorError::CouldNotGetData) => {
+                    warn!(
+                        "[BlockPreparer] failed to prepare block {}, retrying after data fetch error",
+                        block.id()
+                    );
+                    tokio::time::sleep(Duration::from_millis(100)).await;
+                },
                 Err(e) => {
                     warn!(
-                        "[BlockPreparer] failed to prepare block {}, retrying: {}",
+                        "[BlockPreparer] failed to prepare block {} with unrecoverable error: {}",
                         block.id(),
                         e
                     );
-                    tokio::time::sleep(Duration::from_millis(100)).await;
+                    return Err(TaskError::InternalError(Arc::new(anyhow!(e))));
                 },
             }
         };

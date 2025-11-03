@@ -125,7 +125,8 @@ impl NetworkBuilder {
         authentication_mode: AuthenticationMode,
         peers_and_metadata: Arc<PeersAndMetadata>,
     ) -> NetworkBuilder {
-        let mutual_authentication = matches!(authentication_mode, AuthenticationMode::Mutual(_));
+        let mutual_authentication =
+            matches!(authentication_mode, AuthenticationMode::Mutual { .. });
 
         let mut builder = NetworkBuilder::new(
             chain_id,
@@ -168,11 +169,18 @@ impl NetworkBuilder {
     ) -> NetworkBuilder {
         let peer_id = config.peer_id();
         let identity_key = config.identity_key();
+        let pq_identity_key = config.identity_post_quantum_key();
 
         let authentication_mode = if config.mutual_authentication {
-            AuthenticationMode::Mutual(identity_key)
+            AuthenticationMode::Mutual {
+                network_private_key: identity_key,
+                post_quantum_private_key: pq_identity_key,
+            }
         } else {
-            AuthenticationMode::MaybeMutual(identity_key)
+            AuthenticationMode::MaybeMutual {
+                network_private_key: identity_key,
+                post_quantum_private_key: pq_identity_key,
+            }
         };
 
         let network_context = NetworkContext::new(role, config.network_id, peer_id);

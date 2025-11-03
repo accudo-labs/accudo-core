@@ -9,7 +9,7 @@ use crate::{
 use accudo_compression::client::CompressionClient;
 use accudo_config::config::{NodeConfig, MAX_APPLICATION_MESSAGE_SIZE};
 use accudo_consensus_types::common::{TransactionInProgress, TransactionSummary};
-use accudo_crypto::{ed25519::Ed25519PrivateKey, PrivateKey, Uniform};
+use accudo_crypto::{ed25519::Ed25519PrivateKey, pq::Dilithium3KeyPair, PrivateKey, Uniform};
 use accudo_types::{
     account_address::AccountAddress,
     chain_id::ChainId,
@@ -160,8 +160,9 @@ impl TestTransaction {
         seed[..4].copy_from_slice(&[1, 2, 3, 4]);
         let mut rng: StdRng = StdRng::from_seed(seed);
         let privkey = Ed25519PrivateKey::generate(&mut rng);
+        let pq_keypair = Dilithium3KeyPair::generate().expect("Failed to generate Dilithium key");
         raw_txn
-            .sign(&privkey, privkey.public_key())
+            .sign_dual_with_dilithium(Some(&privkey), &pq_keypair)
             .expect("Failed to sign raw transaction.")
             .into_inner()
     }

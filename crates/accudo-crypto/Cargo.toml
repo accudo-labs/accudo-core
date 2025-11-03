@@ -54,6 +54,7 @@ pairing = { workspace = true }
 proptest = { workspace = true, optional = true }
 proptest-derive = { workspace = true, optional = true }
 pqcrypto-dilithium = "0.9.2"
+pqcrypto-kyber = "0.9.2"
 rand = { workspace = true }
 rand_core = { workspace = true }
 ring = { workspace = true }

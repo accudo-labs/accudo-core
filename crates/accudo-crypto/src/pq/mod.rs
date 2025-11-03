@@ -7,6 +7,8 @@
 //! level code can negotiate capabilities or send dual-signature payloads
 //! during the migration to post-quantum primitives.
 
+mod kyber;
+
 use crate::ed25519::{
     Ed25519PublicKey, Ed25519Signature, ED25519_PUBLIC_KEY_LENGTH, ED25519_SIGNATURE_LENGTH,
 };
@@ -15,6 +17,10 @@ use pqcrypto_dilithium::dilithium3;
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, fmt, sync::Arc};
 
+pub use kyber::{
+    KyberCiphertext, KyberKeyPair, KyberPrivateKey, KyberPublicKey, KYBER_CIPHERTEXT_LENGTH,
+    KYBER_PRIVATE_KEY_LENGTH, KYBER_PUBLIC_KEY_LENGTH, KYBER_SHARED_SECRET_LENGTH,
+};
 /// Canonical identifiers for classical and post-quantum schemes.
 ///
 /// These values are intended for serialization and on-the-wire negotiation, so

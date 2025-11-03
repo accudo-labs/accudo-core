@@ -5,6 +5,7 @@
 #![allow(clippy::arc_with_non_send_sync)]
 
 use accudo_crypto::{
+    pq::{KyberKeyPair, KyberPublicKey},
     traits::{CryptoMaterialError, ValidCryptoMaterialStringExt},
     x25519,
 };
@@ -110,7 +111,6 @@ pub struct NetworkAddress(Vec<Protocol>);
 
 /// A single protocol in the [`NetworkAddress`] protocol stack.
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
-#[cfg_attr(any(test, feature = "fuzzing"), derive(Arbitrary))]
 pub enum Protocol {
     Ip4(Ipv4Addr),
     Ip6(Ipv6Addr),
@@ -121,6 +121,8 @@ pub enum Protocol {
     Memory(u16),
     // human-readable x25519::PublicKey is lower-case hex encoded
     NoiseIK(x25519::PublicKey),
+    /// Kyber768 post-quantum network identity.
+    NoiseKyber(KyberPublicKey),
     // TODO(philiphayes): use actual handshake::MessagingProtocolVersion. we
     // probably need to move network wire into its own crate to avoid circular
     // dependency b/w network and types.
@@ -344,8 +346,23 @@ impl NetworkAddress {
         network_pubkey: x25519::PublicKey,
         handshake_version: u8,
     ) -> Self {
-        self.push(Protocol::NoiseIK(network_pubkey))
-            .push(Protocol::Handshake(handshake_version))
+        self.append_prod_protos_with_pq(network_pubkey, None, handshake_version)
+    }
+
+    /// Same as [`append_prod_protos`] but allows attaching a Kyber public key.
+    pub fn append_prod_protos_with_pq(
+        self,
+        network_pubkey: x25519::PublicKey,
+        pq_pubkey: Option<KyberPublicKey>,
+        handshake_version: u8,
+    ) -> Self {
+        let addr = self.push(Protocol::NoiseIK(network_pubkey));
+        let addr = if let Some(pq_key) = pq_pubkey {
+            addr.push(Protocol::NoiseKyber(pq_key))
+        } else {
+            addr
+        };
+        addr.push(Protocol::Handshake(handshake_version))
     }
 
     /// Check that a `NetworkAddress` looks like a typical AccudoNet address with
@@ -581,8 +598,24 @@ pub fn arb_accudonet_addr() -> impl Strategy<Value = NetworkAddress> {
         any::<(DnsName, u16)>()
             .prop_map(|(name, port)| vec![Protocol::Dns6(name), Protocol::Tcp(port)]),
     ];
-    let arb_accudonet_protos = any::<(x25519::PublicKey, u8)>()
-        .prop_map(|(pubkey, hs)| vec![Protocol::NoiseIK(pubkey), Protocol::Handshake(hs)]);
+    let arb_post_quantum_proto = proptest::option::of(proptest::strategy::LazyJust::new(|| {
+        KyberKeyPair::generate()
+            .expect("failed to generate Kyber keypair for proptest")
+            .public
+    }));
+    let arb_accudonet_protos = (
+        any::<x25519::PublicKey>(),
+        arb_post_quantum_proto,
+        any::<u8>(),
+    )
+        .prop_map(|(pubkey, pq_key, hs)| {
+            let mut protos = vec![Protocol::NoiseIK(pubkey)];
+            if let Some(pq_key) = pq_key {
+                protos.push(Protocol::NoiseKyber(pq_key));
+            }
+            protos.push(Protocol::Handshake(hs));
+            protos
+        });
 
     (arb_transport_protos, arb_accudonet_protos).prop_map(
         |(mut transport_protos, mut accudonet_protos)| {
@@ -610,6 +643,13 @@ impl fmt::Display for Protocol {
             NoiseIK(pubkey) => write!(
                 f,
                 "/noise-ik/{}",
+                pubkey
+                    .to_encoded_string()
+                    .expect("ValidCryptoMaterialStringExt::to_encoded_string is infallible")
+            ),
+            NoiseKyber(pubkey) => write!(
+                f,
+                "/noise-kyber/{}",
                 pubkey
                     .to_encoded_string()
                     .expect("ValidCryptoMaterialStringExt::to_encoded_string is infallible")
@@ -642,6 +682,9 @@ impl Protocol {
             "tcp" => Protocol::Tcp(parse_one(args)?),
             "memory" => Protocol::Memory(parse_one(args)?),
             "noise-ik" => Protocol::NoiseIK(x25519::PublicKey::from_encoded_string(
+                args.next().ok_or(ParseError::UnexpectedEnd)?,
+            )?),
+            "noise-kyber" => Protocol::NoiseKyber(KyberPublicKey::from_encoded_string(
                 args.next().ok_or(ParseError::UnexpectedEnd)?,
             )?),
             "handshake" => Protocol::Handshake(parse_one(args)?),
@@ -911,7 +954,7 @@ mod test {
         let protocols = vec![
             Dns(DnsName("example.com".to_owned())),
             Tcp(1234),
-            NoiseIK(pubkey),
+            NoiseIK(pubkey.clone()),
             Handshake(0),
         ];
 
@@ -922,6 +965,24 @@ mod test {
             pubkey_str
         );
         assert_eq!(noise_addr_str, addr.to_string());
+
+        let pq_key = KyberKeyPair::generate().unwrap().public;
+        let pq_key_str = pq_key
+            .to_encoded_string()
+            .expect("Kyber public key encoding should succeed");
+        let protocols_with_pq = vec![
+            Dns(DnsName("example.com".to_owned())),
+            Tcp(1234),
+            NoiseIK(pubkey.clone()),
+            NoiseKyber(pq_key.clone()),
+            Handshake(1),
+        ];
+        let addr_with_pq = NetworkAddress::from_protocols(protocols_with_pq).unwrap();
+        let expected_with_pq = format!(
+            "/dns/example.com/tcp/1234/noise-ik/0x{}/noise-kyber/{}/handshake/1",
+            pubkey_str, pq_key_str
+        );
+        assert_eq!(expected_with_pq, addr_with_pq.to_string());
     }
 
     #[test]
@@ -933,6 +994,14 @@ mod test {
         let noise_addr_str = format!(
             "/dns/example.com/tcp/1234/noise-ik/{}/handshake/5",
             pubkey_str
+        );
+        let pq_key = KyberKeyPair::generate().unwrap().public;
+        let pq_key_str = pq_key
+            .to_encoded_string()
+            .expect("Kyber public key encoding should succeed");
+        let noise_addr_with_pq = format!(
+            "/dns/example.com/tcp/1234/noise-ik/{}/noise-kyber/{}/handshake/6",
+            pubkey_str, pq_key_str
         );
 
         let test_cases = [
@@ -949,24 +1018,40 @@ mod test {
                     Handshake(123),
                 ],
             ),
-            ("/ip6/::1/tcp/0", vec![
-                Ip6(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1)),
-                Tcp(0),
-            ]),
-            ("/ip6/dead:beef::c0de/tcp/8080", vec![
-                Ip6(Ipv6Addr::new(0xDEAD, 0xBEEF, 0, 0, 0, 0, 0, 0xC0DE)),
-                Tcp(8080),
-            ]),
-            ("/dns/example.com/tcp/80", vec![
-                Dns(DnsName("example.com".to_owned())),
-                Tcp(80),
-            ]),
-            (&noise_addr_str, vec![
-                Dns(DnsName("example.com".to_owned())),
-                Tcp(1234),
-                NoiseIK(pubkey),
-                Handshake(5),
-            ]),
+            (
+                "/ip6/::1/tcp/0",
+                vec![Ip6(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1)), Tcp(0)],
+            ),
+            (
+                "/ip6/dead:beef::c0de/tcp/8080",
+                vec![
+                    Ip6(Ipv6Addr::new(0xDEAD, 0xBEEF, 0, 0, 0, 0, 0, 0xC0DE)),
+                    Tcp(8080),
+                ],
+            ),
+            (
+                "/dns/example.com/tcp/80",
+                vec![Dns(DnsName("example.com".to_owned())), Tcp(80)],
+            ),
+            (
+                &noise_addr_str,
+                vec![
+                    Dns(DnsName("example.com".to_owned())),
+                    Tcp(1234),
+                    NoiseIK(pubkey.clone()),
+                    Handshake(5),
+                ],
+            ),
+            (
+                &noise_addr_with_pq,
+                vec![
+                    Dns(DnsName("example.com".to_owned())),
+                    Tcp(1234),
+                    NoiseIK(pubkey),
+                    NoiseKyber(pq_key),
+                    Handshake(6),
+                ],
+            ),
         ];
 
         for (addr_str, expected_address) in &test_cases {

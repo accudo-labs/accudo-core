@@ -259,27 +259,31 @@ impl EntryFunctionCall {
     fn get_external_definitions(local_types: bool) -> serde_generate::ExternalDefinitions {
         let definitions = if local_types {
             vec![
-                ("move_core_types::language_storage", vec![
-                    "ModuleId", "TypeTag",
-                ]),
+                (
+                    "move_core_types::language_storage",
+                    vec!["ModuleId", "TypeTag"],
+                ),
                 ("move_core_types", vec!["ident_str"]),
-                ("accudo_types::transaction", vec![
-                    "TransactionPayload",
-                    "EntryFunction",
-                ]),
+                (
+                    "accudo_types::transaction",
+                    vec!["TransactionPayload", "EntryFunction"],
+                ),
                 ("accudo_types::account_address", vec!["AccountAddress"]),
             ]
         } else {
-            vec![("accudo_types", vec![
-                "AccountAddress",
-                "TypeTag",
-                "Script",
-                "EntryFunction",
-                "TransactionArgument",
-                "TransactionPayload",
-                "ModuleId",
-                "Identifier",
-            ])]
+            vec![(
+                "accudo_types",
+                vec![
+                    "AccountAddress",
+                    "TypeTag",
+                    "Script",
+                    "EntryFunction",
+                    "TransactionArgument",
+                    "TransactionPayload",
+                    "ModuleId",
+                    "Identifier",
+                ],
+            )]
         };
 
         definitions

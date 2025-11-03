@@ -364,6 +364,12 @@ impl PipelinedBlock {
         input_transactions: Vec<SignedTransaction>,
         state_compute_result: StateComputeResult,
     ) -> Self {
+        debug_assert!(
+            input_transactions
+                .iter()
+                .all(|txn| txn.has_post_quantum_signature()),
+            "pipelined block contains transaction without post-quantum signature"
+        );
         Self {
             block,
             block_window: OrderedBlockWindow::empty(),

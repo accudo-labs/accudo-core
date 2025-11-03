@@ -344,11 +344,16 @@ impl<E: Pairing> traits::BatchedRangeProof<E> for Proof<E> {
         );
 
         // Step 1b
-        fiat_shamir::append_initial_data(fs_t, Self::DST, vk, PublicStatement {
-            n,
-            ell,
-            comm: comm.clone(),
-        });
+        fiat_shamir::append_initial_data(
+            fs_t,
+            Self::DST,
+            vk,
+            PublicStatement {
+                n,
+                ell,
+                comm: comm.clone(),
+            },
+        );
 
         // Step 2a
         let r = E::ScalarField::rand(rng);
@@ -637,11 +642,16 @@ impl<E: Pairing> traits::BatchedRangeProof<E> for Proof<E> {
         } = self;
 
         // Step 2a
-        fiat_shamir::append_initial_data(fs_t, Self::DST, vk, PublicStatement {
-            n,
-            ell,
-            comm: comm.clone(),
-        });
+        fiat_shamir::append_initial_data(
+            fs_t,
+            Self::DST,
+            vk,
+            PublicStatement {
+                n,
+                ell,
+                comm: comm.clone(),
+            },
+        );
 
         // Step 2b
         fiat_shamir::append_hat_f_commitment::<E>(fs_t, &hatC);

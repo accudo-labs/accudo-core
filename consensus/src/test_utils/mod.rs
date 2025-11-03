@@ -39,7 +39,7 @@ use crate::{
     util::mock_time_service::SimulatedTimeService,
 };
 use accudo_consensus_types::{block::block_test_utils::gen_test_certificate, common::Payload};
-use accudo_crypto::ed25519::{Ed25519PrivateKey, Ed25519Signature};
+use accudo_crypto::{ed25519::Ed25519PrivateKey, pq::Dilithium3KeyPair};
 use accudo_infallible::Mutex;
 use accudo_types::{
     block_info::BlockInfo,
@@ -313,7 +313,6 @@ where
 // Creates a single test transaction for a random account
 pub(crate) fn create_signed_transaction(gas_unit_price: u64) -> SignedTransaction {
     let private_key = Ed25519PrivateKey::generate_for_testing();
-    let public_key = private_key.public_key();
 
     // TODO[Orderless]: Change this to transaction payload v2 format.
     let transaction_payload = TransactionPayload::Script(Script::new(vec![], vec![], vec![]));
@@ -326,11 +325,11 @@ pub(crate) fn create_signed_transaction(gas_unit_price: u64) -> SignedTransactio
         0,
         ChainId::new(10),
     );
-    SignedTransaction::new(
-        raw_transaction,
-        public_key,
-        Ed25519Signature::dummy_signature(),
-    )
+    let pq_keypair = Dilithium3KeyPair::generate().expect("pq key generation");
+    raw_transaction
+        .sign_dual_with_dilithium(Some(&private_key), &pq_keypair)
+        .expect("dual signing for test transaction")
+        .into_inner()
 }
 
 pub(crate) fn create_vec_signed_transactions(size: u64) -> Vec<SignedTransaction> {

@@ -96,7 +96,10 @@ pub fn setup_network() -> DummyNetwork {
         Peer::new(vec![], dialer_pubkeys, PeerRole::Validator),
     );
 
-    let authentication_mode = AuthenticationMode::Mutual(listener_identity_private_key);
+    let authentication_mode = AuthenticationMode::Mutual {
+        network_private_key: listener_identity_private_key,
+        post_quantum_private_key: None,
+    };
     let listener_peers_and_metadata = PeersAndMetadata::new(&[network_id]);
     let mut listener_connection_events = listener_peers_and_metadata.subscribe();
     // Set up the listener network
@@ -128,7 +131,10 @@ pub fn setup_network() -> DummyNetwork {
         Peer::from_addrs(PeerRole::Validator, vec![listener_addr]),
     );
 
-    let authentication_mode = AuthenticationMode::Mutual(dialer_identity_private_key);
+    let authentication_mode = AuthenticationMode::Mutual {
+        network_private_key: dialer_identity_private_key,
+        post_quantum_private_key: None,
+    };
 
     let peers_and_metadata = PeersAndMetadata::new(&[network_id]);
     // Set up the dialer network

@@ -307,6 +307,11 @@ impl Mempool {
             committed_seq_number = account_sequence_number
         );
 
+        if !txn.has_post_quantum_signature() {
+            return MempoolStatus::new(MempoolStatusCode::VmError)
+                .with_message("missing post-quantum signature".to_string());
+        }
+
         if let ReplayProtector::SequenceNumber(txn_seq_num) = txn.replay_protector() {
             // don't accept old transactions (e.g. seq is less than account's current seq_number)
             match &account_sequence_number {

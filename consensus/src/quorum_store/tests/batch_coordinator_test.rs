@@ -12,7 +12,7 @@ use crate::{
 };
 use accudo_config::config::BatchTransactionFilterConfig;
 use accudo_consensus_types::common::Author;
-use accudo_crypto::{ed25519::Ed25519PrivateKey, PrivateKey, SigningKey, Uniform};
+use accudo_crypto::{ed25519::Ed25519PrivateKey, pq::Dilithium3KeyPair};
 use accudo_network::application::{interface::NetworkClient, storage::PeersAndMetadata};
 use accudo_transaction_filters::batch_transaction_filter::BatchTransactionFilter;
 use accudo_types::{
@@ -193,13 +193,11 @@ fn create_signed_transactions(num_transactions: u64) -> Vec<SignedTransaction> {
     for _ in 0..num_transactions {
         let raw_transaction = create_raw_transaction();
         let private_key_1 = Ed25519PrivateKey::generate_for_testing();
-        let signature = private_key_1.sign(&raw_transaction).unwrap();
-
-        let signed_transaction = SignedTransaction::new(
-            raw_transaction.clone(),
-            private_key_1.public_key(),
-            signature.clone(),
-        );
+        let pq_keypair = Dilithium3KeyPair::generate().expect("pq key generation");
+        let signed_transaction = raw_transaction
+            .sign_dual_with_dilithium(Some(&private_key_1), &pq_keypair)
+            .expect("dual signing")
+            .into_inner();
         signed_transactions.push(signed_transaction);
     }
 

@@ -63,7 +63,13 @@
 //!
 #![allow(clippy::arithmetic_side_effects)]
 
-use crate::{hash::HashValue, hkdf::Hkdf, traits::Uniform as _, x25519, ValidCryptoMaterial};
+use crate::{
+    hash::HashValue,
+    hkdf::Hkdf,
+    pq::{KyberCiphertext, KyberPrivateKey, KyberPublicKey, KYBER_CIPHERTEXT_LENGTH},
+    traits::{PrivateKey as _, Uniform as _},
+    x25519, ValidCryptoMaterial,
+};
 use ring::aead::{self, Aad, LessSafeKey, UnboundKey};
 use sha2::Digest;
 use std::{
@@ -100,7 +106,7 @@ pub const fn decrypted_len(ciphertext_len: usize) -> usize {
 }
 
 /// A handy const fn to get the size of the first handshake message
-pub const fn handshake_init_msg_len(payload_len: usize) -> usize {
+pub const fn handshake_init_msg_len(payload_len: usize, pq_section_len: usize) -> usize {
     // e
     let e_len = x25519::PUBLIC_KEY_SIZE;
     // encrypted s
@@ -108,7 +114,7 @@ pub const fn handshake_init_msg_len(payload_len: usize) -> usize {
     // encrypted payload
     let enc_payload_len = encrypted_len(payload_len);
     //
-    e_len + enc_s_len + enc_payload_len
+    e_len + enc_s_len + pq_section_len + enc_payload_len
 }
 
 /// A handy const fn to get the size of the second handshake message
@@ -155,6 +161,14 @@ pub enum NoiseError {
     /// could not decrypt the received data (most likely the data was tampered with
     #[error("noise: could not decrypt the received data")]
     Decrypt,
+
+    /// post-quantum negotiation failed
+    #[error("noise: post-quantum negotiation failed")]
+    PostQuantumNegotiation,
+
+    /// expected a post-quantum key but none was configured
+    #[error("noise: post-quantum key unavailable")]
+    MissingPostQuantumKey,
 
     /// the public key received is of the wrong format
     #[error("noise: the public key received is of the wrong format")]
@@ -224,6 +238,17 @@ fn mix_key(ck: &mut Vec<u8>, dh_output: &[u8]) -> Result<Vec<u8>, NoiseError> {
 pub struct NoiseConfig {
     private_key: x25519::PrivateKey,
     public_key: x25519::PublicKey,
+    pq_private_key: Option<KyberPrivateKey>,
+    pq_public_key: Option<KyberPublicKey>,
+}
+
+/// Remote peer identity information required during the handshake.
+#[derive(Clone)]
+pub struct RemoteIdentityKeys {
+    /// Remote party's static X25519 key.
+    pub x25519: x25519::PublicKey,
+    /// Remote party's Kyber public key, if advertised.
+    pub kyber: Option<KyberPublicKey>,
 }
 
 /// Refer to the Noise protocol framework specification in order to understand these fields.
@@ -255,11 +280,21 @@ pub struct ResponderHandshakeState {
 impl NoiseConfig {
     /// A peer must create a NoiseConfig through this function before being able to connect with other peers.
     pub fn new(private_key: x25519::PrivateKey) -> Self {
-        // we could take a public key as argument, and it would be faster, but this is cleaner
+        Self::new_with_post_quantum(private_key, None)
+    }
+
+    /// Creates a Noise configuration that also carries a Kyber private key for hybrid handshakes.
+    pub fn new_with_post_quantum(
+        private_key: x25519::PrivateKey,
+        pq_private_key: Option<KyberPrivateKey>,
+    ) -> Self {
         let public_key = private_key.public_key();
+        let pq_public_key = pq_private_key.as_ref().map(PrivateKey::public_key);
         Self {
             private_key,
             public_key,
+            pq_private_key,
+            pq_public_key,
         }
     }
 
@@ -268,32 +303,48 @@ impl NoiseConfig {
         self.public_key
     }
 
+    /// Returns the configured Kyber public key, if hybrid mode is enabled.
+    pub fn post_quantum_public_key(&self) -> Option<&KyberPublicKey> {
+        self.pq_public_key.as_ref()
+    }
+
+    fn has_post_quantum(&self) -> bool {
+        self.pq_private_key.is_some()
+    }
+
     //
     // Initiator
     // ---------
 
     /// An initiator can use this function to initiate a handshake with a known responder.
-    pub fn initiate_connection(
+    pub fn initiate_connection_with_remote(
         &self,
         rng: &mut (impl rand::RngCore + rand::CryptoRng),
         prologue: &[u8],
-        remote_public: x25519::PublicKey,
+        remote_keys: &RemoteIdentityKeys,
+        handshake_version: u8,
         payload: Option<&[u8]>,
-        response_buffer: &mut [u8],
+        response_buffer: &mut Vec<u8>,
     ) -> Result<InitiatorHandshakeState, NoiseError> {
         // checks
         let payload_len = payload.map(<[u8]>::len).unwrap_or(0);
-        let buffer_size_required = handshake_init_msg_len(payload_len);
+        let pq_section_len = if handshake_version > 0 {
+            if self.pq_private_key.is_some() && remote_keys.kyber.is_some() {
+                2 + KYBER_CIPHERTEXT_LENGTH
+            } else {
+                2
+            }
+        } else {
+            0
+        };
+        let buffer_size_required = handshake_init_msg_len(payload_len, pq_section_len);
         if buffer_size_required > MAX_SIZE_NOISE_MSG {
             return Err(NoiseError::PayloadTooLarge);
-        }
-        if response_buffer.len() < buffer_size_required {
-            return Err(NoiseError::ResponseBufferTooSmall);
         }
         // initialize
         let mut h = PROTOCOL_NAME.to_vec();
         let mut ck = PROTOCOL_NAME.to_vec();
-        let rs = remote_public; // for naming consistency with the specification
+        let rs = remote_keys.x25519; // for naming consistency with the specification
         mix_hash(&mut h, prologue);
         mix_hash(&mut h, rs.as_slice());
 
@@ -302,10 +353,7 @@ impl NoiseConfig {
         let e_pub = e.public_key();
 
         mix_hash(&mut h, e_pub.as_slice());
-        let mut response_buffer = Cursor::new(response_buffer);
-        response_buffer
-            .write(e_pub.as_slice())
-            .map_err(|_| NoiseError::ResponseBufferTooSmall)?;
+        response_buffer.extend_from_slice(e_pub.as_slice());
 
         // -> es
         let dh_output = e.diffie_hellman(&rs);
@@ -320,13 +368,34 @@ impl NoiseConfig {
             .map_err(|_| NoiseError::Encrypt)?;
 
         mix_hash(&mut h, &in_out[..]);
-        response_buffer
-            .write(&in_out[..])
-            .map_err(|_| NoiseError::ResponseBufferTooSmall)?;
+        response_buffer.extend_from_slice(&in_out[..]);
 
         // -> ss
         let dh_output = self.private_key.diffie_hellman(&rs);
-        let k = mix_key(&mut ck, &dh_output)?;
+        let mut k = mix_key(&mut ck, &dh_output)?;
+
+        // -> pq (optional)
+        if handshake_version > 0 {
+            let remote_pq = remote_keys
+                .kyber
+                .as_ref()
+                .ok_or(NoiseError::PostQuantumNegotiation)?;
+            if self.pq_private_key.is_none() {
+                return Err(NoiseError::PostQuantumNegotiation);
+            }
+            let (ciphertext, shared) = remote_pq
+                .encapsulate()
+                .map_err(|_| NoiseError::PostQuantumNegotiation)?;
+            let shared_key = mix_key(&mut ck, &shared)?;
+            k = shared_key;
+            let ct_bytes: Vec<u8> = ciphertext.into();
+            let ct_len: u16 = ct_bytes
+                .len()
+                .try_into()
+                .map_err(|_| NoiseError::PostQuantumNegotiation)?;
+            response_buffer.extend_from_slice(&ct_len.to_le_bytes());
+            response_buffer.extend_from_slice(&ct_bytes);
+        }
 
         // -> payload
         let aead = aes_key(&k[..]);
@@ -338,13 +407,39 @@ impl NoiseConfig {
 
         mix_hash(&mut h, &in_out[..]);
 
-        response_buffer
-            .write(&in_out[..])
-            .map_err(|_| NoiseError::ResponseBufferTooSmall)?;
+        response_buffer.extend_from_slice(&in_out[..]);
 
         // return
         let handshake_state = InitiatorHandshakeState { h, ck, e, rs };
         Ok(handshake_state)
+    }
+
+    /// Legacy helper that writes the handshake message into a fixed-size buffer.
+    pub fn initiate_connection(
+        &self,
+        rng: &mut (impl rand::RngCore + rand::CryptoRng),
+        prologue: &[u8],
+        remote_public: x25519::PublicKey,
+        payload: Option<&[u8]>,
+        response_buffer: &mut [u8],
+    ) -> Result<InitiatorHandshakeState, NoiseError> {
+        let mut temp = Vec::with_capacity(response_buffer.len());
+        let state = self.initiate_connection_with_remote(
+            rng,
+            prologue,
+            &RemoteIdentityKeys {
+                x25519: remote_public,
+                kyber: None,
+            },
+            0,
+            payload,
+            &mut temp,
+        )?;
+        if temp.len() > response_buffer.len() {
+            return Err(NoiseError::ResponseBufferTooSmall);
+        }
+        response_buffer[..temp.len()].copy_from_slice(&temp);
+        Ok(state)
     }
 
     /// A client can call this to finalize a connection, after receiving an answer from a server.
@@ -413,10 +508,11 @@ impl NoiseConfig {
 
     /// A responder can accept a connection by first parsing an initiator message.
     /// The function respond_to_client is usually called after this to respond to the initiator.
-    pub fn parse_client_init_message(
+    pub fn parse_client_init_message_with_options(
         &self,
         prologue: &[u8],
         received_message: &[u8],
+        handshake_version: u8,
     ) -> Result<
         (
             x25519::PublicKey,       // initiator's public key
@@ -448,7 +544,7 @@ impl NoiseConfig {
 
         // <- es
         let dh_output = self.private_key.diffie_hellman(&re);
-        let k = mix_key(&mut ck, &dh_output)?;
+        let mut k = mix_key(&mut ck, &dh_output)?;
 
         // <- s
         let mut encrypted_remote_static = [0u8; x25519::PUBLIC_KEY_SIZE + AES_GCM_TAGLEN];
@@ -468,7 +564,31 @@ impl NoiseConfig {
 
         // <- ss
         let dh_output = self.private_key.diffie_hellman(&rs);
-        let k = mix_key(&mut ck, &dh_output)?;
+        k = mix_key(&mut ck, &dh_output)?;
+
+        if handshake_version > 0 {
+            let mut len_bytes = [0u8; 2];
+            cursor
+                .read_exact(&mut len_bytes)
+                .map_err(|_| NoiseError::MsgTooShort)?;
+            let pq_len = u16::from_le_bytes(len_bytes) as usize;
+            if pq_len != KYBER_CIPHERTEXT_LENGTH {
+                return Err(NoiseError::PostQuantumNegotiation);
+            }
+            let mut ct_bytes = vec![0u8; pq_len];
+            cursor
+                .read_exact(&mut ct_bytes)
+                .map_err(|_| NoiseError::MsgTooShort)?;
+            let ciphertext = KyberCiphertext(ct_bytes);
+            let pq_private = self
+                .pq_private_key
+                .as_ref()
+                .ok_or(NoiseError::MissingPostQuantumKey)?;
+            let shared = pq_private
+                .decapsulate(&ciphertext)
+                .map_err(|_| NoiseError::PostQuantumNegotiation)?;
+            k = mix_key(&mut ck, &shared)?;
+        }
 
         // <- payload
         let offset = cursor.position() as usize;
@@ -489,12 +609,23 @@ impl NoiseConfig {
 
     /// A responder can respond to an initiator by calling this function with the state obtained,
     /// after calling parse_client_init_message
-    pub fn respond_to_client(
+    pub fn parse_client_init_message(
+        &self,
+        prologue: &[u8],
+        received_message: &[u8],
+    ) -> Result<(x25519::PublicKey, ResponderHandshakeState, Vec<u8>), NoiseError> {
+        self.parse_client_init_message_with_options(prologue, received_message, 0)
+    }
+
+    /// A responder can respond to an initiator by calling this function with the state obtained,
+    /// after calling parse_client_init_message
+    pub fn respond_to_client_with_options(
         &self,
         rng: &mut (impl rand::RngCore + rand::CryptoRng),
         handshake_state: ResponderHandshakeState,
+        handshake_version: u8,
         payload: Option<&[u8]>,
-        response_buffer: &mut [u8],
+        response_buffer: &mut Vec<u8>,
     ) -> Result<NoiseSession, NoiseError> {
         // checks
         let payload_len = payload.map(<[u8]>::len).unwrap_or(0);
@@ -502,9 +633,7 @@ impl NoiseConfig {
         if buffer_size_required > MAX_SIZE_NOISE_MSG {
             return Err(NoiseError::PayloadTooLarge);
         }
-        if response_buffer.len() < buffer_size_required {
-            return Err(NoiseError::ResponseBufferTooSmall);
-        }
+        response_buffer.reserve(buffer_size_required);
 
         // retrieve handshake state
         let ResponderHandshakeState {
@@ -519,10 +648,7 @@ impl NoiseConfig {
         let e_pub = e.public_key();
 
         mix_hash(&mut h, e_pub.as_slice());
-        let mut response_buffer = Cursor::new(response_buffer);
-        response_buffer
-            .write(e_pub.as_slice())
-            .map_err(|_| NoiseError::ResponseBufferTooSmall)?;
+        response_buffer.extend_from_slice(e_pub.as_slice());
 
         // -> ee
         let dh_output = e.diffie_hellman(&re);
@@ -541,9 +667,7 @@ impl NoiseConfig {
 
         mix_hash(&mut h, &in_out[..]);
 
-        response_buffer
-            .write(&in_out[..])
-            .map_err(|_| NoiseError::ResponseBufferTooSmall)?;
+        response_buffer.extend_from_slice(&in_out[..]);
 
         // split
         let (k1, k2) = hkdf(&ck, None)?;
@@ -553,15 +677,34 @@ impl NoiseConfig {
         Ok(session)
     }
 
+    /// Legacy helper that writes the server response into a fixed-size buffer.
+    pub fn respond_to_client(
+        &self,
+        rng: &mut (impl rand::RngCore + rand::CryptoRng),
+        handshake_state: ResponderHandshakeState,
+        payload: Option<&[u8]>,
+        response_buffer: &mut [u8],
+    ) -> Result<NoiseSession, NoiseError> {
+        let mut temp = Vec::with_capacity(response_buffer.len());
+        let session =
+            self.respond_to_client_with_options(rng, handshake_state, 0, payload, &mut temp)?;
+        if temp.len() > response_buffer.len() {
+            return Err(NoiseError::ResponseBufferTooSmall);
+        }
+        response_buffer[..temp.len()].copy_from_slice(&temp);
+        Ok(session)
+    }
+
     /// This function is a one-call that replaces calling the two functions parse_client_init_message
     /// and respond_to_client consecutively
-    pub fn respond_to_client_and_finalize(
+    pub fn respond_to_client_and_finalize_with_options(
         &self,
         rng: &mut (impl rand::RngCore + rand::CryptoRng),
         prologue: &[u8],
         received_message: &[u8],
+        handshake_version: u8,
         payload: Option<&[u8]>,
-        response_buffer: &mut [u8],
+        response_buffer: &mut Vec<u8>,
     ) -> Result<
         (
             Vec<u8>,      // the payload the initiator sent
@@ -569,10 +712,44 @@ impl NoiseConfig {
         ),
         NoiseError,
     > {
-        let (_, handshake_state, received_payload) =
-            self.parse_client_init_message(prologue, received_message)?;
-        let session = self.respond_to_client(rng, handshake_state, payload, response_buffer)?;
+        let (_, handshake_state, received_payload) = self.parse_client_init_message_with_options(
+            prologue,
+            received_message,
+            handshake_version,
+        )?;
+        let session = self.respond_to_client_with_options(
+            rng,
+            handshake_state,
+            handshake_version,
+            payload,
+            response_buffer,
+        )?;
         Ok((received_payload, session))
+    }
+
+    /// Legacy helper that performs the responder side of the handshake and writes into a fixed buffer.
+    pub fn respond_to_client_and_finalize(
+        &self,
+        rng: &mut (impl rand::RngCore + rand::CryptoRng),
+        prologue: &[u8],
+        received_message: &[u8],
+        payload: Option<&[u8]>,
+        response_buffer: &mut [u8],
+    ) -> Result<(Vec<u8>, NoiseSession), NoiseError> {
+        let mut temp = Vec::with_capacity(response_buffer.len());
+        let (payload_bytes, session) = self.respond_to_client_and_finalize_with_options(
+            rng,
+            prologue,
+            received_message,
+            0,
+            payload,
+            &mut temp,
+        )?;
+        if temp.len() > response_buffer.len() {
+            return Err(NoiseError::ResponseBufferTooSmall);
+        }
+        response_buffer[..temp.len()].copy_from_slice(&temp);
+        Ok((payload_bytes, session))
     }
 }
 

@@ -3119,6 +3119,10 @@ impl VMValidator for AccudoVM {
                 return VMValidatorResult::error(StatusCode::INVALID_SIGNATURE);
             },
         };
+
+        if !txn.has_post_quantum_signature() {
+            return VMValidatorResult::error(StatusCode::INVALID_SIGNATURE);
+        }
         let auxiliary_info = AuxiliaryInfo::new_empty();
         let txn_data = TransactionMetadata::new(&txn, &auxiliary_info);
 

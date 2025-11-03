@@ -49,10 +49,10 @@ impl TransactionGenerator for BatchTransferTransactionGenerator {
                 .clone_from_pool(self.batch_size, &mut self.rng);
             requests.push(
                 account.sign_with_transaction_builder(self.txn_factory.payload(
-                    accudo_stdlib::accudo_account_batch_transfer(receivers, vec![
-                        self.send_amount;
-                        self.batch_size
-                    ]),
+                    accudo_stdlib::accudo_account_batch_transfer(
+                        receivers,
+                        vec![self.send_amount; self.batch_size],
+                    ),
                 )),
             );
         }

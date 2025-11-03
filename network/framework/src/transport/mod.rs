@@ -14,7 +14,11 @@ use accudo_config::{
     config::{PeerRole, HANDSHAKE_VERSION},
     network_id::{NetworkContext, NetworkId},
 };
-use accudo_crypto::x25519;
+use accudo_crypto::{
+    pq::{KyberPrivateKey, KyberPublicKey},
+    traits::PrivateKey as _,
+    x25519,
+};
 use accudo_id_generator::{IdGenerator, U32IdGenerator};
 use accudo_logger::prelude::*;
 // Re-exposed for accudo-network-checker
@@ -275,8 +279,11 @@ async fn upgrade_inbound<T: TSocket>(
     };
 
     // try authenticating via noise handshake
-    let (mut socket, remote_peer_id, peer_role) =
-        ctxt.noise.upgrade_inbound(socket).await.map_err(|err| {
+    let (mut socket, remote_peer_id, peer_role) = ctxt
+        .noise
+        .upgrade_inbound(socket, ctxt.handshake_version)
+        .await
+        .map_err(|err| {
             if err.should_security_log() {
                 sample!(
                     SampleRate::Duration(Duration::from_secs(15)),
@@ -293,7 +300,7 @@ async fn upgrade_inbound<T: TSocket>(
             add_pp_addr(proxy_protocol_enabled, err, &addr)
         })?;
     let remote_pubkey = socket.get_remote_static();
-    let addr = addr.append_prod_protos(remote_pubkey, HANDSHAKE_VERSION);
+    let addr = addr.append_prod_protos_with_pq(remote_pubkey, None, HANDSHAKE_VERSION);
 
     // exchange HandshakeMsg
     let handshake_msg = HandshakeMsg {
@@ -340,6 +347,7 @@ pub async fn upgrade_outbound<T: TSocket>(
     addr: NetworkAddress,
     remote_peer_id: PeerId,
     remote_pubkey: x25519::PublicKey,
+    remote_pq_pubkey: Option<KyberPublicKey>,
 ) -> io::Result<Connection<NoiseStream<T>>> {
     let origin = ConnectionOrigin::Outbound;
     let socket = fut_socket.await?;
@@ -351,6 +359,8 @@ pub async fn upgrade_outbound<T: TSocket>(
             socket,
             remote_peer_id,
             remote_pubkey,
+            remote_pq_pubkey,
+            ctxt.handshake_version,
             AntiReplayTimestamps::now,
         )
         .await
@@ -424,6 +434,7 @@ pub struct AccudoNetTransport<TTransport> {
     ctxt: Arc<UpgradeContext>,
     time_service: TimeService,
     identity_pubkey: x25519::PublicKey,
+    identity_pq_pubkey: Option<KyberPublicKey>,
     enable_proxy_protocol: bool,
 }
 
@@ -440,6 +451,7 @@ where
         network_context: NetworkContext,
         time_service: TimeService,
         identity_key: x25519::PrivateKey,
+        pq_identity_key: Option<KyberPrivateKey>,
         auth_mode: HandshakeAuthMode,
         handshake_version: u8,
         chain_id: ChainId,
@@ -451,9 +463,16 @@ where
         supported_protocols.insert(SUPPORTED_MESSAGING_PROTOCOL, application_protocols);
 
         let identity_pubkey = identity_key.public_key();
+        let identity_pq_pubkey = pq_identity_key.as_ref().map(|key| key.public_key());
+        if handshake_version > 0 && identity_pq_pubkey.is_none() {
+            panic!(
+                "Handshake version {} requires a post-quantum network identity key",
+                handshake_version
+            );
+        }
 
         let upgrade_context = UpgradeContext::new(
-            NoiseUpgrader::new(network_context, identity_key, auth_mode),
+            NoiseUpgrader::new(network_context, identity_key, pq_identity_key, auth_mode),
             handshake_version,
             supported_protocols,
             chain_id,
@@ -465,13 +484,19 @@ where
             ctxt: Arc::new(upgrade_context),
             time_service,
             identity_pubkey,
+            identity_pq_pubkey,
             enable_proxy_protocol,
         }
     }
 
     fn parse_dial_addr(
         addr: &NetworkAddress,
-    ) -> io::Result<(NetworkAddress, x25519::PublicKey, u8)> {
+    ) -> io::Result<(
+        NetworkAddress,
+        x25519::PublicKey,
+        Option<KyberPublicKey>,
+        u8,
+    )> {
         use accudo_types::network_address::Protocol::*;
 
         let protos = addr.as_slice();
@@ -495,18 +520,23 @@ where
                 )
             })?;
 
-        // parse out the accudonet protocols (noise ik and handshake)
+        // parse out the accudonet protocols (noise ik, optional kyber, and handshake)
         match base_transport_suffix {
+            [NoiseIK(pubkey), NoiseKyber(pq_pubkey), Handshake(version)] => {
+                let base_addr = NetworkAddress::try_from(base_transport_protos.to_vec())
+                    .expect("base_transport_protos is always non-empty");
+                Ok((base_addr, *pubkey, Some(pq_pubkey.clone()), *version))
+            },
             [NoiseIK(pubkey), Handshake(version)] => {
                 let base_addr = NetworkAddress::try_from(base_transport_protos.to_vec())
                     .expect("base_transport_protos is always non-empty");
-                Ok((base_addr, *pubkey, *version))
+                Ok((base_addr, *pubkey, None, *version))
             },
             _ => Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
                 format!(
                     "Unexpected dialing network address: '{}', expected: \
-                     '/../noise-ik/<pubkey>/handshake/<version>'",
+                     '/../noise-ik/<pubkey>[/noise-kyber/<pq_pubkey>]/handshake/<version>'",
                     addr
                 ),
             )),
@@ -547,7 +577,7 @@ where
     > {
         // parse accudonet protocols
         // TODO(philiphayes): `Transport` trait should include parsing in `dial`?
-        let (base_addr, pubkey, handshake_version) = Self::parse_dial_addr(&addr)?;
+        let (base_addr, pubkey, pq_key, handshake_version) = Self::parse_dial_addr(&addr)?;
 
         // Check that the parsed handshake version from the dial addr is supported.
         if self.ctxt.handshake_version != handshake_version {
@@ -559,12 +589,22 @@ where
                 ),
             ));
         }
+        if handshake_version > 0 && pq_key.is_none() {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                format!(
+                    "Remote address '{}' is missing a noise-kyber segment required for handshake version {}",
+                    addr, handshake_version
+                ),
+            ));
+        }
 
         // try to connect socket
         let fut_socket = self.base_transport.dial(peer_id, base_addr)?;
 
         // outbound dial upgrade task
-        let upgrade_fut = upgrade_outbound(self.ctxt.clone(), fut_socket, addr, peer_id, pubkey);
+        let upgrade_fut =
+            upgrade_outbound(self.ctxt.clone(), fut_socket, addr, peer_id, pubkey, pq_key);
         let upgrade_fut = timeout_io(self.time_service.clone(), TRANSPORT_TIMEOUT, upgrade_fut);
         Ok(upgrade_fut)
     }
@@ -609,8 +649,16 @@ where
         // (e.g., `/memory/<port>` with no trailers), so we don't need to do any
         // parsing here.
         let (listener, listen_addr) = self.base_transport.listen_on(addr)?;
-        let listen_addr =
-            listen_addr.append_prod_protos(self.identity_pubkey, self.ctxt.handshake_version);
+        let advertised_pq_key = if self.ctxt.handshake_version > 0 {
+            self.identity_pq_pubkey.clone()
+        } else {
+            None
+        };
+        let listen_addr = listen_addr.append_prod_protos_with_pq(
+            self.identity_pubkey,
+            advertised_pq_key,
+            self.ctxt.handshake_version,
+        );
 
         // need to move a ctxt into stream task
         let ctxt = self.ctxt.clone();

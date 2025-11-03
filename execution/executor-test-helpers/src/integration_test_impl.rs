@@ -404,13 +404,11 @@ pub fn create_db_and_executor<P: AsRef<std::path::Path>>(
     BlockExecutor<AccudoVMBlockExecutor>,
     Waypoint,
 ) {
-    let (db, dbrw) = DbReaderWriter::wrap(
-        if force_sharding {
-            AccudoDB::new_for_test_with_sharding(&path, DEFAULT_MAX_NUM_NODES_PER_LRU_CACHE_SHARD)
-        } else {
-            AccudoDB::new_for_test(&path)
-        },
-    );
+    let (db, dbrw) = DbReaderWriter::wrap(if force_sharding {
+        AccudoDB::new_for_test_with_sharding(&path, DEFAULT_MAX_NUM_NODES_PER_LRU_CACHE_SHARD)
+    } else {
+        AccudoDB::new_for_test(&path)
+    });
     let waypoint = bootstrap_genesis::<AccudoVMBlockExecutor>(&dbrw, genesis).unwrap();
     let executor = BlockExecutor::new(dbrw.clone());
 

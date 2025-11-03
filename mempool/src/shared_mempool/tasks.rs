@@ -646,8 +646,7 @@ pub(crate) fn process_quorum_store_request<NetworkClient, TransactionValidator>(
             exclude_transactions,
             callback,
         ) => {
-            let txns;
-            {
+            let txns = {
                 let lock_timer = counters::mempool_service_start_latency_timer(
                     counters::GET_BLOCK_LOCK_LABEL,
                     counters::REQUEST_SUCCESS_LABEL,
@@ -673,12 +672,31 @@ pub(crate) fn process_quorum_store_request<NetworkClient, TransactionValidator>(
                 );
                 txns =
                     mempool.get_batch(max_txns, max_bytes, return_non_full, exclude_transactions);
+                txns
+            };
+
+            let mut pq_filtered_txns = Vec::with_capacity(txns.len());
+            let mut dropped_non_pq = 0u64;
+            for txn in txns {
+                if txn.has_post_quantum_signature() {
+                    pq_filtered_txns.push(txn);
+                } else {
+                    dropped_non_pq += 1;
+                }
+            }
+
+            if dropped_non_pq > 0 {
+                info!(
+                    LogSchema::event_log(LogEntry::QuorumStore, LogEvent::TransactionRejected)
+                        .message("filtered transactions missing post-quantum signatures")
+                        .num_txns(dropped_non_pq as usize)
+                );
             }
 
             // mempool_service_transactions is logged inside get_batch
 
             (
-                QuorumStoreResponse::GetBatchResponse(txns),
+                QuorumStoreResponse::GetBatchResponse(pq_filtered_txns),
                 callback,
                 counters::GET_BLOCK_LABEL,
             )
@@ -797,7 +815,7 @@ pub(crate) async fn process_config_update<V, P>(
 #[cfg(test)]
 mod test {
     use super::*;
-    use accudo_crypto::{ed25519::Ed25519PrivateKey, PrivateKey, SigningKey, Uniform};
+    use accudo_crypto::{ed25519::Ed25519PrivateKey, pq::Dilithium3KeyPair};
     use accudo_transaction_filters::transaction_filter::TransactionFilter;
     use accudo_types::{
         chain_id::ChainId,
@@ -913,13 +931,11 @@ mod test {
     fn create_signed_transaction() -> SignedTransaction {
         let raw_transaction = create_raw_transaction();
         let private_key_1 = Ed25519PrivateKey::generate_for_testing();
-        let signature = private_key_1.sign(&raw_transaction).unwrap();
-
-        SignedTransaction::new(
-            raw_transaction.clone(),
-            private_key_1.public_key(),
-            signature.clone(),
-        )
+        let pq_keypair = Dilithium3KeyPair::generate().expect("pq keypair generation");
+        raw_transaction
+            .sign_dual_with_dilithium(Some(&private_key_1), &pq_keypair)
+            .expect("dual signing succeeds")
+            .into_inner()
     }
 
     fn verify_rejected_status(

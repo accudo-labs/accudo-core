@@ -72,7 +72,7 @@ pub fn build_seed_for_network(seed_config: &NetworkConfig, seed_role: PeerRole) 
     let seed_addr = seed_config
         .listen_address
         .clone()
-        .append_prod_protos(seed_pubkey, HANDSHAKE_VERSION);
+        .append_prod_protos_with_pq(seed_pubkey, None, HANDSHAKE_VERSION);
 
     let mut keys = HashSet::new();
     keys.insert(seed_pubkey);

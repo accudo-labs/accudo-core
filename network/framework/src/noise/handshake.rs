@@ -17,10 +17,14 @@ use crate::{
     noise::{error::NoiseHandshakeError, stream::NoiseStream},
 };
 use accudo_config::{
-    config::{Peer, PeerRole},
+    config::{Peer, PeerRole, HANDSHAKE_VERSION},
     network_id::{NetworkContext, NetworkId},
 };
-use accudo_crypto::{noise, x25519};
+use accudo_crypto::{
+    noise::{self, RemoteIdentityKeys},
+    pq::{KyberPrivateKey, KyberPublicKey, KYBER_CIPHERTEXT_LENGTH},
+    x25519,
+};
 use accudo_infallible::{duration_since_epoch, RwLock};
 use accudo_logger::{error, trace};
 use accudo_short_hex_str::{AsShortHexStr, ShortHexStr};
@@ -153,9 +157,6 @@ pub struct NoiseUpgrader {
 }
 
 impl NoiseUpgrader {
-    /// The client message consist of the prologue + a noise message with a timestamp as payload.
-    const CLIENT_MESSAGE_SIZE: usize =
-        Self::PROLOGUE_SIZE + noise::handshake_init_msg_len(AntiReplayTimestamps::TIMESTAMP_SIZE);
     /// The prologue is the client's peer_id and the remote's expected public key.
     const PROLOGUE_SIZE: usize = PeerId::LENGTH + x25519::PUBLIC_KEY_SIZE;
     /// The server's message contains no payload.
@@ -165,11 +166,12 @@ impl NoiseUpgrader {
     pub fn new(
         network_context: NetworkContext,
         key: x25519::PrivateKey,
+        pq_key: Option<KyberPrivateKey>,
         auth_mode: HandshakeAuthMode,
     ) -> Self {
         Self {
             network_context,
-            noise_config: noise::NoiseConfig::new(key),
+            noise_config: noise::NoiseConfig::new_with_post_quantum(key, pq_key),
             auth_mode,
         }
     }
@@ -186,35 +188,39 @@ impl NoiseUpgrader {
         mut socket: TSocket,
         remote_peer_id: PeerId,
         remote_public_key: x25519::PublicKey,
+        remote_pq_public_key: Option<KyberPublicKey>,
+        handshake_version: u8,
         time_provider: F,
     ) -> Result<(NoiseStream<TSocket>, PeerRole), NoiseHandshakeError>
     where
         TSocket: AsyncRead + AsyncWrite + Debug + Unpin,
         F: Fn() -> [u8; AntiReplayTimestamps::TIMESTAMP_SIZE],
     {
-        // buffer to hold prologue + first noise handshake message
-        let mut client_message = [0; Self::CLIENT_MESSAGE_SIZE];
-
         // craft prologue = self_peer_id | expected_public_key
-        client_message[..PeerId::LENGTH].copy_from_slice(self.network_context.peer_id().as_ref());
-        client_message[PeerId::LENGTH..Self::PROLOGUE_SIZE]
-            .copy_from_slice(remote_public_key.as_slice());
+        let mut prologue = vec![0u8; Self::PROLOGUE_SIZE];
+        prologue[..PeerId::LENGTH].copy_from_slice(self.network_context.peer_id().as_ref());
+        prologue[PeerId::LENGTH..Self::PROLOGUE_SIZE].copy_from_slice(remote_public_key.as_slice());
 
-        let (prologue_msg, client_noise_msg) = client_message.split_at_mut(Self::PROLOGUE_SIZE);
+        let mut client_message = prologue.clone();
 
         // craft 8-byte payload as current timestamp (in milliseconds)
         let payload = time_provider();
 
         // craft first handshake message  (-> e, es, s, ss)
         let mut rng = rand::rngs::OsRng;
+        let remote_keys = RemoteIdentityKeys {
+            x25519: remote_public_key,
+            kyber: remote_pq_public_key.clone(),
+        };
         let initiator_state = self
             .noise_config
-            .initiate_connection(
+            .initiate_connection_with_remote(
                 &mut rng,
-                prologue_msg,
-                remote_public_key,
-                Some(&payload),
-                client_noise_msg,
+                &prologue,
+                &remote_keys,
+                handshake_version,
+                Some(payload.as_ref()),
+                &mut client_message,
             )
             .map_err(NoiseHandshakeError::BuildClientHandshakeMessageFailed)?;
 
@@ -314,23 +320,36 @@ impl NoiseUpgrader {
     pub async fn upgrade_inbound<TSocket>(
         &self,
         mut socket: TSocket,
+        handshake_version: u8,
     ) -> Result<(NoiseStream<TSocket>, PeerId, PeerRole), NoiseHandshakeError>
     where
         TSocket: AsyncRead + AsyncWrite + Debug + Unpin,
     {
         // buffer to contain the client first message
-        let mut client_message = [0; Self::CLIENT_MESSAGE_SIZE];
+        let mut prologue = [0u8; Self::PROLOGUE_SIZE];
 
-        // receive the prologue + first noise handshake message
+        // receive the prologue
         trace!("{} noise server: handshake read", self.network_context);
         socket
-            .read_exact(&mut client_message)
+            .read_exact(&mut prologue)
+            .await
+            .map_err(NoiseHandshakeError::ServerReadFailed)?;
+
+        let pq_section_len = if handshake_version > 0 {
+            2 + KYBER_CIPHERTEXT_LENGTH
+        } else {
+            0
+        };
+        let payload_len = AntiReplayTimestamps::TIMESTAMP_SIZE;
+        let noise_msg_len = noise::handshake_init_msg_len(payload_len, pq_section_len);
+        let mut client_init_message = vec![0u8; noise_msg_len];
+        socket
+            .read_exact(&mut client_init_message)
             .await
             .map_err(NoiseHandshakeError::ServerReadFailed)?;
 
         // extract prologue (remote_peer_id | self_public_key)
-        let (remote_peer_id, self_expected_public_key) =
-            client_message[..Self::PROLOGUE_SIZE].split_at(PeerId::LENGTH);
+        let (remote_peer_id, self_expected_public_key) = prologue.split_at(PeerId::LENGTH);
 
         // parse the client's peer id
         // note: in mutual authenticated network, we could verify that their peer_id is in the trust peer set now.
@@ -358,10 +377,13 @@ impl NoiseUpgrader {
         }
 
         // parse it
-        let (prologue, client_init_message) = client_message.split_at(Self::PROLOGUE_SIZE);
         let (remote_public_key, handshake_state, payload) = self
             .noise_config
-            .parse_client_init_message(prologue, client_init_message)
+            .parse_client_init_message_with_options(
+                &prologue,
+                &client_init_message,
+                handshake_version,
+            )
             .map_err(|err| NoiseHandshakeError::ServerParseClient(remote_peer_short, err))?;
 
         // if mutual auth mode, verify the remote pubkey is in our set of trusted peers
@@ -456,10 +478,16 @@ impl NoiseUpgrader {
 
         // construct the response
         let mut rng = rand::rngs::OsRng;
-        let mut server_response = [0u8; Self::SERVER_MESSAGE_SIZE];
+        let mut server_response = Vec::with_capacity(Self::SERVER_MESSAGE_SIZE);
         let session = self
             .noise_config
-            .respond_to_client(&mut rng, handshake_state, None, &mut server_response)
+            .respond_to_client_with_options(
+                &mut rng,
+                handshake_state,
+                handshake_version,
+                None,
+                &mut server_response,
+            )
             .map_err(|err| {
                 NoiseHandshakeError::BuildServerHandshakeMessageFailed(remote_peer_short, err)
             })?;
@@ -585,8 +613,18 @@ mod test {
                 )
             };
 
-        let client = NoiseUpgrader::new(client_network_context, client_private_key, client_auth);
-        let server = NoiseUpgrader::new(server_network_context, server_private_key, server_auth);
+        let client = NoiseUpgrader::new(
+            client_network_context,
+            client_private_key,
+            None,
+            client_auth,
+        );
+        let server = NoiseUpgrader::new(
+            server_network_context,
+            server_private_key,
+            None,
+            server_auth,
+        );
 
         ((client, client_public_key), (server, server_public_key))
     }
@@ -616,9 +654,11 @@ mod test {
                 dialer_socket,
                 server.network_context.peer_id(),
                 server_public_key,
+                None,
+                HANDSHAKE_VERSION,
                 AntiReplayTimestamps::now,
             ),
-            server.upgrade_inbound(listener_socket),
+            server.upgrade_inbound(listener_socket, HANDSHAKE_VERSION),
         ))
     }
 
@@ -640,9 +680,11 @@ mod test {
                 dialer_socket,
                 server_peer_id,
                 server_public_key,
+                None,
+                HANDSHAKE_VERSION,
                 bad_timestamp(1),
             ),
-            server.upgrade_inbound(listener_socket),
+            server.upgrade_inbound(listener_socket, HANDSHAKE_VERSION),
         ));
 
         client_session.unwrap();
@@ -655,9 +697,11 @@ mod test {
                 dialer_socket,
                 server_peer_id,
                 server_public_key,
+                None,
+                HANDSHAKE_VERSION,
                 bad_timestamp(0),
             ),
-            server.upgrade_inbound(listener_socket),
+            server.upgrade_inbound(listener_socket, HANDSHAKE_VERSION),
         ));
 
         client_session.unwrap_err();
@@ -670,9 +714,11 @@ mod test {
                 dialer_socket,
                 server_peer_id,
                 server_public_key,
+                None,
+                HANDSHAKE_VERSION,
                 bad_timestamp(1),
             ),
-            server.upgrade_inbound(listener_socket),
+            server.upgrade_inbound(listener_socket, HANDSHAKE_VERSION),
         ));
 
         client_session.unwrap_err();
@@ -685,9 +731,11 @@ mod test {
                 dialer_socket,
                 server_peer_id,
                 server_public_key,
+                None,
+                HANDSHAKE_VERSION,
                 bad_timestamp(2),
             ),
-            server.upgrade_inbound(listener_socket),
+            server.upgrade_inbound(listener_socket, HANDSHAKE_VERSION),
         ));
 
         client_session.unwrap();
@@ -761,6 +809,7 @@ mod test {
         let client = NoiseUpgrader::new(
             NetworkContext::mock_with_peer_id(client_peer_id),
             client_private_key,
+            None,
             HandshakeAuthMode::mutual(PeersAndMetadata::new(&[])),
         );
 
@@ -802,9 +851,11 @@ mod test {
                 dialer_socket,
                 server_peer_id,
                 server_public_key,
+                None,
+                HANDSHAKE_VERSION,
                 AntiReplayTimestamps::now,
             ),
-            server.upgrade_inbound(listener_socket),
+            server.upgrade_inbound(listener_socket, HANDSHAKE_VERSION),
         ));
 
         client_session.unwrap();
@@ -857,6 +908,8 @@ mod test {
                     dialer_socket,
                     server_peer_id,
                     server_public_key,
+                    None,
+                    HANDSHAKE_VERSION,
                     AntiReplayTimestamps::now,
                 )
                 .await
@@ -866,7 +919,10 @@ mod test {
 
         // Create the server connection task
         let server_connection_task = async move {
-            let (_, peer_id, peer_role) = server.upgrade_inbound(listener_socket).await.unwrap();
+            let (_, peer_id, peer_role) = server
+                .upgrade_inbound(listener_socket, HANDSHAKE_VERSION)
+                .await
+                .unwrap();
             assert_eq!(peer_id, client_peer_id);
             assert_eq!(peer_role, PeerRole::Unknown);
         };
@@ -895,6 +951,8 @@ mod test {
                     dialer_socket,
                     server_peer_id,
                     server_public_key,
+                    None,
+                    HANDSHAKE_VERSION,
                     AntiReplayTimestamps::now,
                 )
                 .await
@@ -904,7 +962,10 @@ mod test {
 
         // Create the server connection task
         let server_connection_task = async move {
-            let (_, peer_id, peer_role) = server.upgrade_inbound(listener_socket).await.unwrap();
+            let (_, peer_id, peer_role) = server
+                .upgrade_inbound(listener_socket, HANDSHAKE_VERSION)
+                .await
+                .unwrap();
             assert_eq!(peer_id, client_peer_id);
             assert_eq!(peer_role, PeerRole::Validator);
         };
@@ -959,6 +1020,8 @@ mod test {
                     dialer_socket,
                     server_peer_id,
                     server_public_key,
+                    None,
+                    HANDSHAKE_VERSION,
                     AntiReplayTimestamps::now,
                 )
                 .await
@@ -968,7 +1031,10 @@ mod test {
 
         // Create the server connection task
         let server_connection_task = async move {
-            let (_, peer_id, peer_role) = server.upgrade_inbound(listener_socket).await.unwrap();
+            let (_, peer_id, peer_role) = server
+                .upgrade_inbound(listener_socket, HANDSHAKE_VERSION)
+                .await
+                .unwrap();
             assert_eq!(peer_id, client_peer_id);
             assert_eq!(peer_role, PeerRole::ValidatorFullNode);
         };
@@ -1019,10 +1085,11 @@ mod test {
                 PeerRole::ValidatorFullNode,
             ),
         );
-        insert_new_trusted_peers(&peers_and_metadata, NetworkId::Public, vec![
-            client_peer,
-            server_peer,
-        ]);
+        insert_new_trusted_peers(
+            &peers_and_metadata,
+            NetworkId::Public,
+            vec![client_peer, server_peer],
+        );
 
         // Create an in-memory socket for testing
         let (dialer_socket, listener_socket) = MemorySocket::new_pair();
@@ -1034,6 +1101,8 @@ mod test {
                     dialer_socket,
                     server_peer_id,
                     server_public_key,
+                    None,
+                    HANDSHAKE_VERSION,
                     AntiReplayTimestamps::now,
                 )
                 .await
@@ -1043,7 +1112,10 @@ mod test {
 
         // Create the server connection task
         let server_connection_task = async move {
-            let (_, peer_id, peer_role) = server.upgrade_inbound(listener_socket).await.unwrap();
+            let (_, peer_id, peer_role) = server
+                .upgrade_inbound(listener_socket, HANDSHAKE_VERSION)
+                .await
+                .unwrap();
             assert_eq!(peer_id, client_peer_id);
             assert_eq!(peer_role, PeerRole::ValidatorFullNode);
         };

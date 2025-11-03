@@ -12,10 +12,7 @@ use accudo_consensus_types::{
     common::{Payload, ProofWithData},
     proof_of_store::BatchInfo,
 };
-use accudo_crypto::{
-    ed25519::{Ed25519PrivateKey, Ed25519Signature},
-    HashValue, PrivateKey, Uniform,
-};
+use accudo_crypto::{ed25519::Ed25519PrivateKey, pq::Dilithium3KeyPair, HashValue};
 use accudo_transaction_filters::{
     block_transaction_filter::{BlockTransactionFilter, BlockTransactionMatcher},
     transaction_filter::TransactionMatcher,
@@ -39,9 +36,12 @@ fn test_no_vote_on_denied_inline_transactions() {
 
         // Create a block filter config that denies the first transaction sender
         let block_txn_filter = BlockTransactionFilter::empty()
-            .add_multiple_matchers_filter(false, vec![BlockTransactionMatcher::Transaction(
-                TransactionMatcher::Sender(transactions[0].sender()),
-            )])
+            .add_multiple_matchers_filter(
+                false,
+                vec![BlockTransactionMatcher::Transaction(
+                    TransactionMatcher::Sender(transactions[0].sender()),
+                )],
+            )
             .add_all_filter(true);
         let block_txn_filter_config = BlockTransactionFilterConfig::new(true, block_txn_filter);
 
@@ -161,9 +161,12 @@ fn test_vote_on_no_filter_matches() {
 
         // Create a block filter config that denies the first transaction sender
         let block_txn_filter = BlockTransactionFilter::empty()
-            .add_multiple_matchers_filter(false, vec![BlockTransactionMatcher::Transaction(
-                TransactionMatcher::Sender(transactions[0].sender()),
-            )])
+            .add_multiple_matchers_filter(
+                false,
+                vec![BlockTransactionMatcher::Transaction(
+                    TransactionMatcher::Sender(transactions[0].sender()),
+                )],
+            )
             .add_all_filter(true);
         let block_txn_filter_config = BlockTransactionFilterConfig::new(true, block_txn_filter);
 
@@ -262,12 +265,11 @@ fn create_test_transactions() -> Vec<SignedTransaction> {
 
         // Create a signed transaction
         let private_key = Ed25519PrivateKey::generate_for_testing();
-        let public_key = private_key.public_key();
-        let signed_transaction = SignedTransaction::new(
-            raw_transaction,
-            public_key,
-            Ed25519Signature::dummy_signature(),
-        );
+        let pq_keypair = Dilithium3KeyPair::generate().expect("pq key generation");
+        let signed_transaction = raw_transaction
+            .sign_dual_with_dilithium(Some(&private_key), &pq_keypair)
+            .expect("dual signing")
+            .into_inner();
 
         // Add the signed transaction to the list
         transactions.push(signed_transaction);

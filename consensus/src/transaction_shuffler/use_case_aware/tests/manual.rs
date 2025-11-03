@@ -7,7 +7,7 @@ use crate::transaction_shuffler::use_case_aware::{
     tests::{Account, Contract},
     Config,
 };
-use accudo_crypto::{ed25519::Ed25519PrivateKey, PrivateKey, SigningKey, Uniform};
+use accudo_crypto::{ed25519::Ed25519PrivateKey, pq::Dilithium3KeyPair, PrivateKey};
 use accudo_types::{
     account_address::AccountAddress,
     chain_id::ChainId,
@@ -29,6 +29,17 @@ const A1: Account = Account(1);
 const A2: Account = Account(2);
 const A3: Account = Account(3);
 const A4: Account = Account(4);
+
+fn sign_with_pq(
+    raw_txn: RawTransaction,
+    ed_priv: &Ed25519PrivateKey,
+    pq_keypair: &Dilithium3KeyPair,
+) -> SignedTransaction {
+    raw_txn
+        .sign_dual_with_dilithium(Some(ed_priv), pq_keypair)
+        .expect("dual signing for test transaction")
+        .into_inner()
+}
 
 fn assert_shuffle_result(
     config: Config,
@@ -217,18 +228,22 @@ fn test_spread_sender_within_use_case() {
 fn test_different_transaction_types() {
     // Create test accounts with private keys
     let sender1_private_key = Ed25519PrivateKey::generate_for_testing();
+    let sender1_pq_keypair = Dilithium3KeyPair::generate().expect("sender1 pq key");
     let sender1_public_key = sender1_private_key.public_key();
     let sender1 = AccountAddress::from_str("0x1").unwrap();
 
     let sender2_private_key = Ed25519PrivateKey::generate_for_testing();
+    let sender2_pq_keypair = Dilithium3KeyPair::generate().expect("sender2 pq key");
     let sender2_public_key = sender2_private_key.public_key();
     let sender2 = AccountAddress::from_str("0x2").unwrap();
 
     let sender3_private_key = Ed25519PrivateKey::generate_for_testing();
+    let sender3_pq_keypair = Dilithium3KeyPair::generate().expect("sender3 pq key");
     let sender3_public_key = sender3_private_key.public_key();
     let sender3 = AccountAddress::from_str("0x3").unwrap();
 
     let sender4_private_key = Ed25519PrivateKey::generate_for_testing();
+    let sender4_pq_keypair = Dilithium3KeyPair::generate().expect("sender4 pq key");
     let sender4_public_key = sender4_private_key.public_key();
     let sender4 = AccountAddress::from_str("0x4").unwrap();
 
@@ -255,8 +270,7 @@ fn test_different_transaction_types() {
         u64::MAX,
         ChainId::test(),
     );
-    let signature = sender1_private_key.sign(&raw_txn).unwrap();
-    let signed_txn = SignedTransaction::new(raw_txn, sender1_public_key.clone(), signature);
+    let signed_txn = sign_with_pq(raw_txn, &sender1_private_key, &sender1_pq_keypair);
     transactions.push(signed_txn);
 
     // Contract entry function with Payload
@@ -284,8 +298,7 @@ fn test_different_transaction_types() {
         u64::MAX,
         ChainId::test(),
     );
-    let signature = sender1_private_key.sign(&raw_txn).unwrap();
-    let signed_txn = SignedTransaction::new(raw_txn, sender1_public_key.clone(), signature);
+    let signed_txn = sign_with_pq(raw_txn, &sender1_private_key, &sender1_pq_keypair);
     transactions.push(signed_txn);
 
     // Sender 2: Mix of script and multisig transactions
@@ -300,8 +313,7 @@ fn test_different_transaction_types() {
         u64::MAX,
         ChainId::test(),
     );
-    let signature = sender2_private_key.sign(&raw_txn).unwrap();
-    let signed_txn = SignedTransaction::new(raw_txn, sender2_public_key.clone(), signature);
+    let signed_txn = sign_with_pq(raw_txn, &sender2_private_key, &sender2_pq_keypair);
     transactions.push(signed_txn);
 
     // Multisig transaction with Payload
@@ -330,8 +342,7 @@ fn test_different_transaction_types() {
         u64::MAX,
         ChainId::test(),
     );
-    let signature = sender2_private_key.sign(&raw_txn).unwrap();
-    let signed_txn = SignedTransaction::new(raw_txn, sender2_public_key.clone(), signature);
+    let signed_txn = sign_with_pq(raw_txn, &sender2_private_key, &sender2_pq_keypair);
     transactions.push(signed_txn);
 
     let multisig_payload = TransactionPayload::Payload(TransactionPayloadInner::V1 {
@@ -350,8 +361,7 @@ fn test_different_transaction_types() {
         u64::MAX,
         ChainId::test(),
     );
-    let signature = sender2_private_key.sign(&raw_txn).unwrap();
-    let signed_txn = SignedTransaction::new(raw_txn, sender2_public_key.clone(), signature);
+    let signed_txn = sign_with_pq(raw_txn, &sender2_private_key, &sender2_pq_keypair);
     transactions.push(signed_txn);
 
     // Sender 3: Mix of platform and script transactions
@@ -372,8 +382,7 @@ fn test_different_transaction_types() {
         u64::MAX,
         ChainId::test(),
     );
-    let signature = sender3_private_key.sign(&raw_txn).unwrap();
-    let signed_txn = SignedTransaction::new(raw_txn, sender3_public_key.clone(), signature);
+    let signed_txn = sign_with_pq(raw_txn, &sender3_private_key, &sender3_pq_keypair);
     transactions.push(signed_txn);
 
     let multisig_payload = TransactionPayload::Payload(TransactionPayloadInner::V1 {
@@ -400,8 +409,7 @@ fn test_different_transaction_types() {
         u64::MAX,
         ChainId::test(),
     );
-    let signature = sender3_private_key.sign(&raw_txn).unwrap();
-    let signed_txn = SignedTransaction::new(raw_txn, sender3_public_key.clone(), signature);
+    let signed_txn = sign_with_pq(raw_txn, &sender3_private_key, &sender3_pq_keypair);
     transactions.push(signed_txn);
 
     // Platform entry function with Payload
@@ -429,8 +437,7 @@ fn test_different_transaction_types() {
         u64::MAX,
         ChainId::test(),
     );
-    let signature = sender3_private_key.sign(&raw_txn).unwrap();
-    let signed_txn = SignedTransaction::new(raw_txn, sender3_public_key.clone(), signature);
+    let signed_txn = sign_with_pq(raw_txn, &sender3_private_key, &sender3_pq_keypair);
     transactions.push(signed_txn);
 
     // Sender 4: Mix of contract and multisig transactions
@@ -453,8 +460,7 @@ fn test_different_transaction_types() {
         u64::MAX,
         ChainId::test(),
     );
-    let signature = sender4_private_key.sign(&raw_txn).unwrap();
-    let signed_txn = SignedTransaction::new(raw_txn, sender4_public_key.clone(), signature);
+    let signed_txn = sign_with_pq(raw_txn, &sender4_private_key, &sender4_pq_keypair);
     transactions.push(signed_txn);
 
     // Multisig transaction
@@ -483,8 +489,7 @@ fn test_different_transaction_types() {
         u64::MAX,
         ChainId::test(),
     );
-    let signature = sender4_private_key.sign(&raw_txn).unwrap();
-    let signed_txn = SignedTransaction::new(raw_txn, sender4_public_key.clone(), signature);
+    let signed_txn = sign_with_pq(raw_txn, &sender4_private_key, &sender4_pq_keypair);
     transactions.push(signed_txn);
 
     // Add another transaction for sender 4 with Payload multisig
@@ -513,8 +518,7 @@ fn test_different_transaction_types() {
         u64::MAX,
         ChainId::test(),
     );
-    let signature = sender4_private_key.sign(&raw_txn).unwrap();
-    let signed_txn = SignedTransaction::new(raw_txn, sender4_public_key.clone(), signature);
+    let signed_txn = sign_with_pq(raw_txn, &sender4_private_key, &sender4_pq_keypair);
     transactions.push(signed_txn);
 
     // Create config with different spread factors

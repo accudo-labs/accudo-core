@@ -165,6 +165,7 @@ where
         listener_network_context,
         time_service.clone(),
         listener_key,
+        None,
         listener_auth_mode,
         HANDSHAKE_VERSION,
         chain_id,
@@ -177,6 +178,7 @@ where
         dialer_network_context,
         time_service.clone(),
         dialer_key,
+        None,
         dialer_auth_mode,
         HANDSHAKE_VERSION,
         chain_id,
@@ -207,7 +209,11 @@ async fn write_read_msg(socket: &mut impl TSocket, msg: &[u8]) -> Bytes {
 /// `"/memory/<port>/noise-ik/<pubkey>/handshake/<version>"`
 fn expect_memory_noise_addr(addr: &NetworkAddress) {
     assert!(
-        matches!(addr.as_slice(), [Memory(_), NoiseIK(_), Handshake(_)]),
+        matches!(
+            addr.as_slice(),
+            [Memory(_), NoiseIK(_), Handshake(_)]
+                | [Memory(_), NoiseIK(_), NoiseKyber(_), Handshake(_)]
+        ),
         "addr: '{}'",
         addr
     );
@@ -217,7 +223,11 @@ fn expect_memory_noise_addr(addr: &NetworkAddress) {
 /// `"/ip4/<ipaddr>/tcp/<port>/noise-ik/<pubkey>/handshake/<version>"`
 fn expect_ip4_tcp_noise_addr(addr: &NetworkAddress) {
     assert!(
-        matches!(addr.as_slice(), [Ip4(_), Tcp(_), NoiseIK(_), Handshake(_)]),
+        matches!(
+            addr.as_slice(),
+            [Ip4(_), Tcp(_), NoiseIK(_), Handshake(_)]
+                | [Ip4(_), Tcp(_), NoiseIK(_), NoiseKyber(_), Handshake(_)]
+        ),
         "addr: '{}'",
         addr
     );

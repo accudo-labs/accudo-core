@@ -125,11 +125,14 @@ fn main() -> Result<()> {
             continue;
         }
 
-        report.insert(package_name, InventoryEntry {
-            manifest_path,
-            crates: hits.into_iter().collect(),
-            categories: categories.into_iter().collect(),
-        });
+        report.insert(
+            package_name,
+            InventoryEntry {
+                manifest_path,
+                crates: hits.into_iter().collect(),
+                categories: categories.into_iter().collect(),
+            },
+        );
     }
 
     print_report(&report);

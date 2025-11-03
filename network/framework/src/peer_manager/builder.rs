@@ -19,7 +19,7 @@ use crate::{
 };
 use accudo_channels::{self, accudo_channel, message_queues::QueueStyle};
 use accudo_config::{config::HANDSHAKE_VERSION, network_id::NetworkContext};
-use accudo_crypto::x25519;
+use accudo_crypto::{pq::KyberPrivateKey, x25519};
 use accudo_logger::prelude::*;
 #[cfg(any(test, feature = "testing", feature = "fuzzing"))]
 use accudo_netcore::transport::memory::MemoryTransport;
@@ -40,10 +40,16 @@ pub enum AuthenticationMode {
     /// if the `PeerId` is known it will be authenticated against it's `PublicKey`
     /// Otherwise, the incoming connections will be allowed through in the common
     /// pool of unknown peers.
-    MaybeMutual(x25519::PrivateKey),
+    MaybeMutual {
+        network_private_key: x25519::PrivateKey,
+        post_quantum_private_key: Option<KyberPrivateKey>,
+    },
     /// Both dialer and listener will verify public keys of each other in the
     /// handshake.
-    Mutual(x25519::PrivateKey),
+    Mutual {
+        network_private_key: x25519::PrivateKey,
+        post_quantum_private_key: Option<KyberPrivateKey>,
+    },
 }
 
 struct TransportContext {
@@ -251,16 +257,23 @@ impl PeerManagerBuilder {
         let chain_id = transport_context.chain_id;
         let enable_proxy_protocol = transport_context.enable_proxy_protocol;
 
-        let (key, auth_mode) = match transport_context.authentication_mode {
-            AuthenticationMode::MaybeMutual(key) => (
-                key,
-                HandshakeAuthMode::maybe_mutual(transport_context.peers_and_metadata),
-            ),
-            AuthenticationMode::Mutual(key) => (
-                key,
-                HandshakeAuthMode::mutual(transport_context.peers_and_metadata),
-            ),
-        };
+        let ((network_private_key, post_quantum_private_key), auth_mode) =
+            match transport_context.authentication_mode {
+                AuthenticationMode::MaybeMutual {
+                    network_private_key,
+                    post_quantum_private_key,
+                } => (
+                    (network_private_key, post_quantum_private_key),
+                    HandshakeAuthMode::maybe_mutual(transport_context.peers_and_metadata),
+                ),
+                AuthenticationMode::Mutual {
+                    network_private_key,
+                    post_quantum_private_key,
+                } => (
+                    (network_private_key, post_quantum_private_key),
+                    HandshakeAuthMode::mutual(transport_context.peers_and_metadata),
+                ),
+            };
 
         let mut accudo_tcp_transport = ACCUDO_TCP_TRANSPORT.clone();
         let tcp_cfg = self.get_tcp_buffers_cfg();
@@ -273,7 +286,8 @@ impl PeerManagerBuilder {
                         accudo_tcp_transport,
                         self.network_context,
                         self.time_service.clone(),
-                        key,
+                        network_private_key,
+                        post_quantum_private_key,
                         auth_mode,
                         HANDSHAKE_VERSION,
                         chain_id,
@@ -289,7 +303,8 @@ impl PeerManagerBuilder {
                     MemoryTransport,
                     self.network_context,
                     self.time_service.clone(),
-                    key,
+                    network_private_key,
+                    post_quantum_private_key,
                     auth_mode,
                     HANDSHAKE_VERSION,
                     chain_id,

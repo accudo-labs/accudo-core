@@ -43,7 +43,7 @@ fn network_address_with_pubkey(
     addr_str: &'static str,
     pubkey: x25519::PublicKey,
 ) -> NetworkAddress {
-    network_address(addr_str).append_prod_protos(pubkey, HANDSHAKE_VERSION)
+    network_address(addr_str).append_prod_protos_with_pq(pubkey, None, HANDSHAKE_VERSION)
 }
 
 fn test_peer(index: AccountAddress) -> (PeerId, Peer, x25519::PublicKey, NetworkAddress) {

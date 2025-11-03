@@ -5,12 +5,16 @@
 use crate::{
     config::{
         identity_config::{Identity, IdentityFromStorage},
+        keys::ConfigKey,
         Error, IdentityBlob,
     },
     network_id::NetworkId,
     utils,
 };
-use accudo_crypto::{x25519, Uniform};
+use accudo_crypto::{
+    pq::{KyberKeyPair, KyberPrivateKey},
+    x25519, Uniform,
+};
 use accudo_secure_storage::{CryptoStorage, KVStorage, Storage};
 use accudo_short_hex_str::AsShortHexStr;
 use accudo_types::{
@@ -187,7 +191,7 @@ impl NetworkConfig {
 
     pub fn identity_key(&self) -> x25519::PrivateKey {
         let key = match &self.identity {
-            Identity::FromConfig(config) => Some(config.key.private_key()),
+            Identity::FromConfig(config) => Some(config.private_key()),
             Identity::FromStorage(config) => {
                 let storage: Storage = (&config.backend).into();
                 let key = storage
@@ -211,6 +215,16 @@ impl NetworkConfig {
             identity
         } else {
             panic!("Invalid identity found, expected a storage identity.");
+        }
+    }
+
+    pub fn identity_post_quantum_key(&self) -> Option<KyberPrivateKey> {
+        match &self.identity {
+            Identity::FromConfig(config) => config.pq_private_key(),
+            Identity::FromFile(config) => IdentityBlob::from_file(&config.path)
+                .ok()
+                .and_then(|blob| blob.network_post_quantum_private_key),
+            _ => None,
         }
     }
 
@@ -282,6 +296,12 @@ impl NetworkConfig {
             Identity::FromConfig(config) => {
                 if config.peer_id == PeerId::ZERO {
                     config.peer_id = from_identity_public_key(config.key.public_key());
+                }
+                if config.pq_key.is_none() {
+                    let pq_key = KyberKeyPair::generate()
+                        .expect("failed to generate Kyber keypair")
+                        .private;
+                    config.pq_key = Some(ConfigKey::new(pq_key));
                 }
             },
             Identity::FromFile(_) => (),

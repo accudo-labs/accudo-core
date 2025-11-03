@@ -245,7 +245,7 @@ mod tests {
         >,
     ) {
         let validator_address =
-            NetworkAddress::mock().append_prod_protos(pubkey, HANDSHAKE_VERSION);
+            NetworkAddress::mock().append_prod_protos_with_pq(pubkey, None, HANDSHAKE_VERSION);
         let addresses = vec![validator_address];
         let validator_encoded_addresses = bcs::to_bytes(&addresses).unwrap();
         let fullnode_encoded_addresses = bcs::to_bytes(&addresses).unwrap();
@@ -267,10 +267,13 @@ mod tests {
         );
         let payload = OnChainConfigPayload::new(1, InMemoryOnChainConfig::new(configs));
         reconfig_tx
-            .push((), ReconfigNotification {
-                version: 1,
-                on_chain_configs: payload,
-            })
+            .push(
+                (),
+                ReconfigNotification {
+                    version: 1,
+                    on_chain_configs: payload,
+                },
+            )
             .unwrap();
     }
 

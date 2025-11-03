@@ -672,6 +672,18 @@ impl ProposalGenerator {
             .await
             .context("Fail to retrieve payload")?;
 
+        if let Payload::DirectMempool(txns) = &mut payload {
+            let original_len = txns.len();
+            txns.retain(|txn| txn.has_post_quantum_signature());
+            let dropped = original_len - txns.len();
+            if dropped > 0 {
+                warn!(
+                    "[ProposalGenerator] Dropped {} non post-quantum transactions from direct mempool payload",
+                    dropped
+                );
+            }
+        }
+
         if !payload.is_direct()
             && max_txns_from_block_to_execute.is_some()
             && max_txns_from_block_to_execute.is_some_and(|v| payload.len() as u64 > v)
@@ -803,13 +815,11 @@ impl ProposalGenerator {
                 execution_backpressure_applied = true;
             }
         }
-        EXECUTION_BACKPRESSURE_ON_PROPOSAL_TRIGGERED.observe(
-            if execution_backpressure_applied {
-                1.0
-            } else {
-                0.0
-            },
-        );
+        EXECUTION_BACKPRESSURE_ON_PROPOSAL_TRIGGERED.observe(if execution_backpressure_applied {
+            1.0
+        } else {
+            0.0
+        });
 
         let max_block_txns_after_filtering = values_max_block_txns_after_filtering
             .into_iter()

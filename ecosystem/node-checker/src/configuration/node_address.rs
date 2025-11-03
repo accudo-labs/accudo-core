@@ -155,6 +155,6 @@ impl NodeAddress {
         );
 
         // Build a network address, including the public key and protocol.
-        Ok(NetworkAddress::from(socket_addr).append_prod_protos(public_key, 0))
+        Ok(NetworkAddress::from(socket_addr).append_prod_protos_with_pq(public_key, None, 0))
     }
 }

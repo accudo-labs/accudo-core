@@ -7,7 +7,7 @@ use crate::{
     block_executor::config::BlockExecutorConfigFromOnchain,
     chain_id::ChainId,
     transaction::{
-        authenticator::AccountAuthenticator,
+        authenticator::{AccountAuthenticator, AnyPublicKey, AnySignature},
         signature_verified_transaction::{
             into_signature_verified_block, SignatureVerifiedTransaction,
         },
@@ -15,7 +15,7 @@ use crate::{
         TransactionPayload,
     },
 };
-use accudo_crypto::{ed25519::*, traits::*};
+use accudo_crypto::{ed25519::*, pq::Dilithium3KeyPair, signing_message, traits::*};
 
 const MAX_GAS_AMOUNT: u64 = 1_000_000;
 const TEST_GAS_PRICE: u64 = 100;
@@ -46,6 +46,32 @@ pub fn get_test_signed_transaction(
     gas_unit_price: u64,
     max_gas_amount: Option<u64>,
 ) -> SignedTransaction {
+    debug_assert_eq!(public_key, private_key.public_key());
+    let pq_keypair = Dilithium3KeyPair::generate().expect("dilithium keypair generation");
+    get_test_signed_transaction_dual(
+        sender,
+        sequence_number,
+        private_key,
+        &pq_keypair,
+        payload,
+        expiration_timestamp_secs,
+        gas_unit_price,
+        max_gas_amount,
+    )
+}
+
+/// Version of [`get_test_signed_transaction`] that attaches a Dilithium signature alongside the
+/// classical signature. This is useful for PQ-aware test scenarios.
+pub fn get_test_signed_transaction_dual(
+    sender: AccountAddress,
+    sequence_number: u64,
+    private_key: &Ed25519PrivateKey,
+    pq_keypair: &Dilithium3KeyPair,
+    payload: Option<TransactionPayload>,
+    expiration_timestamp_secs: u64,
+    gas_unit_price: u64,
+    max_gas_amount: Option<u64>,
+) -> SignedTransaction {
     let raw_txn = RawTransaction::new(
         sender,
         sequence_number,
@@ -58,9 +84,10 @@ pub fn get_test_signed_transaction(
         ChainId::test(),
     );
 
-    let signature = private_key.sign(&raw_txn).unwrap();
-
-    SignedTransaction::new(raw_txn, public_key, signature)
+    raw_txn
+        .sign_dual_with_dilithium(Some(private_key), pq_keypair)
+        .expect("dual signing for test transaction")
+        .into_inner()
 }
 
 // Test helper for creating transactions for which the signature hasn't been checked.
@@ -99,6 +126,7 @@ fn get_test_unchecked_transaction_(
     max_gas_amount: Option<u64>,
     chain_id: ChainId,
 ) -> SignedTransaction {
+    debug_assert_eq!(public_key, private_key.public_key());
     let raw_txn = RawTransaction::new(
         sender,
         sequence_number,
@@ -109,9 +137,11 @@ fn get_test_unchecked_transaction_(
         chain_id,
     );
 
-    let signature = private_key.sign(&raw_txn).unwrap();
-
-    SignedTransaction::new(raw_txn, public_key, signature)
+    let pq_keypair = Dilithium3KeyPair::generate().expect("dilithium keypair generation");
+    raw_txn
+        .sign_dual_with_dilithium(Some(private_key), &pq_keypair)
+        .expect("dual signing for test transaction")
+        .into_inner()
 }
 
 // Test helper for transaction creation. Short version for get_test_signed_transaction
@@ -181,15 +211,41 @@ pub fn get_test_unchecked_multi_agent_txn(
     let message =
         RawTransactionWithData::new_multi_agent(raw_txn.clone(), secondary_signers.clone());
 
-    let sender_signature = sender_private_key.sign(&message).unwrap();
-    let sender_authenticator = AccountAuthenticator::ed25519(sender_public_key, sender_signature);
+    let signing_bytes = signing_message(&message).expect("multi-agent signing message");
 
-    let mut secondary_authenticators = vec![];
-    for i in 0..secondary_public_keys.len() {
-        let signature = secondary_private_keys[i].sign(&message).unwrap();
-        secondary_authenticators.push(AccountAuthenticator::ed25519(
-            secondary_public_keys[i].clone(),
-            signature,
+    let sender_pq_keypair = Dilithium3KeyPair::generate().expect("sender Dilithium keypair");
+    let sender_pq_signature = sender_pq_keypair
+        .sign(&signing_bytes)
+        .expect("sender Dilithium signing");
+    let sender_signature = sender_private_key.sign(&message).unwrap();
+    let sender_authenticator = AccountAuthenticator::single_key_dual(
+        Some((
+            AnyPublicKey::ed25519(sender_public_key.clone()),
+            AnySignature::ed25519(sender_signature),
+        )),
+        sender_pq_signature.scheme,
+        sender_pq_keypair.public_key().to_vec(),
+        sender_pq_signature,
+    );
+
+    let mut secondary_authenticators = Vec::with_capacity(secondary_public_keys.len());
+    for (priv_key, pub_key) in secondary_private_keys
+        .into_iter()
+        .zip(secondary_public_keys)
+    {
+        let classical_signature = priv_key.sign(&message).unwrap();
+        let pq_keypair = Dilithium3KeyPair::generate().expect("secondary Dilithium keypair");
+        let pq_signature = pq_keypair
+            .sign(&signing_bytes)
+            .expect("secondary Dilithium signing");
+        secondary_authenticators.push(AccountAuthenticator::single_key_dual(
+            Some((
+                AnyPublicKey::ed25519(pub_key.clone()),
+                AnySignature::ed25519(classical_signature),
+            )),
+            pq_signature.scheme,
+            pq_keypair.public_key().to_vec(),
+            pq_signature,
         ));
     }
 
@@ -208,6 +264,7 @@ pub fn get_test_txn_with_chain_id(
     public_key: Ed25519PublicKey,
     chain_id: ChainId,
 ) -> SignedTransaction {
+    debug_assert_eq!(public_key, private_key.public_key());
     let expiration_time = expiration_time(10);
     let raw_txn = RawTransaction::new_script(
         sender,
@@ -219,9 +276,11 @@ pub fn get_test_txn_with_chain_id(
         chain_id,
     );
 
-    let signature = private_key.sign(&raw_txn).unwrap();
-
-    SignedTransaction::new(raw_txn, public_key, signature)
+    let pq_keypair = Dilithium3KeyPair::generate().expect("dilithium keypair generation");
+    raw_txn
+        .sign_dual_with_dilithium(Some(private_key), &pq_keypair)
+        .expect("dual signing for test transaction")
+        .into_inner()
 }
 
 pub fn block(user_txns: Vec<Transaction>) -> Vec<SignatureVerifiedTransaction> {

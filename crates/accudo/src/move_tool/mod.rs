@@ -239,24 +239,30 @@ impl FrameworkPackageArgs {
         // Add the framework dependency if it's provided
         let mut dependencies = BTreeMap::new();
         if let Some(ref path) = self.framework_local_dir {
-            dependencies.insert(ACCUDO_FRAMEWORK.to_string(), Dependency {
-                local: Some(path.display().to_string()),
-                git: None,
-                rev: None,
-                subdir: None,
-                accudo: None,
-                address: None,
-            });
+            dependencies.insert(
+                ACCUDO_FRAMEWORK.to_string(),
+                Dependency {
+                    local: Some(path.display().to_string()),
+                    git: None,
+                    rev: None,
+                    subdir: None,
+                    accudo: None,
+                    address: None,
+                },
+            );
         } else {
             let git_rev = self.framework_git_rev.as_deref().unwrap_or(DEFAULT_BRANCH);
-            dependencies.insert(ACCUDO_FRAMEWORK.to_string(), Dependency {
-                local: None,
-                git: Some(ACCUDO_GIT_PATH.to_string()),
-                rev: Some(git_rev.to_string()),
-                subdir: Some(SUBDIR_PATH.to_string()),
-                accudo: None,
-                address: None,
-            });
+            dependencies.insert(
+                ACCUDO_FRAMEWORK.to_string(),
+                Dependency {
+                    local: None,
+                    git: Some(ACCUDO_GIT_PATH.to_string()),
+                    rev: Some(git_rev.to_string()),
+                    subdir: Some(SUBDIR_PATH.to_string()),
+                    accudo: None,
+                    address: None,
+                },
+            );
         }
 
         let manifest = MovePackageManifest {
