@@ -114,10 +114,20 @@ impl Identity {
     }
 
     pub fn from_storage(key_name: String, peer_id_name: String, backend: SecureBackend) -> Self {
+        Self::from_storage_with_pq(key_name, peer_id_name, None, backend)
+    }
+
+    pub fn from_storage_with_pq(
+        key_name: String,
+        peer_id_name: String,
+        pq_key_name: Option<String>,
+        backend: SecureBackend,
+    ) -> Self {
         Identity::FromStorage(IdentityFromStorage {
             backend,
             key_name,
             peer_id_name,
+            pq_key_name,
         })
     }
 
@@ -196,6 +206,8 @@ pub struct IdentityFromStorage {
     pub backend: SecureBackend,
     pub key_name: String,
     pub peer_id_name: String,
+    #[serde(default)]
+    pub pq_key_name: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq, Serialize)]

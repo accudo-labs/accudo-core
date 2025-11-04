@@ -227,10 +227,18 @@ impl TryFrom<&ValidatorNodeConfig> for ValidatorConfiguration {
             validator_network_public_key: Some(
                 private_identity.validator_network_private_key.public_key(),
             ),
+            validator_network_post_quantum_public_key: private_identity
+                .validator_network_post_quantum_private_key
+                .as_ref()
+                .map(accudo_crypto::PrivateKey::public_key),
             validator_host: Some(validator_host),
             full_node_network_public_key: Some(
                 private_identity.full_node_network_private_key.public_key(),
             ),
+            full_node_network_post_quantum_public_key: private_identity
+                .full_node_network_post_quantum_private_key
+                .as_ref()
+                .map(accudo_crypto::PrivateKey::public_key),
             full_node_host,
             stake_amount: config.genesis_stake_amount,
             commission_percentage: config.commission_percentage,

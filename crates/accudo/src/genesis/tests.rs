@@ -387,8 +387,14 @@ async fn create_employee_vesting_accounts_file(
                     consensus_public_key: operator_identity.consensus_public_key,
                     proof_of_possession: operator_identity.consensus_proof_of_possession,
                     validator_network_public_key: operator_identity.validator_network_public_key,
+                    validator_network_post_quantum_public_key: operator_identity
+                        .validator_network_post_quantum_public_key
+                        .clone(),
                     validator_host: Some(HostAndPort::from_str("localhost:8080").unwrap()),
                     full_node_network_public_key: operator_identity.full_node_network_public_key,
+                    full_node_network_post_quantum_public_key: operator_identity
+                        .full_node_network_post_quantum_public_key
+                        .clone(),
                     full_node_host: Some(HostAndPort::from_str("localhost:8081").unwrap()),
                     stake_amount: 2 * INITIAL_BALANCE,
                     commission_percentage: 0,
@@ -405,8 +411,10 @@ async fn create_employee_vesting_accounts_file(
                     consensus_public_key: None,
                     proof_of_possession: None,
                     validator_network_public_key: None,
+                    validator_network_post_quantum_public_key: None,
                     validator_host: None,
                     full_node_network_public_key: None,
+                    full_node_network_post_quantum_public_key: None,
                     full_node_host: None,
                     stake_amount: 2 * INITIAL_BALANCE,
                     commission_percentage: 0,

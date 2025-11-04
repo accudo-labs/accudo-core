@@ -25,7 +25,9 @@ use accudo_backup_cli::{
     utils::GlobalRestoreOpt,
 };
 use accudo_cached_packages::accudo_stdlib;
-use accudo_crypto::{bls12381, bls12381::PublicKey, x25519, ValidCryptoMaterialStringExt};
+use accudo_crypto::{
+    bls12381, bls12381::PublicKey, pq::KyberPublicKey, x25519, ValidCryptoMaterialStringExt,
+};
 use accudo_genesis::config::{HostAndPort, OperatorConfiguration};
 use accudo_logger::Level;
 use accudo_network_checker::args::{
@@ -194,6 +196,10 @@ pub struct ValidatorNetworkAddressesArgs {
     #[clap(long, value_parser = x25519::PublicKey::from_encoded_string)]
     pub(crate) validator_network_public_key: Option<x25519::PublicKey>,
 
+    /// Validator Kyber public network key
+    #[clap(long, value_parser = KyberPublicKey::from_encoded_string)]
+    pub(crate) validator_network_post_quantum_public_key: Option<KyberPublicKey>,
+
     /// Host and port pair for the fullnode
     ///
     /// e.g. 127.0.0.1:6180.  Optional
@@ -203,6 +209,10 @@ pub struct ValidatorNetworkAddressesArgs {
     /// Full node x25519 public network key
     #[clap(long, value_parser = x25519::PublicKey::from_encoded_string)]
     pub(crate) full_node_network_public_key: Option<x25519::PublicKey>,
+
+    /// Full node Kyber public network key
+    #[clap(long, value_parser = KyberPublicKey::from_encoded_string)]
+    pub(crate) full_node_network_post_quantum_public_key: Option<KyberPublicKey>,
 }
 
 impl ValidatorNetworkAddressesArgs {
@@ -212,6 +222,8 @@ impl ValidatorNetworkAddressesArgs {
     ) -> CliTypedResult<(
         x25519::PublicKey,
         Option<x25519::PublicKey>,
+        Option<KyberPublicKey>,
+        Option<KyberPublicKey>,
         &'a HostAndPort,
         Option<&'a HostAndPort>,
     )> {
@@ -227,11 +239,29 @@ impl ValidatorNetworkAddressesArgs {
                 ));
             };
 
+        let validator_network_post_quantum_public_key =
+            if let Some(public_key) = self.validator_network_post_quantum_public_key {
+                Some(public_key)
+            } else if let Some(operator_config) = operator_config {
+                operator_config.validator_network_post_quantum_public_key
+            } else {
+                None
+            };
+
         let full_node_network_public_key =
             if let Some(public_key) = self.full_node_network_public_key {
                 Some(public_key)
             } else if let Some(operator_config) = operator_config {
                 operator_config.full_node_network_public_key
+            } else {
+                None
+            };
+
+        let full_node_network_post_quantum_public_key =
+            if let Some(public_key) = self.full_node_network_post_quantum_public_key {
+                Some(public_key)
+            } else if let Some(operator_config) = operator_config {
+                operator_config.full_node_network_post_quantum_public_key
             } else {
                 None
             };
@@ -257,6 +287,8 @@ impl ValidatorNetworkAddressesArgs {
         Ok((
             validator_network_public_key,
             full_node_network_public_key,
+            validator_network_post_quantum_public_key,
+            full_node_network_post_quantum_public_key,
             validator_host,
             full_node_host,
         ))
@@ -619,16 +651,20 @@ impl CliCommand<TransactionSummary> for InitializeValidator {
         let (
             validator_network_public_key,
             full_node_network_public_key,
+            validator_pq_public_key,
+            full_node_pq_public_key,
             validator_host,
             full_node_host,
         ) = self
             .validator_network_addresses_args
             .get_network_configs(&operator_config)?;
-        let validator_network_addresses =
-            vec![validator_host.as_network_address(validator_network_public_key)?];
+        let validator_network_addresses = vec![validator_host
+            .as_network_address(validator_network_public_key, validator_pq_public_key)?];
         let full_node_network_addresses =
             match (full_node_host.as_ref(), full_node_network_public_key) {
-                (Some(host), Some(public_key)) => vec![host.as_network_address(public_key)?],
+                (Some(host), Some(public_key)) => {
+                    vec![host.as_network_address(public_key, full_node_pq_public_key)?]
+                },
                 (None, None) => vec![],
                 _ => {
                     return Err(CliError::CommandArgumentError(
@@ -1117,16 +1153,25 @@ impl CliCommand<TransactionSummary> for UpdateValidatorNetworkAddresses {
         let (
             validator_network_public_key,
             full_node_network_public_key,
+            validator_network_post_quantum_public_key,
+            full_node_network_post_quantum_public_key,
             validator_host,
             full_node_host,
         ) = self
             .validator_network_addresses_args
             .get_network_configs(&validator_config)?;
-        let validator_network_addresses =
-            vec![validator_host.as_network_address(validator_network_public_key)?];
+        let validator_network_addresses = vec![validator_host.as_network_address(
+            validator_network_public_key,
+            validator_network_post_quantum_public_key,
+        )?];
         let full_node_network_addresses =
             match (full_node_host.as_ref(), full_node_network_public_key) {
-                (Some(host), Some(public_key)) => vec![host.as_network_address(public_key)?],
+                (Some(host), Some(public_key)) => {
+                    vec![host.as_network_address(
+                        public_key,
+                        full_node_network_post_quantum_public_key,
+                    )?]
+                },
                 (None, None) => vec![],
                 _ => {
                     return Err(CliError::CommandArgumentError(

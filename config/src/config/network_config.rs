@@ -224,6 +224,13 @@ impl NetworkConfig {
             Identity::FromFile(config) => IdentityBlob::from_file(&config.path)
                 .ok()
                 .and_then(|blob| blob.network_post_quantum_private_key),
+            Identity::FromStorage(config) => config.pq_key_name.as_ref().and_then(|name| {
+                let storage: Storage = (&config.backend).into();
+                storage
+                    .get::<KyberPrivateKey>(name)
+                    .ok()
+                    .map(|res| res.value)
+            }),
             _ => None,
         }
     }
@@ -286,7 +293,20 @@ impl NetworkConfig {
 
     fn prepare_identity(&mut self) {
         match &mut self.identity {
-            Identity::FromStorage(_) => (),
+            Identity::FromStorage(config) => {
+                let pq_key_name = config
+                    .pq_key_name
+                    .get_or_insert_with(|| format!("{}_pq", config.key_name));
+                let mut storage: Storage = (&config.backend).into();
+                if storage.get::<KyberPrivateKey>(pq_key_name).is_err() {
+                    let pq_key = KyberKeyPair::generate()
+                        .expect("failed to generate Kyber keypair")
+                        .private;
+                    storage
+                        .set(pq_key_name, pq_key)
+                        .expect("Unable to store network post-quantum private key");
+                }
+            },
             Identity::None => {
                 let mut rng = StdRng::from_seed(OsRng.r#gen());
                 let key = x25519::PrivateKey::generate(&mut rng);

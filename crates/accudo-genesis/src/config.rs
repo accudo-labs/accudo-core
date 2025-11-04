@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use accudo_config::config::HANDSHAKE_VERSION;
-use accudo_crypto::{bls12381, ed25519::Ed25519PublicKey, x25519};
+use accudo_crypto::{bls12381, ed25519::Ed25519PublicKey, pq::KyberPublicKey, x25519};
 use accudo_types::{
     account_address::{AccountAddress, AccountAddressWithChecks},
     chain_id::ChainId,
@@ -154,12 +154,18 @@ pub struct ValidatorConfiguration {
     /// Public key used for validator network identity (same as account address)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub validator_network_public_key: Option<x25519::PublicKey>,
+    /// Kyber public key used for validator network identity.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub validator_network_post_quantum_public_key: Option<KyberPublicKey>,
     /// Host for validator which can be an IP or a DNS name
     #[serde(skip_serializing_if = "Option::is_none")]
     pub validator_host: Option<HostAndPort>,
     /// Public key used for full node network identity (same as account address)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub full_node_network_public_key: Option<x25519::PublicKey>,
+    /// Kyber public key used for full node network identity.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub full_node_network_post_quantum_public_key: Option<KyberPublicKey>,
     /// Host for full node which can be an IP or a DNS name and is optional
     #[serde(skip_serializing_if = "Option::is_none")]
     pub full_node_host: Option<HostAndPort>,
@@ -192,28 +198,51 @@ impl TryFrom<ValidatorConfiguration> for Validator {
 
     fn try_from(config: ValidatorConfiguration) -> Result<Self, Self::Error> {
         let validator_addresses = if let Some(validator_host) = config.validator_host {
-            if let Some(validator_network_public_key) = config.validator_network_public_key {
-                vec![validator_host
-                    .as_network_address(validator_network_public_key)
-                    .unwrap()]
-            } else {
-                return Err(anyhow::Error::msg(
-                    "Validator addresses specified, but not validator network key",
-                ));
+            match (
+                config.validator_network_public_key,
+                config.validator_network_post_quantum_public_key,
+            ) {
+                (Some(validator_network_public_key), Some(validator_pq_public_key)) => {
+                    vec![validator_host
+                        .as_network_address(
+                            validator_network_public_key,
+                            Some(validator_pq_public_key),
+                        )
+                        .unwrap()]
+                },
+                (None, _) => {
+                    return Err(anyhow::Error::msg(
+                        "Validator addresses specified, but not validator network key",
+                    ));
+                },
+                (_, None) => {
+                    return Err(anyhow::Error::msg(
+                        "Validator addresses specified, but not validator post-quantum network key",
+                    ));
+                },
             }
         } else {
             vec![]
         };
 
         let full_node_addresses = if let Some(full_node_host) = config.full_node_host {
-            if let Some(full_node_network_key) = config.full_node_network_public_key {
-                vec![full_node_host
-                    .as_network_address(full_node_network_key)
-                    .unwrap()]
-            } else {
-                return Err(anyhow::Error::msg(
-                    "Full node host specified, but not full node network key",
-                ));
+            match (
+                config.full_node_network_public_key,
+                config.full_node_network_post_quantum_public_key,
+            ) {
+                (Some(full_node_network_key), Some(full_node_pq_key)) => vec![full_node_host
+                    .as_network_address(full_node_network_key, Some(full_node_pq_key))
+                    .unwrap()],
+                (None, _) => {
+                    return Err(anyhow::Error::msg(
+                        "Full node host specified, but not full node network key",
+                    ));
+                },
+                (_, None) => {
+                    return Err(anyhow::Error::msg(
+                        "Full node host specified, but not full node post-quantum network key",
+                    ));
+                },
             }
         } else {
             vec![]
@@ -290,7 +319,11 @@ impl HostAndPort {
         })
     }
 
-    pub fn as_network_address(&self, key: x25519::PublicKey) -> anyhow::Result<NetworkAddress> {
+    pub fn as_network_address(
+        &self,
+        key: x25519::PublicKey,
+        pq_key: Option<KyberPublicKey>,
+    ) -> anyhow::Result<NetworkAddress> {
         let host = self.host.to_string();
 
         // Since DnsName supports IPs as well, let's properly fix what the type is
@@ -303,14 +336,19 @@ impl HostAndPort {
         };
         let port_protocol = Protocol::Tcp(self.port);
         let noise_protocol = Protocol::NoiseIK(key);
-        let handshake_protocol = Protocol::Handshake(HANDSHAKE_VERSION);
+        let mut protocols = vec![host_protocol, port_protocol, noise_protocol];
+        if HANDSHAKE_VERSION > 0 {
+            let pq_key = pq_key.ok_or_else(|| {
+                anyhow::anyhow!(
+                    "missing post-quantum network key for handshake version {}",
+                    HANDSHAKE_VERSION
+                )
+            })?;
+            protocols.push(Protocol::NoiseKyber(pq_key));
+        }
+        protocols.push(Protocol::Handshake(HANDSHAKE_VERSION));
 
-        Ok(NetworkAddress::try_from(vec![
-            host_protocol,
-            port_protocol,
-            noise_protocol,
-            handshake_protocol,
-        ])?)
+        Ok(NetworkAddress::try_from(protocols)?)
     }
 }
 
@@ -365,8 +403,12 @@ pub struct OperatorConfiguration {
     pub consensus_public_key: bls12381::PublicKey,
     pub consensus_proof_of_possession: bls12381::ProofOfPossession,
     pub validator_network_public_key: x25519::PublicKey,
+    #[serde(default)]
+    pub validator_network_post_quantum_public_key: Option<KyberPublicKey>,
     pub validator_host: HostAndPort,
     pub full_node_network_public_key: Option<x25519::PublicKey>,
+    #[serde(default)]
+    pub full_node_network_post_quantum_public_key: Option<KyberPublicKey>,
     pub full_node_host: Option<HostAndPort>,
 }
 
@@ -390,8 +432,10 @@ pub struct StringOperatorConfiguration {
     pub consensus_public_key: Option<String>,
     pub consensus_proof_of_possession: Option<String>,
     pub validator_network_public_key: Option<String>,
+    pub validator_network_post_quantum_public_key: Option<String>,
     pub validator_host: HostAndPort,
     pub full_node_network_public_key: Option<String>,
+    pub full_node_network_post_quantum_public_key: Option<String>,
     pub full_node_host: Option<HostAndPort>,
 }
 

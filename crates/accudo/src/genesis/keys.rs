@@ -227,6 +227,17 @@ impl CliCommand<()> for SetValidatorConfiguration {
             None
         };
 
+        let validator_network_post_quantum_public_key = operator_identity
+            .validator_network_post_quantum_public_key
+            .clone();
+        let full_node_network_post_quantum_public_key = if self.full_node_host.is_some() {
+            operator_identity
+                .full_node_network_post_quantum_public_key
+                .clone()
+        } else {
+            None
+        };
+
         // Build operator configuration file
         let operator_config = OperatorConfiguration {
             operator_account_address: operator_identity.account_address.into(),
@@ -234,8 +245,10 @@ impl CliCommand<()> for SetValidatorConfiguration {
             consensus_public_key,
             consensus_proof_of_possession,
             validator_network_public_key,
+            validator_network_post_quantum_public_key,
             validator_host: self.validator_host,
             full_node_network_public_key,
+            full_node_network_post_quantum_public_key,
             full_node_host: self.full_node_host,
         };
 

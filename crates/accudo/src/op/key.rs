@@ -98,9 +98,12 @@ impl CliCommand<HashMap<AccountAddress, Peer>> for ExtractPeer {
         let mut public_keys = HashSet::new();
         public_keys.insert(public_key);
 
-        let address = self.host.as_network_address(public_key).map_err(|err| {
-            CliError::UnexpectedError(format!("Failed to build network address: {}", err))
-        })?;
+        let address = self
+            .host
+            .as_network_address(public_key, None)
+            .map_err(|err| {
+                CliError::UnexpectedError(format!("Failed to build network address: {}", err))
+            })?;
 
         let peer = Peer::new(vec![address], public_keys, PeerRole::Upstream);
 

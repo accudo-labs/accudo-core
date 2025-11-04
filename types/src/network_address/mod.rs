@@ -926,11 +926,15 @@ fn parse_accudonet_protos(protos: &[Protocol]) -> Option<&[Protocol]> {
     // parse_noise_ik
 
     let auth_suffix = parse_noise_ik(transport_suffix).map(|x| x.1)?;
+    let handshake_suffix = match auth_suffix.split_first() {
+        Some((Protocol::NoiseKyber(_), remaining)) => remaining,
+        _ => auth_suffix,
+    };
 
     // parse handshake layer
-
-    // also ensures there are no trailing protos after handshake
-    parse_handshake(auth_suffix)?;
+    if parse_handshake(handshake_suffix).is_none() || handshake_suffix.len() != 1 {
+        return None;
+    }
 
     Some(protos)
 }

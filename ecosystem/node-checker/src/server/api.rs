@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 use super::{build::BaselineConfigurationRunners, common::ServerArgs};
 use crate::{configuration::NodeAddress, runner::Runner, CheckSummary};
-use accudo_crypto::{x25519, ValidCryptoMaterialStringExt};
+use accudo_crypto::{pq::KyberPublicKey, x25519, ValidCryptoMaterialStringExt};
 use accudo_logger::error;
 use anyhow::{anyhow, Context};
 use poem::http::StatusCode;
@@ -39,9 +39,11 @@ impl<R: Runner> Api<R> {
         api_port: Query<Option<u16>>,
         /// If given, we will assume that clients can communicate with your node via noise at the given port.
         noise_port: Query<Option<u16>>,
-        /// A public key for the node, e.g. 0x44fd1324c66371b4788af0b901c9eb8088781acb29e6b8b9c791d5d9838fbe1f.
+        /// An x25519 public key for the node, e.g. 0x44fd1324c66371b4788af0b901c9eb8088781acb29e6b8b9c791d5d9838fbe1f.
         /// This is only necessary for certain checkers, e.g. HandshakeChecker.
         public_key: Query<Option<String>>,
+        /// A Kyber post-quantum public key for the node, required for hybrid handshake checks.
+        pq_public_key: Query<Option<String>>,
     ) -> poem::Result<Json<CheckSummary>> {
         // Ensure the public key, if given, is in a valid format.
         let public_key = match public_key.0 {
@@ -51,6 +53,23 @@ impl<R: Runner> Api<R> {
                     return Err(poem::Error::from((
                         StatusCode::BAD_REQUEST,
                         anyhow!("Invalid public key \"{}\": {:#}", public_key, e),
+                    )))
+                },
+            },
+            None => None,
+        };
+
+        let pq_public_key = match pq_public_key.0 {
+            Some(pq_public_key) => match KyberPublicKey::from_encoded_string(&pq_public_key) {
+                Ok(public_key) => Some(public_key),
+                Err(e) => {
+                    return Err(poem::Error::from((
+                        StatusCode::BAD_REQUEST,
+                        anyhow!(
+                            "Invalid post-quantum public key \"{}\": {:#}",
+                            pq_public_key,
+                            e
+                        ),
                     )))
                 },
             },
@@ -84,6 +103,7 @@ impl<R: Runner> Api<R> {
             metrics_port.0,
             noise_port.0,
             public_key,
+            pq_public_key,
         );
 
         let complete_evaluation_result = baseline_configuration

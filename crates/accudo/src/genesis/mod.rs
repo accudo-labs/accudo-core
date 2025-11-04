@@ -440,8 +440,10 @@ fn get_config(
             consensus_public_key: None,
             proof_of_possession: None,
             validator_network_public_key: None,
+            validator_network_post_quantum_public_key: None,
             validator_host: None,
             full_node_network_public_key: None,
+            full_node_network_post_quantum_public_key: None,
             full_node_host: None,
             stake_amount,
             commission_percentage,
@@ -485,11 +487,23 @@ fn get_config(
         "validator_network_public_key",
         |str| parse_key(ED25519_PUBLIC_KEY_LENGTH, str),
     )?;
+    let validator_network_post_quantum_public_key = parse_optional_option(
+        &operator_config.validator_network_post_quantum_public_key,
+        operator_file,
+        "validator_network_post_quantum_public_key",
+        |str| parse_key(KYBER_PUBLIC_KEY_LENGTH, str),
+    )?;
     let full_node_network_public_key = parse_optional_option(
         &operator_config.full_node_network_public_key,
         operator_file,
         "full_node_network_public_key",
         |str| parse_key(ED25519_PUBLIC_KEY_LENGTH, str),
+    )?;
+    let full_node_network_post_quantum_public_key = parse_optional_option(
+        &operator_config.full_node_network_post_quantum_public_key,
+        operator_file,
+        "full_node_network_post_quantum_public_key",
+        |str| parse_key(KYBER_PUBLIC_KEY_LENGTH, str),
     )?;
 
     // Verify owner & operator agree on operator
@@ -525,8 +539,10 @@ fn get_config(
         consensus_public_key: Some(consensus_public_key),
         proof_of_possession: Some(consensus_proof_of_possession),
         validator_network_public_key: Some(validator_network_public_key),
+        validator_network_post_quantum_public_key,
         validator_host: Some(operator_config.validator_host),
         full_node_network_public_key,
+        full_node_network_post_quantum_public_key,
         full_node_host: operator_config.full_node_host,
         stake_amount,
         commission_percentage,

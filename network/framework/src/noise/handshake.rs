@@ -176,6 +176,11 @@ impl NoiseUpgrader {
         }
     }
 
+    /// Returns the configured Kyber public key, if hybrid mode is enabled.
+    pub fn post_quantum_public_key(&self) -> Option<KyberPublicKey> {
+        self.noise_config.post_quantum_public_key().cloned()
+    }
+
     /// Perform an outbound protocol upgrade on this connection.
     ///
     /// This runs the "client" side of the Noise IK handshake to establish a

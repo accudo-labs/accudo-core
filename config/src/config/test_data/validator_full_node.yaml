@@ -22,6 +22,7 @@ full_node_networks:
           type: "from_storage"
           key_name: "fullnode_network"
           peer_id_name: "owner_account"
+          pq_key_name: "fullnode_network_pq"
           backend:
               type: "vault"
               server: "https://127.0.0.1:8200"

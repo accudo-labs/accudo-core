@@ -69,10 +69,15 @@ pub fn validator_swarm_for_testing(nodes: usize) -> ValidatorSwarm {
 /// and handshake protocol version.
 pub fn build_seed_for_network(seed_config: &NetworkConfig, seed_role: PeerRole) -> PeerSet {
     let seed_pubkey = accudo_crypto::PrivateKey::public_key(&seed_config.identity_key());
+    let seed_pq_pubkey = accudo_crypto::PrivateKey::public_key(
+        &seed_config
+            .identity_post_quantum_key()
+            .expect("seed network identity missing post-quantum key"),
+    );
     let seed_addr = seed_config
         .listen_address
         .clone()
-        .append_prod_protos_with_pq(seed_pubkey, None, HANDSHAKE_VERSION);
+        .append_prod_protos_with_pq(seed_pubkey, Some(seed_pq_pubkey), HANDSHAKE_VERSION);
 
     let mut keys = HashSet::new();
     keys.insert(seed_pubkey);

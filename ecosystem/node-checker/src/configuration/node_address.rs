@@ -1,7 +1,8 @@
 // Copyright © Accudo Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-use accudo_crypto::x25519;
+use accudo_config::config::HANDSHAKE_VERSION;
+use accudo_crypto::{pq::KyberPublicKey, x25519};
 use accudo_rest_client::Client as AccudoRestClient;
 use accudo_sdk::types::network_address::NetworkAddress;
 use anyhow::{anyhow, bail, Context, Result};
@@ -28,6 +29,9 @@ pub struct NodeAddress {
     /// Public key for the node. This is used for the HandshakeChecker.
     /// If that Checker is not enabled, this is not necessary.
     public_key: Option<x25519::PublicKey>,
+    /// Post-quantum public key for the node. Required when PQ handshakes are negotiated.
+    #[serde(default)]
+    pq_public_key: Option<KyberPublicKey>,
 
     // Cookie store.
     #[serde(skip)]
@@ -41,6 +45,7 @@ impl NodeAddress {
         metrics_port: Option<u16>,
         noise_port: Option<u16>,
         public_key: Option<x25519::PublicKey>,
+        pq_public_key: Option<KyberPublicKey>,
     ) -> Self {
         Self {
             url,
@@ -48,6 +53,7 @@ impl NodeAddress {
             metrics_port,
             noise_port,
             public_key,
+            pq_public_key,
             cookie_store: Arc::new(Jar::default()),
         }
     }
@@ -68,6 +74,10 @@ impl NodeAddress {
 
     pub fn get_public_key(&self) -> Option<x25519::PublicKey> {
         self.public_key
+    }
+
+    pub fn get_post_quantum_public_key(&self) -> Option<KyberPublicKey> {
+        self.pq_public_key.clone()
     }
 
     pub fn get_api_url(&self) -> Result<Url> {
@@ -154,7 +164,21 @@ impl NodeAddress {
                 .context("Can't build NetworkAddress without a noise port")?,
         );
 
+        let pq_public_key = if HANDSHAKE_VERSION > 0 {
+            Some(self.pq_public_key.clone().context(
+                "Cannot convert NodeAddress to NetworkAddress without a post-quantum public key",
+            )?)
+        } else {
+            None
+        };
+
         // Build a network address, including the public key and protocol.
-        Ok(NetworkAddress::from(socket_addr).append_prod_protos_with_pq(public_key, None, 0))
+        Ok(
+            NetworkAddress::from(socket_addr).append_prod_protos_with_pq(
+                public_key,
+                pq_public_key,
+                HANDSHAKE_VERSION,
+            ),
+        )
     }
 }

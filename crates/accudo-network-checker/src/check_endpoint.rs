@@ -6,7 +6,10 @@ use accudo_config::{
     config::{Error, RoleType, HANDSHAKE_VERSION},
     network_id::{NetworkContext, NetworkId},
 };
-use accudo_crypto::x25519::{self, PRIVATE_KEY_SIZE};
+use accudo_crypto::{
+    pq::KyberKeyPair,
+    x25519::{self, PRIVATE_KEY_SIZE},
+};
 use accudo_network::{
     noise::{HandshakeAuthMode, NoiseUpgrader},
     protocols::wire::handshake::v1::ProtocolIdSet,
@@ -94,12 +97,21 @@ async fn check_endpoint_with_handshake(
 
     // The peer id doesn't matter because we don't validate it.
     let remote_peer_id = account_address::from_identity_public_key(remote_pubkey);
+    let remote_pq_pubkey = address.as_slice().iter().find_map(|proto| {
+        if let accudo_types::network_address::Protocol::NoiseKyber(pubkey) = proto {
+            Some(pubkey.clone())
+        } else {
+            None
+        }
+    });
+
     let conn = upgrade_outbound(
         upgrade_context,
         fut_socket,
         address.clone(),
         remote_peer_id,
         remote_pubkey,
+        remote_pq_pubkey,
     )
     .await
     .map_err(|error| {
@@ -171,12 +183,17 @@ fn build_upgrade_context(
     let mut supported_protocols = BTreeMap::new();
     supported_protocols.insert(SUPPORTED_MESSAGING_PROTOCOL, ProtocolIdSet::all_known());
 
+    let pq_private_key = KyberKeyPair::generate()
+        .expect("failed to generate Kyber keypair for network checker")
+        .private;
+
     // Build the noise and network handshake, without running a full Noise server
     // with listener.
     Arc::new(UpgradeContext::new(
         NoiseUpgrader::new(
             network_context,
             private_key,
+            Some(pq_private_key),
             // If we had an incoming message, auth mode would matter.
             HandshakeAuthMode::server_only(&[network_id]),
         ),
