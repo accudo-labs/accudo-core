@@ -10,6 +10,7 @@ use crate::{
 use accudo_crypto::{
     ed25519::{self, Ed25519PublicKey, ED25519_PUBLIC_KEY_LENGTH, ED25519_SIGNATURE_LENGTH},
     multi_ed25519::{self, MultiEd25519PublicKey, BITMAP_NUM_OF_BYTES, MAX_NUM_OF_KEYS},
+    pq::{SchemeId, SignatureBundle},
     secp256k1_ecdsa, secp256r1_ecdsa,
     secp256r1_ecdsa::PUBLIC_KEY_LENGTH,
     ValidCryptoMaterial,
@@ -27,14 +28,14 @@ use accudo_types::{
     transaction::{
         authenticator::{
             AbstractAuthenticator, AccountAuthenticator, AnyPublicKey, AnySignature, MultiKey,
-            MultiKeyAuthenticator, SingleKeyAuthenticator, TransactionAuthenticator,
-            MAX_NUM_OF_SIGS,
+            MultiKeyAuthenticator, PostQuantumPublicKey, SingleKeyAuthenticator,
+            TransactionAuthenticator, MAX_NUM_OF_SIGS,
         },
         webauthn::{PartialAuthenticatorAssertionResponse, MAX_WEBAUTHN_SIGNATURE_BYTES},
         Script, SignedTransaction, TransactionOutput, TransactionWithProof,
     },
 };
-use anyhow::{bail, Context as AnyhowContext, Result};
+use anyhow::{anyhow, bail, Context as AnyhowContext, Result};
 use bcs::to_bytes;
 use once_cell::sync::Lazy;
 use poem_openapi::{Object, Union};
@@ -1587,6 +1588,48 @@ impl FederatedKeyless {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Object)]
+pub struct PostQuantumSignature {
+    /// Algorithm identifier, e.g. `dilithium3`.
+    pub scheme: String,
+    /// Hex-encoded PQ public key bytes.
+    pub public_key: HexEncodedBytes,
+    /// Hex-encoded PQ signature bytes.
+    pub signature: HexEncodedBytes,
+}
+
+impl PostQuantumSignature {
+    fn parse_scheme(&self) -> Result<SchemeId> {
+        match self.scheme.to_ascii_lowercase().as_str() {
+            "dilithium3" | "dilithium-3" => Ok(SchemeId::Dilithium3),
+            "dilithium2" | "dilithium-2" => Ok(SchemeId::Dilithium2),
+            "dilithium5" | "dilithium-5" => Ok(SchemeId::Dilithium5),
+            "falcon512" | "falcon-512" => Ok(SchemeId::Falcon512),
+            _ => Err(anyhow!(
+                "Unsupported post-quantum signature scheme: {}",
+                self.scheme
+            )),
+        }
+    }
+
+    fn to_components(&self) -> Result<(PostQuantumPublicKey, SignatureBundle)> {
+        let scheme = self.parse_scheme()?;
+        let public_key = PostQuantumPublicKey::new(scheme, self.public_key.inner().to_vec());
+        let signature = SignatureBundle::new(scheme, self.signature.inner().to_vec());
+        Ok((public_key, signature))
+    }
+}
+
+impl From<(&PostQuantumPublicKey, &SignatureBundle)> for PostQuantumSignature {
+    fn from((public_key, signature): (&PostQuantumPublicKey, &SignatureBundle)) -> Self {
+        PostQuantumSignature {
+            scheme: public_key.scheme().to_string(),
+            public_key: public_key.as_bytes().to_vec().into(),
+            signature: signature.bytes().to_vec().into(),
+        }
+    }
+}
+
 impl TryFrom<&Signature> for AnySignature {
     type Error = anyhow::Error;
 
@@ -1679,10 +1722,21 @@ impl From<&AnyPublicKey> for PublicKey {
 pub struct SingleKeySignature {
     pub public_key: PublicKey,
     pub signature: Signature,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[oai(default, skip_serializing_if = "Option::is_none")]
+    pub post_quantum: Option<PostQuantumSignature>,
 }
 
 impl VerifyInput for SingleKeySignature {
     fn verify(&self) -> anyhow::Result<()> {
+        let requires_pq = matches!(
+            self.public_key,
+            PublicKey::Ed25519(_) | PublicKey::Secp256k1Ecdsa(_) | PublicKey::Secp256r1Ecdsa(_)
+        );
+        if requires_pq && self.post_quantum.is_none() {
+            bail!("Post-quantum signature is required for classical public keys");
+        }
+
         match (&self.public_key, &self.signature) {
             (PublicKey::Ed25519(p), Signature::Ed25519(s)) => Ed25519Signature {
                 public_key: p.value.clone(),
@@ -1712,7 +1766,12 @@ impl VerifyInput for SingleKeySignature {
             }
             .verify(),
             _ => bail!("Invalid public key, signature match."),
+        }?;
+
+        if let Some(pq) = &self.post_quantum {
+            let _ = pq.to_components()?;
         }
+        Ok(())
     }
 }
 
@@ -1729,76 +1788,40 @@ impl TryFrom<&SingleKeySignature> for AccountAuthenticator {
     type Error = anyhow::Error;
 
     fn try_from(value: &SingleKeySignature) -> Result<Self, Self::Error> {
-        let key =
-            match value.public_key {
-                PublicKey::Ed25519(ref p) => {
-                    let key =
-                        p.value.inner().try_into().context(
-                            "Failed to parse given public_key bytes as Ed25519PublicKey",
-                        )?;
-                    AnyPublicKey::ed25519(key)
-                },
-                PublicKey::Secp256k1Ecdsa(ref p) => {
-                    let key = p.value.inner().try_into().context(
-                        "Failed to parse given public_key bytes as Secp256k1EcdsaPublicKey",
-                    )?;
-                    AnyPublicKey::secp256k1_ecdsa(key)
-                },
-                PublicKey::Secp256r1Ecdsa(ref p) => {
-                    let key = p.value.inner().try_into().context(
-                        "Failed to parse given public_key bytes as Secp256r1EcdsaPublicKey",
-                    )?;
-                    AnyPublicKey::secp256r1_ecdsa(key)
-                },
-                PublicKey::Keyless(ref p) => {
-                    let key = p.value.inner().try_into().context(
-                        "Failed to parse given public_key bytes as AnyPublicKey::Keyless",
-                    )?;
-                    AnyPublicKey::keyless(key)
-                },
-                PublicKey::FederatedKeyless(ref p) => {
-                    let key = p.value.inner().try_into().context(
-                        "Failed to parse given public_key bytes as AnyPublicKey::FederatedKeyless",
-                    )?;
-                    AnyPublicKey::keyless(key)
-                },
-            };
+        let key: AnyPublicKey = (&value.public_key).try_into()?;
+        let signature: AnySignature = (&value.signature).try_into()?;
 
-        let signature = match value.signature {
-            Signature::Ed25519(ref s) => {
-                let signature = s
-                    .value
-                    .inner()
-                    .try_into()
-                    .context("Failed to parse given signature bytes as Ed25519Signature")?;
-                AnySignature::ed25519(signature)
+        let authenticator = match &value.post_quantum {
+            Some(pq) => {
+                let (pq_public_key, pq_signature) = pq.to_components()?;
+                SingleKeyAuthenticator::with_post_quantum(
+                    key,
+                    signature,
+                    pq_public_key,
+                    pq_signature,
+                )
             },
-            Signature::Secp256k1Ecdsa(ref s) => {
-                let signature =
-                    s.value.inner().try_into().context(
-                        "Failed to parse given signature bytes as Secp256k1EcdsaSignature",
-                    )?;
-                AnySignature::secp256k1_ecdsa(signature)
-            },
-            Signature::WebAuthn(ref s) => {
-                let signature = s
-                    .value
-                    .inner()
-                    .try_into()
-                    .context( "Failed to parse given signature bytes as PartialAuthenticatorAssertionResponse")?;
-                AnySignature::webauthn(signature)
-            },
-            Signature::Keyless(ref s) => {
-                let signature =
-                    s.value.inner().try_into().context(
-                        "Failed to parse given signature bytes as AnySignature::Keyless",
-                    )?;
-                AnySignature::keyless(signature)
-            },
+            None => SingleKeyAuthenticator::new(key, signature),
         };
 
-        let auth = SingleKeyAuthenticator::new(key, signature);
-        Ok(AccountAuthenticator::single_key(auth))
+        Ok(AccountAuthenticator::single_key(authenticator))
+    }
+}
+
+impl From<&SingleKeyAuthenticator> for SingleKeySignature {
+    fn from(authenticator: &SingleKeyAuthenticator) -> Self {
+        let mut signature = SingleKeySignature {
+            public_key: PublicKey::from(authenticator.public_key()),
+            signature: Signature::from(authenticator.signature()),
+            post_quantum: None,
+        };
+        if let (Some(pq_key), Some(pq_sig)) = (
+            authenticator.post_quantum_public_key(),
+            authenticator.post_quantum_signature(),
+        ) {
+            signature.post_quantum = Some(PostQuantumSignature::from((pq_key, pq_sig)));
+        }
+        signature
     }
 }
 
@@ -2162,10 +2185,9 @@ impl From<&AccountAuthenticator> for AccountSignature {
                 public_key,
                 signature,
             } => Self::MultiEd25519Signature((public_key, signature).into()),
-            SingleKey { authenticator } => Self::SingleKeySignature(SingleKeySignature {
-                public_key: authenticator.public_key().into(),
-                signature: authenticator.signature().into(),
-            }),
+            SingleKey { authenticator } => {
+                Self::SingleKeySignature(SingleKeySignature::from(authenticator))
+            },
             MultiKey { authenticator } => {
                 let public_keys = authenticator.public_keys();
                 let signatures = authenticator.signatures();

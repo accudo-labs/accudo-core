@@ -201,6 +201,30 @@ pub static CORE_MEMPOOL_GAS_UPGRADED_TXNS: Lazy<IntCounter> = Lazy::new(|| {
     .unwrap()
 });
 
+pub static CORE_MEMPOOL_PQ_SIGNATURE_PRESENT: Lazy<IntCounter> = Lazy::new(|| {
+    register_int_counter!(
+        "accudo_core_mempool_pq_signature_present_total",
+        "Number of transactions that provided required post-quantum signature material"
+    )
+    .unwrap()
+});
+
+pub static CORE_MEMPOOL_PQ_SIGNATURE_MISSING: Lazy<IntCounter> = Lazy::new(|| {
+    register_int_counter!(
+        "accudo_core_mempool_pq_signature_missing_total",
+        "Number of transactions rejected due to missing post-quantum signature material"
+    )
+    .unwrap()
+});
+
+pub fn core_mempool_inc_pq_signature_present() {
+    CORE_MEMPOOL_PQ_SIGNATURE_PRESENT.inc();
+}
+
+pub fn core_mempool_inc_pq_signature_missing() {
+    CORE_MEMPOOL_PQ_SIGNATURE_MISSING.inc();
+}
+
 pub fn core_mempool_txn_commit_latency(
     stage: &'static str,
     submitted_by: &'static str,

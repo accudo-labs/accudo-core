@@ -38,7 +38,7 @@ use std::{
 //   configurations of the system, we'll leave it here for now.
 /// Current supported protocol negotiation handshake version. See
 /// [`accudo_network::protocols::wire::v1`](../../network/protocols/wire/handshake/v1/index.html).
-pub const HANDSHAKE_VERSION: u8 = 0;
+pub const HANDSHAKE_VERSION: u8 = 1;
 pub const NETWORK_CHANNEL_SIZE: usize = 1024;
 pub const PING_INTERVAL_MS: u64 = 10_000;
 pub const PING_TIMEOUT_MS: u64 = 20_000;

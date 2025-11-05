@@ -42,6 +42,9 @@ pub const TXN_COMMIT_FAILED_TXN_EXPIRATION_TOO_FAR_IN_FUTURE_LABEL: &str =
 /// Transaction commit was unsuccessful, but will be retried
 pub const TXN_COMMIT_RETRY_LABEL: &str = "retry";
 
+pub const PQ_SIGNATURE_LABEL_COMPLIANT: &str = "compliant";
+pub const PQ_SIGNATURE_LABEL_MISSING: &str = "missing";
+
 fn gas_buckets() -> Vec<f64> {
     exponential_buckets(
         /*start=*/ 1.0, /*factor=*/ 1.5, /*count=*/ 30,
@@ -139,6 +142,19 @@ pub static COMMITTED_TXNS_COUNT: Lazy<IntCounterVec> = Lazy::new(|| {
     )
     .unwrap()
 });
+
+pub static PQ_SIGNATURE_BLOCKS: Lazy<IntCounterVec> = Lazy::new(|| {
+    register_int_counter_vec!(
+        "accudo_consensus_pq_signature_blocks_total",
+        "Count of blocks evaluated for post-quantum signature enforcement",
+        &["status"]
+    )
+    .unwrap()
+});
+
+pub fn consensus_inc_pq_signature_block(status: &'static str) {
+    PQ_SIGNATURE_BLOCKS.with_label_values(&[status]).inc();
+}
 
 //////////////////////
 // PROPOSAL VOTE COUNTERS

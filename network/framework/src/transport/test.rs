@@ -9,7 +9,13 @@ use crate::{
     transport::*,
 };
 use accudo_config::config::{Peer, PeerRole, PeerSet, HANDSHAKE_VERSION};
-use accudo_crypto::{test_utils::TEST_SEED, traits::Uniform, x25519, x25519::PrivateKey};
+use accudo_crypto::{
+    pq::{KyberKeyPair, KyberPublicKey},
+    test_utils::TEST_SEED,
+    traits::Uniform,
+    x25519,
+    x25519::PrivateKey,
+};
 use accudo_netcore::{
     framing::{read_u16frame, write_u16frame},
     transport::{memory, ConnectionOrigin, Transport},
@@ -32,10 +38,16 @@ fn add_trusted_peer(
     trusted_peers: &mut PeerSet,
     peer_id: PeerId,
     private_key: &x25519::PrivateKey,
+    pq_public_key: KyberPublicKey,
     role: PeerRole,
 ) {
     let pubkey_set = [private_key.public_key()].iter().copied().collect();
-    let peer = Peer::new(Vec::new(), pubkey_set, role);
+    let addr = NetworkAddress::mock().append_prod_protos_with_pq(
+        private_key.public_key(),
+        Some(pq_public_key),
+        HANDSHAKE_VERSION,
+    );
+    let peer = Peer::new(vec![addr], pubkey_set, role);
     trusted_peers.insert(peer_id, peer);
 }
 
@@ -69,6 +81,8 @@ where
     let mut rng = StdRng::from_seed(TEST_SEED);
     let listener_key = x25519::PrivateKey::generate(&mut rng);
     let dialer_key = x25519::PrivateKey::generate(&mut rng);
+    let listener_pq_key = KyberKeyPair::generate().expect("listener Kyber key generation");
+    let dialer_pq_key = KyberKeyPair::generate().expect("dialer Kyber key generation");
 
     let (
         listener_network_context,
@@ -87,11 +101,13 @@ where
             let dialer = (
                 dialer_network_context.peer_id(),
                 &dialer_key,
+                dialer_pq_key.public.clone(),
                 PeerRole::Validator,
             );
             let listener = (
                 listener_network_context.peer_id(),
                 &listener_key,
+                listener_pq_key.public.clone(),
                 PeerRole::Validator,
             );
             insert_trusted_peers(&peers_and_metadata, network_id, vec![dialer, listener]);
@@ -118,11 +134,13 @@ where
             let dialer = (
                 dialer_network_context.peer_id(),
                 &dialer_key,
+                dialer_pq_key.public.clone(),
                 PeerRole::Validator,
             );
             let listener = (
                 listener_network_context.peer_id(),
                 &listener_key,
+                listener_pq_key.public.clone(),
                 PeerRole::Validator,
             );
             insert_trusted_peers(&peers_and_metadata, network_id, vec![dialer, listener]);
@@ -146,6 +164,19 @@ where
 
             // Get the network ID
             let network_id = listener_network_context.network_id();
+            let dialer = (
+                dialer_network_context.peer_id(),
+                &dialer_key,
+                dialer_pq_key.public.clone(),
+                PeerRole::Validator,
+            );
+            let listener = (
+                listener_network_context.peer_id(),
+                &listener_key,
+                listener_pq_key.public.clone(),
+                PeerRole::Validator,
+            );
+            insert_trusted_peers(&peers_and_metadata, network_id, vec![dialer, listener]);
 
             (
                 listener_network_context,
@@ -165,7 +196,7 @@ where
         listener_network_context,
         time_service.clone(),
         listener_key,
-        None,
+        Some(listener_pq_key.private.clone()),
         listener_auth_mode,
         HANDSHAKE_VERSION,
         chain_id,
@@ -178,7 +209,7 @@ where
         dialer_network_context,
         time_service.clone(),
         dialer_key,
-        None,
+        Some(dialer_pq_key.private.clone()),
         dialer_auth_mode,
         HANDSHAKE_VERSION,
         chain_id,
@@ -211,8 +242,7 @@ fn expect_memory_noise_addr(addr: &NetworkAddress) {
     assert!(
         matches!(
             addr.as_slice(),
-            [Memory(_), NoiseIK(_), Handshake(_)]
-                | [Memory(_), NoiseIK(_), NoiseKyber(_), Handshake(_)]
+            [Memory(_), NoiseIK(_), NoiseKyber(_), Handshake(_)]
         ),
         "addr: '{}'",
         addr
@@ -225,8 +255,7 @@ fn expect_ip4_tcp_noise_addr(addr: &NetworkAddress) {
     assert!(
         matches!(
             addr.as_slice(),
-            [Ip4(_), Tcp(_), NoiseIK(_), Handshake(_)]
-                | [Ip4(_), Tcp(_), NoiseIK(_), NoiseKyber(_), Handshake(_)]
+            [Ip4(_), Tcp(_), NoiseIK(_), NoiseKyber(_), Handshake(_)]
         ),
         "addr: '{}'",
         addr
@@ -601,14 +630,20 @@ fn test_tcp_transport_rejects_unauthed_dialer() {
 fn insert_trusted_peers(
     peers_and_metadata: &Arc<PeersAndMetadata>,
     network_id: NetworkId,
-    peers: Vec<(AccountAddress, &PrivateKey, PeerRole)>,
+    peers: Vec<(AccountAddress, &PrivateKey, KyberPublicKey, PeerRole)>,
 ) {
     // Get a copy of the trusted peers
     let mut trusted_peers = peers_and_metadata.get_trusted_peers(&network_id).unwrap();
 
     // Insert the new peers
-    for (peer_address, private_key, peer_role) in peers {
-        add_trusted_peer(&mut trusted_peers, peer_address, private_key, peer_role);
+    for (peer_address, private_key, pq_public_key, peer_role) in peers {
+        add_trusted_peer(
+            &mut trusted_peers,
+            peer_address,
+            private_key,
+            pq_public_key,
+            peer_role,
+        );
     }
 
     // Update the trusted peers

@@ -3,18 +3,61 @@
 
 use crate::tests::{new_test_context, new_test_context_with_orderless_flags};
 use accudo_api_test_context::{current_function_name, pretty, TestContext};
-use accudo_crypto::ed25519::Ed25519Signature;
+use accudo_crypto::ed25519::{Ed25519PublicKey, Ed25519Signature};
 use accudo_types::{
     account_address::AccountAddress,
     transaction::{
-        authenticator::{AccountAuthenticator, TransactionAuthenticator},
+        authenticator::{
+            AccountAuthenticator, AnyPublicKey, AnySignature, TransactionAuthenticator,
+        },
         EntryFunction, ReplayProtector, SignedTransaction, TransactionPayload,
     },
 };
+use hex;
 use move_core_types::{ident_str, language_storage::ModuleId};
 use rstest::rstest;
-use serde_json::json;
+use serde_json::{json, Value};
 use std::path::PathBuf;
+
+fn extract_ed25519_components<'a>(
+    authenticator: &'a TransactionAuthenticator,
+) -> (&'a Ed25519PublicKey, &'a Ed25519Signature) {
+    match authenticator {
+        TransactionAuthenticator::Ed25519 {
+            public_key,
+            signature,
+        } => (public_key, signature),
+        TransactionAuthenticator::SingleSender { sender } => match sender {
+            AccountAuthenticator::SingleKey { authenticator } => {
+                match (authenticator.public_key(), authenticator.signature()) {
+                    (AnyPublicKey::Ed25519 { public_key }, AnySignature::Ed25519 { signature }) => {
+                        (public_key, signature)
+                    },
+                    _ => panic!("expected ed25519 components in single key authenticator"),
+                }
+            },
+            other => panic!("unexpected account authenticator variant: {:?}", other),
+        },
+        other => panic!("unexpected transaction authenticator variant: {:?}", other),
+    }
+}
+
+fn add_post_quantum_sidecar(request: &mut Value, authenticator: &TransactionAuthenticator) {
+    if let TransactionAuthenticator::SingleSender { sender } = authenticator {
+        if let AccountAuthenticator::SingleKey { authenticator } = sender {
+            if let (Some(pq_key), Some(pq_sig)) = (
+                authenticator.post_quantum_public_key(),
+                authenticator.post_quantum_signature(),
+            ) {
+                request["signature"]["post_quantum"] = json!({
+                    "scheme": pq_key.scheme().to_string(),
+                    "public_key": format!("0x{}", hex::encode(pq_key.as_bytes())),
+                    "signature": format!("0x{}", hex::encode(pq_sig.bytes())),
+                });
+            }
+        }
+    }
+}
 
 async fn simulate_accudo_transfer(
     context: &mut TestContext,
@@ -29,69 +72,71 @@ async fn simulate_accudo_transfer(
     context.commit_block(&vec![txn]).await;
 
     let txn = context.account_transfer_to(alice, bob.address(), transfer_amount);
-
-    if let TransactionAuthenticator::Ed25519 {
-        public_key,
-        signature,
-    } = txn.authenticator_ref()
-    {
-        let signature = if use_valid_signature {
-            signature.to_string()
-        } else {
-            Ed25519Signature::dummy_signature().to_string()
-        };
-
-        let mut request = json!({
-            "sender": txn.sender().to_string(),
-            "sequence_number": txn.sequence_number().to_string(),
-            "max_gas_amount": txn.max_gas_amount().to_string(),
-            "gas_unit_price": txn.gas_unit_price().to_string(),
-            "expiration_timestamp_secs": txn.expiration_timestamp_secs().to_string(),
-            "payload": {
-                "type": "entry_function_payload",
-                "function": "0x1::accudo_account::transfer",
-                "type_arguments": [],
-                "arguments": [
-                    bob.address().to_standard_string(), transfer_amount.to_string(),
-                ]
-            },
-            "signature": {
-                "type": "ed25519_signature",
-                "public_key": public_key.to_string(),
-                "signature": signature,
-            },
-        });
-
-        if context.use_orderless_transactions {
-            let nonce = match txn.replay_protector() {
-                ReplayProtector::SequenceNumber(_) => 0,
-                ReplayProtector::Nonce(nonce) => nonce,
-            };
-            request["replay_protection_nonce"] = json!(nonce.to_string());
-        }
-
-        let req = warp::test::request()
-            .method("POST")
-            .path("/v1/transactions/simulate")
-            .json(&request);
-        let resp = context.expect_status_code(expected_status).reply(req).await;
-        // Assert the gas used header is present if expected.
-        if assert_gas_used {
-            assert!(
-                resp.headers()
-                    .get("X-Accudo-Gas-Used")
-                    .unwrap()
-                    .to_str()
-                    .unwrap()
-                    .parse::<u64>()
-                    .unwrap()
-                    > 0
-            );
-        }
-        serde_json::from_slice(resp.body()).unwrap()
+    let (public_key, signature) = extract_ed25519_components(txn.authenticator_ref());
+    let signature = if use_valid_signature {
+        signature.to_string()
     } else {
-        unreachable!("Simulation uses Ed25519 authenticator.");
+        Ed25519Signature::dummy_signature().to_string()
+    };
+
+    let mut request = json!({
+        "sender": txn.sender().to_string(),
+        "sequence_number": txn.sequence_number().to_string(),
+        "max_gas_amount": txn.max_gas_amount().to_string(),
+        "gas_unit_price": txn.gas_unit_price().to_string(),
+        "expiration_timestamp_secs": txn.expiration_timestamp_secs().to_string(),
+        "payload": {
+            "type": "entry_function_payload",
+            "function": "0x1::accudo_account::transfer",
+            "type_arguments": [],
+            "arguments": [
+                bob.address().to_standard_string(), transfer_amount.to_string(),
+            ]
+        },
+        "signature": {
+            "type": "ed25519_signature",
+            "public_key": public_key.to_string(),
+            "signature": signature,
+        },
+    });
+
+    add_post_quantum_sidecar(&mut request, txn.authenticator_ref());
+
+    if context.use_orderless_transactions {
+        let nonce = match txn.replay_protector() {
+            ReplayProtector::SequenceNumber(_) => 0,
+            ReplayProtector::Nonce(nonce) => nonce,
+        };
+        request["replay_protection_nonce"] = json!(nonce.to_string());
     }
+
+    let req = warp::test::request()
+        .method("POST")
+        .path("/v1/transactions/simulate")
+        .json(&request);
+    let resp = context.expect_status_code(expected_status).reply(req).await;
+    if assert_gas_used {
+        assert!(
+            resp.headers()
+                .get("X-Accudo-Gas-Used")
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .parse::<u64>()
+                .unwrap()
+                > 0
+        );
+    }
+
+    let resp_json: serde_json::Value = serde_json::from_slice(resp.body()).unwrap();
+    if expected_status == 200 {
+        if context.use_orderless_transactions {
+            assert_eq!(resp_json["changes"].as_array().unwrap().len(), 2);
+        }
+        assert_eq!(resp_json["vm_status"], "Executed");
+        assert!(resp_json["gas_used"].as_u64().unwrap() > 0);
+    }
+    resp_json
 }
 
 async fn simulate_accudo_transfer_bcs(
@@ -319,45 +364,39 @@ async fn test_simulate_txn_with_aggregator(
                 context.use_orderless_transactions,
             ),
     );
-    if let TransactionAuthenticator::Ed25519 {
-        public_key,
-        signature: _,
-    } = txn.authenticator_ref()
-    {
-        let function = format!("{}::counter::increment_counter", account.address());
-        let mut request = json!({
-            "sender": txn.sender().to_string(),
-            "sequence_number": txn.sequence_number().to_string(),
-            "max_gas_amount": txn.max_gas_amount().to_string(),
-            "gas_unit_price": txn.gas_unit_price().to_string(),
-            "expiration_timestamp_secs": txn.expiration_timestamp_secs().to_string(),
-            "payload": {
-                "type": "entry_function_payload",
-                "function": function,
-                "type_arguments": [],
-                "arguments": []
-            },
-            "signature": {
-                "type": "ed25519_signature",
-                "public_key": public_key.to_string(),
-                "signature": Ed25519Signature::dummy_signature().to_string(),
-            },
-        });
-        if context.use_orderless_transactions {
-            let replay_protection_nonce = match txn.replay_protector() {
-                ReplayProtector::SequenceNumber(_) => 0,
-                ReplayProtector::Nonce(nonce) => nonce,
-            };
-            request["replay_protection_nonce"] = json!(replay_protection_nonce.to_string());
-        }
-        let resp = context
-            .expect_status_code(200)
-            .post("/transactions/simulate", request)
-            .await;
-        assert!(resp[0]["success"].as_bool().is_some_and(|v| v));
-    } else {
-        unreachable!("Simulation uses Ed25519 authenticator.");
+    let (public_key, _) = extract_ed25519_components(txn.authenticator_ref());
+    let function = format!("{}::counter::increment_counter", account.address());
+    let mut request = json!({
+        "sender": txn.sender().to_string(),
+        "sequence_number": txn.sequence_number().to_string(),
+        "max_gas_amount": txn.max_gas_amount().to_string(),
+        "gas_unit_price": txn.gas_unit_price().to_string(),
+        "expiration_timestamp_secs": txn.expiration_timestamp_secs().to_string(),
+        "payload": {
+            "type": "entry_function_payload",
+            "function": function,
+            "type_arguments": [],
+            "arguments": []
+        },
+        "signature": {
+            "type": "ed25519_signature",
+            "public_key": public_key.to_string(),
+            "signature": Ed25519Signature::dummy_signature().to_string(),
+        },
+    });
+    add_post_quantum_sidecar(&mut request, txn.authenticator_ref());
+    if context.use_orderless_transactions {
+        let replay_protection_nonce = match txn.replay_protector() {
+            ReplayProtector::SequenceNumber(_) => 0,
+            ReplayProtector::Nonce(nonce) => nonce,
+        };
+        request["replay_protection_nonce"] = json!(replay_protection_nonce.to_string());
     }
+    let resp = context
+        .expect_status_code(200)
+        .post("/transactions/simulate", request)
+        .await;
+    assert!(resp[0]["success"].as_bool().is_some_and(|v| v));
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -721,36 +760,30 @@ async fn test_simulate_txn_with_randomness() {
                 context.use_orderless_transactions,
             ),
     );
-    if let TransactionAuthenticator::Ed25519 {
-        public_key,
-        signature: _,
-    } = txn.authenticator_ref()
-    {
-        let function = format!("{}::rand::rand_integer", account.address());
-        let request = json!({
-            "sender": txn.sender().to_string(),
-            "sequence_number": txn.sequence_number().to_string(),
-            "max_gas_amount": txn.max_gas_amount().to_string(),
-            "gas_unit_price": txn.gas_unit_price().to_string(),
-            "expiration_timestamp_secs": txn.expiration_timestamp_secs().to_string(),
-            "payload": {
-                "type": "entry_function_payload",
-                "function": function,
-                "type_arguments": [],
-                "arguments": []
-            },
-            "signature": {
-                "type": "ed25519_signature",
-                "public_key": public_key.to_string(),
-                "signature": Ed25519Signature::dummy_signature().to_string(),
-            },
-        });
-        let resp = context
-            .expect_status_code(200)
-            .post("/transactions/simulate", request)
-            .await;
-        assert!(resp[0]["success"].as_bool().is_some_and(|v| v));
-    } else {
-        unreachable!("Simulation uses Ed25519 authenticator.");
-    }
+    let (public_key, _) = extract_ed25519_components(txn.authenticator_ref());
+    let function = format!("{}::rand::rand_integer", account.address());
+    let mut request = json!({
+        "sender": txn.sender().to_string(),
+        "sequence_number": txn.sequence_number().to_string(),
+        "max_gas_amount": txn.max_gas_amount().to_string(),
+        "gas_unit_price": txn.gas_unit_price().to_string(),
+        "expiration_timestamp_secs": txn.expiration_timestamp_secs().to_string(),
+        "payload": {
+            "type": "entry_function_payload",
+            "function": function,
+            "type_arguments": [],
+            "arguments": []
+        },
+        "signature": {
+            "type": "ed25519_signature",
+            "public_key": public_key.to_string(),
+            "signature": Ed25519Signature::dummy_signature().to_string(),
+        },
+    });
+    add_post_quantum_sidecar(&mut request, txn.authenticator_ref());
+    let resp = context
+        .expect_status_code(200)
+        .post("/transactions/simulate", request)
+        .await;
+    assert!(resp[0]["success"].as_bool().is_some_and(|v| v));
 }

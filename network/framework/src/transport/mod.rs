@@ -3,8 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{
+    counters,
     logging::NetworkSchema,
-    noise::{stream::NoiseStream, AntiReplayTimestamps, HandshakeAuthMode, NoiseUpgrader},
+    noise::{
+        error::NoiseHandshakeError, stream::NoiseStream, AntiReplayTimestamps, HandshakeAuthMode,
+        NoiseUpgrader,
+    },
     protocols::{
         identity::exchange_handshake,
         wire::handshake::v1::{HandshakeMsg, MessagingProtocolVersion, ProtocolIdSet},
@@ -15,6 +19,7 @@ use accudo_config::{
     network_id::{NetworkContext, NetworkId},
 };
 use accudo_crypto::{
+    noise::NoiseError,
     pq::{KyberPrivateKey, KyberPublicKey},
     traits::PrivateKey as _,
     x25519,
@@ -246,6 +251,24 @@ fn add_pp_addr(proxy_protocol_enabled: bool, error: io::Error, addr: &NetworkAdd
     }
 }
 
+fn is_post_quantum_negotiation_error(err: &NoiseHandshakeError) -> bool {
+    use NoiseError::{MissingPostQuantumKey, PostQuantumNegotiation};
+    use NoiseHandshakeError::{
+        BuildClientHandshakeMessageFailed, BuildServerHandshakeMessageFailed, ClientFinalizeFailed,
+        ServerParseClient,
+    };
+
+    match err {
+        BuildClientHandshakeMessageFailed(MissingPostQuantumKey | PostQuantumNegotiation) => true,
+        ClientFinalizeFailed(MissingPostQuantumKey | PostQuantumNegotiation) => true,
+        ServerParseClient(_, MissingPostQuantumKey | PostQuantumNegotiation) => true,
+        BuildServerHandshakeMessageFailed(_, MissingPostQuantumKey | PostQuantumNegotiation) => {
+            true
+        },
+        _ => false,
+    }
+}
+
 /// Upgrade an inbound connection. This means we run a Noise IK handshake for
 /// authentication and then negotiate common supported protocols. If
 /// `ctxt.noise.auth_mode` is `HandshakeAuthMode::Mutual( anti_replay_timestamps , trusted_peers )`,
@@ -284,6 +307,13 @@ async fn upgrade_inbound<T: TSocket>(
         .upgrade_inbound(socket, ctxt.handshake_version)
         .await
         .map_err(|err| {
+            if is_post_quantum_negotiation_error(&err) {
+                counters::inc_post_quantum_handshake_failure(
+                    &ctxt.noise.network_context,
+                    origin,
+                    "pq_negotiation_failed",
+                );
+            }
             if err.should_security_log() {
                 sample!(
                     SampleRate::Duration(Duration::from_secs(15)),
@@ -300,7 +330,37 @@ async fn upgrade_inbound<T: TSocket>(
             add_pp_addr(proxy_protocol_enabled, err, &addr)
         })?;
     let remote_pubkey = socket.get_remote_static();
-    let addr = addr.append_prod_protos_with_pq(remote_pubkey, None, HANDSHAKE_VERSION);
+    let resolved_pq_pubkey = if ctxt.handshake_version > 0 {
+        match ctxt
+            .noise
+            .remote_post_quantum_public_key(remote_peer_id)
+            .or_else(|| remote_pq_pubkey.clone())
+        {
+            Some(key) => Some(key),
+            None => {
+                counters::inc_post_quantum_handshake_failure(
+                    &ctxt.noise.network_context,
+                    origin,
+                    "missing_peer_key",
+                );
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    format!(
+                        "missing post-quantum Kyber key for peer {} on network {}",
+                        remote_peer_id,
+                        ctxt.noise.network_context.network_id()
+                    ),
+                ));
+            },
+        }
+    } else {
+        None
+    };
+    let addr = addr.append_prod_protos_with_pq(
+        remote_pubkey,
+        resolved_pq_pubkey.clone(),
+        HANDSHAKE_VERSION,
+    );
 
     // exchange HandshakeMsg
     let handshake_msg = HandshakeMsg {
@@ -359,12 +419,19 @@ pub async fn upgrade_outbound<T: TSocket>(
             socket,
             remote_peer_id,
             remote_pubkey,
-            remote_pq_pubkey,
+            resolved_pq_pubkey,
             ctxt.handshake_version,
             AntiReplayTimestamps::now,
         )
         .await
         .map_err(|err| {
+            if is_post_quantum_negotiation_error(&err) {
+                counters::inc_post_quantum_handshake_failure(
+                    &ctxt.noise.network_context,
+                    origin,
+                    "pq_negotiation_failed",
+                );
+            }
             if err.should_security_log() {
                 sample!(
                     SampleRate::Duration(Duration::from_secs(15)),
@@ -527,6 +594,13 @@ where
                     .expect("base_transport_protos is always non-empty");
                 Ok((base_addr, *pubkey, Some(pq_pubkey.clone()), *version))
             },
+            [NoiseIK(_), Handshake(version)] if *version > 0 => Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                format!(
+                    "Handshake version {} requires a post-quantum NoiseKyber component",
+                    version
+                ),
+            )),
             [NoiseIK(pubkey), Handshake(version)] => {
                 let base_addr = NetworkAddress::try_from(base_transport_protos.to_vec())
                     .expect("base_transport_protos is always non-empty");
@@ -590,6 +664,11 @@ where
             ));
         }
         if handshake_version > 0 && pq_key.is_none() {
+            counters::inc_post_quantum_handshake_failure(
+                &self.ctxt.noise.network_context,
+                ConnectionOrigin::Outbound,
+                "missing_remote_address_key",
+            );
             return Err(io::Error::new(
                 io::ErrorKind::InvalidData,
                 format!(

@@ -77,7 +77,8 @@ impl RestApiReliableTransactionSubmitter {
                 txn.sender().to_vec(),
             ]
             .concat();
-            let mut seeded_rng = StdRng::from_seed(*accudo_crypto::HashValue::sha3_256_of(&seed));
+            let mut seeded_rng =
+                StdRng::from_seed(*accudo_crypto::HashValue::quantum_safe_of(&seed));
             let rest_client = self.random_rest_client_from_rng(&mut seeded_rng);
             let mut failed_submit = false;
             let mut failed_wait = false;

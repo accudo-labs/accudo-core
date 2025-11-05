@@ -165,6 +165,31 @@ pub fn update_network_connection_operation_metrics(
         .inc();
 }
 
+pub static ACCUDO_NETWORK_PQ_HANDSHAKE_FAILURES: Lazy<IntCounterVec> = Lazy::new(|| {
+    register_int_counter_vec!(
+        "accudo_network_post_quantum_handshake_failures",
+        "Count of Noise handshake attempts that failed due to missing post-quantum material",
+        &["role_type", "network_id", "peer_id", "origin", "reason"]
+    )
+    .unwrap()
+});
+
+pub fn inc_post_quantum_handshake_failure(
+    network_context: &NetworkContext,
+    origin: ConnectionOrigin,
+    reason: &'static str,
+) {
+    ACCUDO_NETWORK_PQ_HANDSHAKE_FAILURES
+        .with_label_values(&[
+            network_context.role().as_str(),
+            network_context.network_id().as_str(),
+            network_context.peer_id().short_str().as_str(),
+            origin.as_str(),
+            reason,
+        ])
+        .inc();
+}
+
 pub static ACCUDO_NETWORK_CONNECTION_UPGRADE_TIME: Lazy<HistogramVec> = Lazy::new(|| {
     register_histogram_vec!(
         "accudo_network_connection_upgrade_time_seconds",

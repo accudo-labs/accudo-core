@@ -18,7 +18,7 @@ use crate::{
 };
 use accudo_config::{
     config::{Peer, PeerRole, HANDSHAKE_VERSION},
-    network_id::{NetworkContext, NetworkId},
+    network_id::{NetworkContext, NetworkId, PeerNetworkId},
 };
 use accudo_crypto::{
     noise::{self, RemoteIdentityKeys},
@@ -179,6 +179,27 @@ impl NoiseUpgrader {
     /// Returns the configured Kyber public key, if hybrid mode is enabled.
     pub fn post_quantum_public_key(&self) -> Option<KyberPublicKey> {
         self.noise_config.post_quantum_public_key().cloned()
+    }
+
+    /// Returns the Kyber public key advertised for the given peer, if available.
+    pub fn remote_post_quantum_public_key(&self, peer_id: PeerId) -> Option<KyberPublicKey> {
+        let peers_and_metadata = match &self.auth_mode {
+            HandshakeAuthMode::Mutual {
+                peers_and_metadata, ..
+            } => Some(peers_and_metadata.clone()),
+            HandshakeAuthMode::MaybeMutual(peers_and_metadata) => Some(peers_and_metadata.clone()),
+        }?;
+
+        let network_id = self.network_context.network_id();
+        let peer_network_id = PeerNetworkId::new(network_id, peer_id);
+        let peer = peers_and_metadata
+            .get_trusted_peer_state(&peer_network_id)
+            .ok()
+            .flatten()?;
+
+        peer.addresses
+            .iter()
+            .find_map(accudo_types::network_address::NetworkAddress::find_noise_kyber_proto)
     }
 
     /// Perform an outbound protocol upgrade on this connection.

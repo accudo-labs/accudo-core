@@ -8,6 +8,7 @@ mod tests {
     use accudo_api_test_context::current_function_name;
     use accudo_crypto::{
         ed25519::Ed25519PrivateKey,
+        pq::{Dilithium3KeyPair, SchemeId},
         secp256r1_ecdsa::{
             PrivateKey as Secp256r1EcdsaPrivateKey, PublicKey as Secp256r1EcdsaPublicKey,
         },
@@ -17,7 +18,7 @@ mod tests {
     use accudo_types::transaction::{
         authenticator::{
             AccountAuthenticator, AnyPublicKey, AnySignature, AuthenticationKey,
-            SingleKeyAuthenticator, TransactionAuthenticator,
+            PostQuantumPublicKey, SingleKeyAuthenticator, TransactionAuthenticator,
         },
         webauthn::{AssertionSignature, PartialAuthenticatorAssertionResponse},
         RawTransaction, SignedTransaction,
@@ -39,7 +40,7 @@ mod tests {
     /// Given a `RawTransaction`, returns a test `CollectedClientData` struct
     fn get_collected_client_data(raw_transaction: &RawTransaction) -> CollectedClientData {
         let signing_message = signing_message(raw_transaction).unwrap();
-        let sha3_256_raw_txn = HashValue::sha3_256_of(signing_message.as_slice());
+        let sha3_256_raw_txn = HashValue::quantum_safe_of(signing_message.as_slice());
         let sha3_256_raw_txn_bytes = Bytes::from(sha3_256_raw_txn.to_vec());
 
         CollectedClientData {
@@ -75,7 +76,17 @@ mod tests {
         let signature = AnySignature::WebAuthn {
             signature: partial_authenticator_assertion_response,
         };
-        let authenticator = SingleKeyAuthenticator::new(public_key, signature);
+        let signing_bytes = signing_message(&raw_txn).unwrap();
+        let pq_keypair = Dilithium3KeyPair::generate().unwrap();
+        let pq_signature = pq_keypair.sign(&signing_bytes).unwrap();
+        let pq_public_key =
+            PostQuantumPublicKey::new(SchemeId::Dilithium3, pq_keypair.public_key().to_vec());
+        let authenticator = SingleKeyAuthenticator::with_post_quantum(
+            public_key,
+            signature,
+            pq_public_key,
+            pq_signature,
+        );
         let account_authenticator = AccountAuthenticator::SingleKey { authenticator };
         let txn_authenticator = TransactionAuthenticator::SingleSender {
             sender: account_authenticator,

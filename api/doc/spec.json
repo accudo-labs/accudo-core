@@ -18084,6 +18084,27 @@
           }
         ]
       },
+      "PostQuantumSignature": {
+        "type": "object",
+        "description": "Post-quantum signature sidecar paired with a classical authenticator.",
+        "required": [
+          "scheme",
+          "public_key",
+          "signature"
+        ],
+        "properties": {
+          "scheme": {
+            "type": "string",
+            "description": "Identifier of the PQ signature scheme, for example `dilithium3`."
+          },
+          "public_key": {
+            "$ref": "#/components/schemas/HexEncodedBytes"
+          },
+          "signature": {
+            "$ref": "#/components/schemas/HexEncodedBytes"
+          }
+        }
+      },
       "SingleKeySignature": {
         "type": "object",
         "description": "A single key signature",
@@ -18097,6 +18118,9 @@
           },
           "signature": {
             "$ref": "#/components/schemas/Signature"
+          },
+          "post_quantum": {
+            "$ref": "#/components/schemas/PostQuantumSignature"
           }
         }
       },

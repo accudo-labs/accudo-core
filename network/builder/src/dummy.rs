@@ -10,7 +10,7 @@ use accudo_config::{
     config::{Peer, PeerRole, PeerSet, RoleType, NETWORK_CHANNEL_SIZE},
     network_id::{NetworkContext, NetworkId, PeerNetworkId},
 };
-use accudo_crypto::{test_utils::TEST_SEED, x25519, Uniform};
+use accudo_crypto::{pq::KyberKeyPair, test_utils::TEST_SEED, x25519, Uniform};
 use accudo_netcore::transport::ConnectionOrigin;
 use accudo_network::{
     application::{interface::NetworkClient, storage::PeersAndMetadata},
@@ -84,6 +84,9 @@ pub fn setup_network() -> DummyNetwork {
 
     // Setup keys for listener.
     let listener_identity_private_key = x25519::PrivateKey::generate(&mut rng);
+    let listener_pq_private_key = KyberKeyPair::generate()
+        .expect("listener Kyber key generation")
+        .private;
 
     // Setup listen addresses
     let dialer_addr: NetworkAddress = "/ip4/127.0.0.1/tcp/0".parse().unwrap();
@@ -98,7 +101,7 @@ pub fn setup_network() -> DummyNetwork {
 
     let authentication_mode = AuthenticationMode::Mutual {
         network_private_key: listener_identity_private_key,
-        post_quantum_private_key: None,
+        post_quantum_private_key: Some(listener_pq_private_key),
     };
     let listener_peers_and_metadata = PeersAndMetadata::new(&[network_id]);
     let mut listener_connection_events = listener_peers_and_metadata.subscribe();
@@ -131,9 +134,12 @@ pub fn setup_network() -> DummyNetwork {
         Peer::from_addrs(PeerRole::Validator, vec![listener_addr]),
     );
 
+    let dialer_pq_private_key = KyberKeyPair::generate()
+        .expect("dialer Kyber key generation")
+        .private;
     let authentication_mode = AuthenticationMode::Mutual {
         network_private_key: dialer_identity_private_key,
-        post_quantum_private_key: None,
+        post_quantum_private_key: Some(dialer_pq_private_key),
     };
 
     let peers_and_metadata = PeersAndMetadata::new(&[network_id]);

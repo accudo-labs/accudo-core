@@ -13,8 +13,8 @@ use crate::{
     ledger_info::LedgerInfo,
     proof::{TransactionInfoListWithProof, TransactionInfoWithProof},
     transaction::authenticator::{
-        AASigningData, AccountAuthenticator, AnyPublicKey, AnySignature, SingleKeyAuthenticator,
-        TransactionAuthenticator,
+        AASigningData, AccountAuthenticator, AnyPublicKey, AnySignature, PostQuantumPublicKey,
+        SingleKeyAuthenticator, TransactionAuthenticator,
     },
     vm_status::{DiscardedVMStatus, KeptVMStatus, StatusCode, StatusType, VMStatus},
     write_set::{HotStateOp, WriteSet},
@@ -23,6 +23,7 @@ use accudo_crypto::{
     ed25519::*,
     hash::CryptoHash,
     multi_ed25519::{MultiEd25519PublicKey, MultiEd25519Signature},
+    pq::{Dilithium3KeyPair, SchemeId, SignatureBundle},
     secp256k1_ecdsa,
     traits::{signing_message, SigningKey},
     CryptoMaterialError, HashValue,
@@ -63,6 +64,7 @@ use crate::{
     executable::ModulePath,
     fee_statement::FeeStatement,
     function_info::FunctionInfo,
+    hash_digest::HashDigest,
     keyless::FederatedKeylessPublicKey,
     on_chain_config::{FeatureFlag, Features},
     proof::accumulator::InMemoryEventAccumulator,
@@ -370,11 +372,7 @@ impl RawTransaction {
     ) -> Result<SignatureCheckedTransaction> {
         let message =
             RawTransactionWithData::new_multi_agent(self.clone(), secondary_signers.clone());
-        let sender_signature = sender_private_key.sign(&message)?;
-        let sender_authenticator = AccountAuthenticator::ed25519(
-            Ed25519PublicKey::from(sender_private_key),
-            sender_signature,
-        );
+        let sender_authenticator = gen_auth(Auth::Ed25519(sender_private_key), &message)?;
 
         if secondary_private_keys.len() != secondary_signers.len() {
             return Err(format_err!(
@@ -383,11 +381,8 @@ impl RawTransaction {
         }
         let mut secondary_authenticators = vec![];
         for priv_key in secondary_private_keys {
-            let signature = priv_key.sign(&message)?;
-            secondary_authenticators.push(AccountAuthenticator::ed25519(
-                Ed25519PublicKey::from(priv_key),
-                signature,
-            ));
+            let secondary_authenticator = gen_auth(Auth::Ed25519(priv_key), &message)?;
+            secondary_authenticators.push(secondary_authenticator);
         }
 
         Ok(SignatureCheckedTransaction(
@@ -419,11 +414,7 @@ impl RawTransaction {
             secondary_signers.clone(),
             fee_payer_address,
         );
-        let sender_signature = sender_private_key.sign(&message)?;
-        let sender_authenticator = AccountAuthenticator::ed25519(
-            Ed25519PublicKey::from(sender_private_key),
-            sender_signature,
-        );
+        let sender_authenticator = gen_auth(Auth::Ed25519(sender_private_key), &message)?;
 
         if secondary_private_keys.len() != secondary_signers.len() {
             return Err(format_err!(
@@ -432,18 +423,11 @@ impl RawTransaction {
         }
         let mut secondary_authenticators = vec![];
         for priv_key in secondary_private_keys {
-            let signature = priv_key.sign(&message)?;
-            secondary_authenticators.push(AccountAuthenticator::ed25519(
-                Ed25519PublicKey::from(priv_key),
-                signature,
-            ));
+            let secondary_authenticator = gen_auth(Auth::Ed25519(priv_key), &message)?;
+            secondary_authenticators.push(secondary_authenticator);
         }
 
-        let fee_payer_signature = fee_payer_private_key.sign(&message)?;
-        let fee_payer_authenticator = AccountAuthenticator::ed25519(
-            Ed25519PublicKey::from(fee_payer_private_key),
-            fee_payer_signature,
-        );
+        let fee_payer_authenticator = gen_auth(Auth::Ed25519(fee_payer_private_key), &message)?;
 
         Ok(SignatureCheckedTransaction(
             SignedTransaction::new_fee_payer(
@@ -584,7 +568,21 @@ fn gen_auth(
     Ok(match auth {
         Auth::Ed25519(private_key) => {
             let sender_signature = private_key.sign(user_signed_message)?;
-            AccountAuthenticator::ed25519(Ed25519PublicKey::from(private_key), sender_signature)
+            let public_key = Ed25519PublicKey::from(private_key);
+            let signing_bytes = signing_message(user_signed_message)?;
+            let pq_keypair = Dilithium3KeyPair::generate()?;
+            let pq_signature = pq_keypair.sign(&signing_bytes)?;
+            let pq_public_key =
+                PostQuantumPublicKey::new(SchemeId::Dilithium3, pq_keypair.public_key().to_vec());
+
+            let single_key_auth = SingleKeyAuthenticator::with_post_quantum(
+                AnyPublicKey::ed25519(public_key),
+                AnySignature::ed25519(sender_signature),
+                pq_public_key,
+                pq_signature,
+            );
+
+            AccountAuthenticator::single_key(single_key_auth)
         },
         Auth::Abstraction(function_info, sign_function) => {
             let digest = AASigningData::signing_message_digest(
@@ -1068,14 +1066,36 @@ impl SignedTransaction {
         public_key: Ed25519PublicKey,
         signature: Ed25519Signature,
     ) -> SignedTransaction {
-        let authenticator = TransactionAuthenticator::ed25519(public_key, signature);
-        SignedTransaction {
-            raw_txn,
-            authenticator,
-            raw_txn_size: OnceCell::new(),
-            authenticator_size: OnceCell::new(),
-            committed_hash: OnceCell::new(),
-        }
+        let signing_bytes = signing_message(&raw_txn)
+            .expect("signing message for raw transaction should never fail");
+        let pq_keypair = Dilithium3KeyPair::generate()
+            .expect("failed to generate Dilithium keypair for transaction signing");
+        let pq_signature = pq_keypair
+            .sign(&signing_bytes)
+            .expect("failed to sign transaction with Dilithium key");
+        let pq_public_key =
+            PostQuantumPublicKey::new(SchemeId::Dilithium3, pq_keypair.public_key().to_vec());
+        Self::new_with_post_quantum(raw_txn, public_key, signature, pq_public_key, pq_signature)
+    }
+
+    pub fn new_with_post_quantum(
+        raw_txn: RawTransaction,
+        public_key: Ed25519PublicKey,
+        signature: Ed25519Signature,
+        pq_public_key: PostQuantumPublicKey,
+        pq_signature: SignatureBundle,
+    ) -> SignedTransaction {
+        let single_key_auth = SingleKeyAuthenticator::with_post_quantum(
+            AnyPublicKey::ed25519(public_key.clone()),
+            AnySignature::ed25519(signature),
+            pq_public_key,
+            pq_signature,
+        );
+
+        let authenticator = TransactionAuthenticator::single_sender(
+            AccountAuthenticator::single_key(single_key_auth),
+        );
+        SignedTransaction::new_signed_transaction(raw_txn, authenticator)
     }
 
     pub fn new_fee_payer(
@@ -1124,10 +1144,23 @@ impl SignedTransaction {
         public_key: secp256k1_ecdsa::PublicKey,
         signature: secp256k1_ecdsa::Signature,
     ) -> SignedTransaction {
-        let authenticator = AccountAuthenticator::single_key(SingleKeyAuthenticator::new(
-            AnyPublicKey::secp256k1_ecdsa(public_key),
-            AnySignature::secp256k1_ecdsa(signature),
-        ));
+        let signing_bytes = signing_message(&raw_txn)
+            .expect("signing message for raw transaction should never fail");
+        let pq_keypair = Dilithium3KeyPair::generate()
+            .expect("failed to generate Dilithium keypair for transaction signing");
+        let pq_signature = pq_keypair
+            .sign(&signing_bytes)
+            .expect("failed to sign transaction with Dilithium key");
+        let pq_public_key =
+            PostQuantumPublicKey::new(SchemeId::Dilithium3, pq_keypair.public_key().to_vec());
+
+        let authenticator =
+            AccountAuthenticator::single_key(SingleKeyAuthenticator::with_post_quantum(
+                AnyPublicKey::secp256k1_ecdsa(public_key),
+                AnySignature::secp256k1_ecdsa(signature),
+                pq_public_key,
+                pq_signature,
+            ));
         Self::new_single_sender(raw_txn, authenticator)
     }
 
@@ -1242,12 +1275,12 @@ impl SignedTransaction {
     /// Checks that the signature of given transaction. Returns `Ok(SignatureCheckedTransaction)` if
     /// the signature is valid.
     pub fn check_signature(self) -> Result<SignatureCheckedTransaction> {
-        self.authenticator.verify(&self.raw_txn)?;
+        self.authenticator.verify_dual(&self.raw_txn)?;
         Ok(SignatureCheckedTransaction(self))
     }
 
     pub fn verify_signature(&self) -> Result<()> {
-        self.authenticator.verify(&self.raw_txn)?;
+        self.authenticator.verify_dual(&self.raw_txn)?;
         Ok(())
     }
 
@@ -1270,6 +1303,10 @@ impl SignedTransaction {
         *self
             .committed_hash
             .get_or_init(|| Transaction::UserTransaction(self.clone()).hash())
+    }
+
+    pub fn committed_hash_digest(&self) -> HashDigest {
+        HashDigest::post_quantum(self.committed_hash())
     }
 
     pub fn replay_protector(&self) -> ReplayProtector {
@@ -1993,8 +2030,16 @@ impl TransactionInfoV0 {
         self.transaction_hash
     }
 
+    pub fn transaction_hash_digest(&self) -> HashDigest {
+        HashDigest::post_quantum(self.transaction_hash)
+    }
+
     pub fn state_change_hash(&self) -> HashValue {
         self.state_change_hash
+    }
+
+    pub fn state_change_digest(&self) -> HashDigest {
+        HashDigest::post_quantum(self.state_change_hash)
     }
 
     pub fn has_state_checkpoint_hash(&self) -> bool {
@@ -2005,8 +2050,16 @@ impl TransactionInfoV0 {
         self.state_checkpoint_hash
     }
 
+    pub fn state_checkpoint_digest(&self) -> Option<HashDigest> {
+        self.state_checkpoint_hash.map(HashDigest::post_quantum)
+    }
+
     pub fn auxiliary_info_hash(&self) -> Option<HashValue> {
         self.auxiliary_info_hash
+    }
+
+    pub fn auxiliary_info_digest(&self) -> Option<HashDigest> {
+        self.auxiliary_info_hash.map(HashDigest::post_quantum)
     }
 
     pub fn ensure_state_checkpoint_hash(&self) -> Result<HashValue> {
@@ -2016,6 +2069,10 @@ impl TransactionInfoV0 {
 
     pub fn event_root_hash(&self) -> HashValue {
         self.event_root_hash
+    }
+
+    pub fn event_root_digest(&self) -> HashDigest {
+        HashDigest::post_quantum(self.event_root_hash)
     }
 
     pub fn gas_used(&self) -> u64 {

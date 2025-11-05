@@ -14,10 +14,10 @@ use crate::{
     },
     CliCommand, CliResult,
 };
-use accudo_config::config::{Peer, PeerRole};
+use accudo_config::config::{Peer, PeerRole, HANDSHAKE_VERSION};
 use accudo_crypto::{
-    bls12381, ed25519, ed25519::Ed25519PrivateKey, encoding_type::EncodingType, x25519, PrivateKey,
-    ValidCryptoMaterial,
+    bls12381, ed25519, ed25519::Ed25519PrivateKey, encoding_type::EncodingType, pq::KyberPublicKey,
+    x25519, PrivateKey, ValidCryptoMaterial,
 };
 use accudo_genesis::config::HostAndPort;
 use accudo_types::account_address::{
@@ -90,6 +90,20 @@ impl CliCommand<HashMap<AccountAddress, Peer>> for ExtractPeer {
             .network_key_input_options
             .extract_public_network_key(self.encoding_options.encoding)?;
 
+        let pq_public_key_opt = self
+            .network_key_input_options
+            .extract_post_quantum_network_public_key(self.encoding_options.encoding)?;
+        let pq_public_key_opt = if HANDSHAKE_VERSION > 0 {
+            Some(pq_public_key_opt.ok_or_else(|| {
+                CliError::CommandArgumentError(
+                    "Handshake version requires providing a post-quantum network public key"
+                        .to_string(),
+                )
+            })?)
+        } else {
+            pq_public_key_opt
+        };
+
         // Check output file exists
         self.output_file_options.check_file()?;
 
@@ -100,7 +114,7 @@ impl CliCommand<HashMap<AccountAddress, Peer>> for ExtractPeer {
 
         let address = self
             .host
-            .as_network_address(public_key, None)
+            .as_network_address(public_key, pq_public_key_opt.clone())
             .map_err(|err| {
                 CliError::UnexpectedError(format!("Failed to build network address: {}", err))
             })?;
@@ -136,6 +150,14 @@ pub struct NetworkKeyInputOptions {
     /// x25519 Public key encoded in a type as shown in `encoding`
     #[clap(long, group = "network_key_input")]
     public_network_key: Option<String>,
+
+    /// Kyber public key input file name
+    #[clap(long, group = "network_pq_key_input", value_parser)]
+    public_network_pq_key_file: Option<PathBuf>,
+
+    /// Kyber public key encoded in a type as shown in `encoding`
+    #[clap(long, group = "network_pq_key_input")]
+    public_network_pq_key: Option<String>,
 }
 
 impl NetworkKeyInputOptions {
@@ -145,17 +167,34 @@ impl NetworkKeyInputOptions {
             private_network_key: None,
             public_network_key_file: None,
             public_network_key: None,
+            public_network_pq_key_file: None,
+            public_network_pq_key: None,
         }
     }
 
+    pub fn with_post_quantum_public_key(mut self, key: String) -> Self {
+        self.public_network_pq_key = Some(key);
+        self
+    }
+
     pub fn extract_public_network_key(
-        self,
+        &self,
         encoding: EncodingType,
     ) -> CliTypedResult<x25519::PublicKey> {
         // The grouping above prevents there from being more than one, but just in case
-        match (self.public_network_key, self.public_network_key_file, self.private_network_key, self.private_network_key_file) {
-            (Some(public_network_key), None, None, None) => Ok(encoding.decode_key("--public-network-key", public_network_key.as_bytes().to_vec())?),
-            (None, Some(public_network_key_file), None, None) => Ok(encoding.load_key("--public-network-key-file", public_network_key_file.as_path())?),
+        match (
+            &self.public_network_key,
+            &self.public_network_key_file,
+            &self.private_network_key,
+            &self.private_network_key_file,
+        ) {
+            (Some(public_network_key), None, None, None) => Ok(encoding.decode_key(
+                "--public-network-key",
+                public_network_key.as_bytes().to_vec(),
+            )?),
+            (None, Some(public_network_key_file), None, None) => {
+                Ok(encoding.load_key("--public-network-key-file", public_network_key_file.as_path())?)
+            }
             (None, None, Some(private_network_key), None) => {
                 let private_network_key: x25519::PrivateKey = encoding.decode_key("--private-network-key", private_network_key.as_bytes().to_vec())?;
                 Ok(private_network_key.public_key())
@@ -165,6 +204,29 @@ impl NetworkKeyInputOptions {
                 Ok(private_network_key.public_key())
             }
             _ => Err(CliError::CommandArgumentError("Must provide exactly one of [--public-network-key, --public-network-key-file, --private-network-key, --private-network-key-file]".to_string()))
+        }
+    }
+
+    pub fn extract_post_quantum_network_public_key(
+        &self,
+        encoding: EncodingType,
+    ) -> CliTypedResult<Option<KyberPublicKey>> {
+        match (
+            &self.public_network_pq_key,
+            &self.public_network_pq_key_file,
+        ) {
+            (None, None) => Ok(None),
+            (Some(public_key), None) => Ok(Some(encoding.decode_key(
+                "--public-network-pq-key",
+                public_key.as_bytes().to_vec(),
+            )?)),
+            (None, Some(public_key_file)) => Ok(Some(
+                encoding.load_key("--public-network-pq-key-file", public_key_file.as_path())?,
+            )),
+            _ => Err(CliError::CommandArgumentError(
+                "Must provide at most one of [--public-network-pq-key, --public-network-pq-key-file]"
+                    .to_string(),
+            )),
         }
     }
 }

@@ -2,7 +2,7 @@
 title: Post-Quantum Migration Plan
 status: draft
 owner: crypto-platform
-last_updated: 2024-06-01
+last_updated: 2024-09-21
 ---
 
 # Objectives
@@ -46,15 +46,18 @@ last_updated: 2024-06-01
 - Publish compatibility guide for nodes replaying old ledgers with legacy hashes.
 
 ## Phase 3 – Dual-Signature Transactions
+> Status: Completed in core (see `docs/quantum-phase3-dual-signatures.md`).
 - Implement Dilithium key generation, signing, and verification in `crates/accudo-crypto/pq`.
 - Extend transaction/authentication payloads to carry `{classical_sig, pq_sig}` pairs plus algo metadata.
 - Update consensus / mempool verification to enforce PQ signature presence; provide metrics for mismatch detection.
 - Build key-rotation tooling for validators, wallets, and Move modules; ship CLI support.
 
-## Phase 4 – Network & Key Exchange
-- Integrate Kyber-based KEM with Noise handshake (X25519 + Kyber hybrid); negotiate via protocol versioning.
+## Phase 4 – API & Network Decommissioning
+> Status: Complete; REST, mempool, and consensus now reject classical-only payloads (see `docs/quantum-phase4-decommission.md`).
+- Integrate Kyber-based KEM with the Noise handshake (X25519 + Kyber hybrid) and surface negotiation counters.
 - Rotate validator network identities; update `config/` templates and keyless operations.
 - Evaluate on-chain key distribution (Move module updates) for PQ keys.
+- Remove classical-only REST fallbacks and document the `post_quantum` payload requirements for client SDKs and tooling.
 
 ## Phase 5 – State & Storage Migration
 - Add ledger checkpointing that records hash algorithm version.

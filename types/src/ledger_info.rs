@@ -8,6 +8,7 @@ use crate::{
     account_address::AccountAddress,
     block_info::{BlockInfo, Round},
     epoch_state::EpochState,
+    hash_digest::HashDigest,
     on_chain_config::ValidatorSet,
     transaction::Version,
     validator_verifier::{ValidatorVerifier, VerifyError},
@@ -129,6 +130,10 @@ impl LedgerInfo {
 
     pub fn transaction_accumulator_hash(&self) -> HashValue {
         self.commit_info.executed_state_id()
+    }
+
+    pub fn transaction_accumulator_digest(&self) -> HashDigest {
+        HashDigest::post_quantum(self.transaction_accumulator_hash())
     }
 
     pub fn version(&self) -> Version {

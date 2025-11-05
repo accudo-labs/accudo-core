@@ -356,6 +356,13 @@ impl NetworkAddress {
         pq_pubkey: Option<KyberPublicKey>,
         handshake_version: u8,
     ) -> Self {
+        if handshake_version > 0 && pq_pubkey.is_none() {
+            panic!(
+                "handshake version {} requires a Kyber public key",
+                handshake_version
+            );
+        }
+
         let addr = self.push(Protocol::NoiseIK(network_pubkey));
         let addr = if let Some(pq_key) = pq_pubkey {
             addr.push(Protocol::NoiseKyber(pq_key))
@@ -363,6 +370,17 @@ impl NetworkAddress {
             addr
         };
         addr.push(Protocol::Handshake(handshake_version))
+    }
+
+    /// Returns the Kyber public key advertised in the address, if present.
+    pub fn find_noise_kyber_proto(&self) -> Option<KyberPublicKey> {
+        self.0.iter().find_map(|protocol| {
+            if let Protocol::NoiseKyber(key) = protocol {
+                Some(key.clone())
+            } else {
+                None
+            }
+        })
     }
 
     /// Check that a `NetworkAddress` looks like a typical AccudoNet address with

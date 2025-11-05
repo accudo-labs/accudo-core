@@ -8,7 +8,9 @@ use accudo_api_test_context::{assert_json, current_function_name, pretty, TestCo
 use accudo_config::config::{GasEstimationStaticOverride, NodeConfig, TransactionFilterConfig};
 use accudo_crypto::{
     ed25519::{Ed25519PrivateKey, Ed25519Signature},
+    hash::signing_message,
     multi_ed25519::{MultiEd25519PrivateKey, MultiEd25519PublicKey},
+    pq::{Dilithium3KeyPair, SchemeId},
     PrivateKey, SigningKey, Uniform,
 };
 use accudo_sdk::types::{AccountKey, LocalAccount};
@@ -17,7 +19,10 @@ use accudo_types::{
     account_address::AccountAddress,
     account_config::accudo_test_root_address,
     transaction::{
-        authenticator::{AuthenticationKey, TransactionAuthenticator},
+        authenticator::{
+            AccountAuthenticator, AnyPublicKey, AnySignature, AuthenticationKey,
+            PostQuantumPublicKey, SingleKeyAuthenticator, TransactionAuthenticator,
+        },
         EntryFunction, ReplayProtector, Script, SignedTransaction,
     },
     utility_coin::{AccudoCoinType, CoinType},
@@ -32,6 +37,27 @@ use rstest::rstest;
 use serde_json::{json, Value};
 use std::{path::PathBuf, time::Duration};
 use tokio::time::sleep;
+
+fn assert_has_pq_signature(value: &Value) {
+    let pq = value
+        .get("post_quantum")
+        .and_then(|v| v.as_object())
+        .expect("post_quantum signature should be present");
+    assert_eq!(pq.get("scheme").and_then(Value::as_str), Some("dilithium3"));
+    for field in ["public_key", "signature"] {
+        let val = pq
+            .get(field)
+            .and_then(Value::as_str)
+            .unwrap_or_else(|| panic!("missing {field}"));
+        assert!(
+            val.starts_with("0x"),
+            "expected hex-encoded {} but got {}",
+            field,
+            val
+        );
+        assert!(val.len() > 2, "empty {} body", field);
+    }
+}
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn test_deserialize_genesis_transaction() {
@@ -353,27 +379,40 @@ async fn test_multi_agent_signed_transaction(
             txn.authenticator()
         ),
     };
-    assert_json(
-        resp["signature"].clone(),
-        json!({
-            "type": "multi_agent_signature",
-            "sender": {
-                "type": "ed25519_signature",
-                "public_key": format!("0x{}", hex::encode(sender.public_key_bytes())),
-                "signature": format!("0x{}", hex::encode(sender.signature_bytes())),
-            },
-            "secondary_signer_addresses": [
-                secondary.address().to_hex_literal(),
-            ],
-            "secondary_signers": [
-                {
-                    "type": "ed25519_signature",
-                    "public_key": format!("0x{}",hex::encode(secondary_signers[0].public_key_bytes())),
-                    "signature": format!("0x{}", hex::encode(secondary_signers[0].signature_bytes())),
-                }
-            ]
-        }),
+    let signature = resp["signature"].as_object().unwrap();
+    assert_eq!(signature["type"], json!("multi_agent_signature"));
+    let sender_sig = signature["sender"].as_object().unwrap();
+    assert_eq!(sender_sig["type"], json!("ed25519_signature"));
+    assert_eq!(
+        sender_sig["public_key"],
+        json!(format!("0x{}", hex::encode(sender.public_key_bytes())))
     );
+    assert_eq!(
+        sender_sig["signature"],
+        json!(format!("0x{}", hex::encode(sender.signature_bytes())))
+    );
+    assert_has_pq_signature(&signature["sender"]);
+    assert_eq!(
+        signature["secondary_signer_addresses"],
+        json!([secondary.address().to_hex_literal()])
+    );
+    let secondary_sig = &signature["secondary_signers"][0];
+    assert_eq!(secondary_sig["type"], json!("ed25519_signature"));
+    assert_eq!(
+        secondary_sig["public_key"],
+        json!(format!(
+            "0x{}",
+            hex::encode(secondary_signers[0].public_key_bytes())
+        ))
+    );
+    assert_eq!(
+        secondary_sig["signature"],
+        json!(format!(
+            "0x{}",
+            hex::encode(secondary_signers[0].signature_bytes())
+        ))
+    );
+    assert_has_pq_signature(secondary_sig);
 
     // ensure multi agent txns can be submitted into mempool by JSON format
     // TODO[Orderless]: When the input is given in JSON format, the /transactions endpoint will use payload v1 format
@@ -444,27 +483,48 @@ async fn test_fee_payer_signed_transaction(
             txn.authenticator()
         ),
     };
-    assert_json(
-        resp["signature"].clone(),
-        json!({
-            "type": "fee_payer_signature",
-            "sender": {
-                "type": "ed25519_signature",
-                "public_key": format!("0x{}", hex::encode(sender.public_key_bytes())),
-                "signature": format!("0x{}", hex::encode(sender.signature_bytes())),
-            },
-            "secondary_signer_addresses": [
-            ],
-            "secondary_signers": [
-            ],
-            "fee_payer_address": fee_payer.address().to_hex_literal(),
-            "fee_payer_signer": {
-                "type": "ed25519_signature",
-                "public_key": format!("0x{}",hex::encode(fee_payer_signer.public_key_bytes())),
-                "signature": format!("0x{}", hex::encode(fee_payer_signer.signature_bytes())),
-            },
-        }),
+    let signature = resp["signature"].as_object().unwrap();
+    assert_eq!(signature["type"], json!("fee_payer_signature"));
+    assert_eq!(
+        signature["fee_payer_address"],
+        json!(fee_payer.address().to_hex_literal())
     );
+    assert_eq!(
+        signature["secondary_signer_addresses"],
+        json!([]),
+        "fee payer test does not use secondary signers"
+    );
+    assert_eq!(signature["secondary_signers"], json!([]));
+
+    let sender_sig = signature["sender"].as_object().unwrap();
+    assert_eq!(sender_sig["type"], json!("ed25519_signature"));
+    assert_eq!(
+        sender_sig["public_key"],
+        json!(format!("0x{}", hex::encode(sender.public_key_bytes())))
+    );
+    assert_eq!(
+        sender_sig["signature"],
+        json!(format!("0x{}", hex::encode(sender.signature_bytes())))
+    );
+    assert_has_pq_signature(&signature["sender"]);
+
+    let fee_payer_sig = signature["fee_payer_signer"].as_object().unwrap();
+    assert_eq!(fee_payer_sig["type"], json!("ed25519_signature"));
+    assert_eq!(
+        fee_payer_sig["public_key"],
+        json!(format!(
+            "0x{}",
+            hex::encode(fee_payer_signer.public_key_bytes())
+        ))
+    );
+    assert_eq!(
+        fee_payer_sig["signature"],
+        json!(format!(
+            "0x{}",
+            hex::encode(fee_payer_signer.signature_bytes())
+        ))
+    );
+    assert_has_pq_signature(&signature["fee_payer_signer"]);
 
     // ensure fee payer txns can be submitted into mempool by JSON format
     // TODO[Orderless]: When the input is given in JSON format, the /transactions endpoint will use payload v1 format
@@ -1005,11 +1065,15 @@ async fn test_signing_message_with_payload(
         .private_key()
         .sign_arbitrary_message(signing_msg.inner());
     let expected_sig = match txn.authenticator() {
-        TransactionAuthenticator::Ed25519 {
-            public_key: _,
-            signature,
-        } => signature,
-        _ => panic!("expect TransactionAuthenticator::Ed25519"),
+        TransactionAuthenticator::Ed25519 { signature, .. } => signature,
+        TransactionAuthenticator::SingleSender { sender } => match sender {
+            AccountAuthenticator::SingleKey { authenticator } => match authenticator.signature() {
+                AnySignature::Ed25519 { signature } => signature,
+                _ => panic!("expected ed25519 signature in single key authenticator"),
+            },
+            other => panic!("unexpected authenticator variant: {:?}", other),
+        },
+        other => panic!("unexpected authenticator variant: {:?}", other),
     };
     assert_eq!(sig, expected_sig);
 
@@ -1869,6 +1933,42 @@ async fn test_submit_transaction_rejects_invalid_json(
     context.check_golden_output(resp);
 }
 
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn test_submit_transaction_rejects_missing_post_quantum_signature() {
+    let mut context = new_test_context(current_function_name!());
+    let mut root_account = context.root_account().await;
+    let factory = context.transaction_factory();
+    let recipient = AccountAddress::random();
+    let raw_txn = factory
+        .transfer(recipient, 1)
+        .sender(root_account.address())
+        .sequence_number(root_account.sequence_number())
+        .build();
+    let root_private_key = context.root_private_key();
+    let signature = root_private_key
+        .sign(&raw_txn)
+        .expect("root signing should succeed");
+    let signing_bytes = signing_message(&raw_txn).unwrap();
+    let pq_keypair = Dilithium3KeyPair::generate().unwrap();
+    let pq_signature = pq_keypair.sign(&signing_bytes).unwrap();
+    let pq_public_key =
+        PostQuantumPublicKey::new(SchemeId::Dilithium3, pq_keypair.public_key().to_vec());
+    let authenticator =
+        AccountAuthenticator::single_key(SingleKeyAuthenticator::with_post_quantum(
+            AnyPublicKey::ed25519(root_private_key.public_key()),
+            AnySignature::ed25519(signature),
+            pq_public_key,
+            pq_signature,
+        ));
+    let txn = SignedTransaction::new_single_sender(raw_txn, authenticator);
+    let body = bcs::to_bytes(&txn).unwrap();
+    let resp = context
+        .expect_status_code(400)
+        .post_bcs_txn("/transactions", &body)
+        .await;
+    context.check_golden_output(resp);
+}
+
 #[ignore]
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn test_create_signing_message_rejects_payload_too_large_json_body() {
@@ -2454,6 +2554,7 @@ async fn test_runtime_error_message_in_interpreter(
             "type": resp["signature"]["type"],
             "public_key": resp["signature"]["public_key"],
             "signature": Ed25519Signature::dummy_signature().to_string(),
+            "post_quantum": resp["signature"]["post_quantum"].clone(),
         }
     });
 

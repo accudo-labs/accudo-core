@@ -202,10 +202,19 @@ impl HashValue {
     /// This is the recommended helper for new call sites that require
     /// post-quantum hashing behavior outside of the `CryptoHasher` trait.
     pub fn quantum_safe_of(buffer: &[u8]) -> Self {
-        let mut classical = HashValue::sha3_256_of(buffer);
+        HashValue::quantum_safe_with_legacy(buffer).0
+    }
+
+    /// Computes the combined quantum-safe digest and returns it alongside the
+    /// underlying SHA3-256 digest. Callers that need to persist both classical
+    /// and PQ material can use this helper to avoid recomputing the lattice
+    /// accumulator.
+    pub fn quantum_safe_with_legacy(buffer: &[u8]) -> (Self, Self) {
+        let classical = HashValue::sha3_256_of(buffer);
+        let mut combined = classical;
         let lattice = quantum_hash(buffer, b"ACCUDO::LATTICE::DIRECT");
-        classical.xor_assign(&lattice);
-        classical
+        combined.xor_assign(&lattice);
+        (combined, classical)
     }
 
     /// Convenience function that sha3_256 the set of buffers

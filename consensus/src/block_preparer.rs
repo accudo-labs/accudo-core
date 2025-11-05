@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{
-    counters::{self, MAX_TXNS_FROM_BLOCK_TO_EXECUTE, TXN_SHUFFLE_SECONDS},
+    counters::{
+        self, consensus_inc_pq_signature_block, MAX_TXNS_FROM_BLOCK_TO_EXECUTE,
+        PQ_SIGNATURE_LABEL_COMPLIANT, PQ_SIGNATURE_LABEL_MISSING, TXN_SHUFFLE_SECONDS,
+    },
     payload_manager::TPayloadManager,
     transaction_deduper::TransactionDeduper,
     transaction_shuffler::TransactionShuffler,
@@ -69,6 +72,7 @@ impl BlockPreparer {
             .enumerate()
             .find(|(_, txn)| !txn.has_post_quantum_signature())
         {
+            consensus_inc_pq_signature_block(PQ_SIGNATURE_LABEL_MISSING);
             warn!(
                 "[BlockPreparer] block {} contains transaction {} without post-quantum signature",
                 block.id(),
@@ -80,6 +84,7 @@ impl BlockPreparer {
                 idx
             )));
         }
+        consensus_inc_pq_signature_block(PQ_SIGNATURE_LABEL_COMPLIANT);
 
         let txn_filter_config = self.txn_filter_config.clone();
         let txn_deduper = self.txn_deduper.clone();

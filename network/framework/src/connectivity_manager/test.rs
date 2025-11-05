@@ -12,7 +12,7 @@ use accudo_config::{
     config::{Peer, PeerRole, PeerSet, HANDSHAKE_VERSION},
     network_id::NetworkId,
 };
-use accudo_crypto::{test_utils::TEST_SEED, x25519, Uniform};
+use accudo_crypto::{pq::KyberKeyPair, test_utils::TEST_SEED, x25519, Uniform};
 use accudo_logger::info;
 use accudo_time_service::{MockTimeService, TimeService};
 use accudo_types::{account_address::AccountAddress, network_address::NetworkAddress};
@@ -43,7 +43,10 @@ fn network_address_with_pubkey(
     addr_str: &'static str,
     pubkey: x25519::PublicKey,
 ) -> NetworkAddress {
-    network_address(addr_str).append_prod_protos_with_pq(pubkey, None, HANDSHAKE_VERSION)
+    let pq_pubkey = KyberKeyPair::generate()
+        .expect("failed to generate Kyber keypair for test peer")
+        .public;
+    network_address(addr_str).append_prod_protos_with_pq(pubkey, Some(pq_pubkey), HANDSHAKE_VERSION)
 }
 
 fn test_peer(index: AccountAddress) -> (PeerId, Peer, x25519::PublicKey, NetworkAddress) {

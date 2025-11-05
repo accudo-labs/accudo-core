@@ -337,7 +337,7 @@ impl TransactionFactory {
         self.payload(
             accudo_stdlib::multisig_account_create_transaction_with_hash(
                 multisig_account,
-                HashValue::sha3_256_of(&payload).to_vec(),
+                HashValue::quantum_safe_of(&payload).to_vec(),
             ),
         )
     }

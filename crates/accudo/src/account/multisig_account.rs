@@ -131,7 +131,7 @@ impl CliCommand<TransactionSummary> for CreateTransaction {
         let transaction_payload = if self.store_hash_only {
             accudo_stdlib::multisig_account_create_transaction_with_hash(
                 self.multisig_account.multisig_address,
-                HashValue::sha3_256_of(&multisig_transaction_payload_bytes).to_vec(),
+                HashValue::quantum_safe_of(&multisig_transaction_payload_bytes).to_vec(),
             )
         } else {
             accudo_stdlib::multisig_account_create_transaction(
@@ -188,15 +188,16 @@ impl CliCommand<serde_json::Value> for VerifyProposal {
             })
             .await?[0];
         // Get expected multisig transaction payload hash hex from provided entry function.
-        let expected_payload_hash = HashValue::sha3_256_of(
-            &to_bytes::<MultisigTransactionPayload>(&self.entry_function_args.try_into()?)?,
-        )
-        .to_hex_literal();
+        let expected_payload_hash =
+            HashValue::quantum_safe_of(&to_bytes::<MultisigTransactionPayload>(
+                &self.entry_function_args.try_into()?,
+            )?)
+            .to_hex_literal();
         // Get on-chain payload hash. If full payload provided on-chain:
         let actual_payload_hash =
             if let Some(actual_payload) = view_json_option_str(&multisig_transaction["payload"])? {
                 // Actual payload hash is the hash of the on-chain payload.
-                HashValue::sha3_256_of(actual_payload.parse::<HexEncodedBytes>()?.inner())
+                HashValue::quantum_safe_of(actual_payload.parse::<HexEncodedBytes>()?.inner())
                     .to_hex_literal()
             // If full payload not provided, get payload hash directly from transaction proposal:
             } else {

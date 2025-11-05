@@ -140,7 +140,7 @@ impl CliCommand<VerifiedProposal> for ViewProposal {
         let mut actual_metadata = None;
         if let Ok(url) = Url::parse(metadata_url) {
             if let Ok(bytes) = get_metadata_from_url(&url).await {
-                let hash = HashValue::sha3_256_of(&bytes);
+                let hash = HashValue::quantum_safe_of(&bytes);
                 metadata_verified = metadata_hash == &hash.to_hex();
                 actual_metadata_hash = hash.to_hex();
                 if let Ok(metadata) = String::from_utf8(bytes) {
@@ -367,7 +367,7 @@ impl SubmitProposalArgs {
                 metadata.discussion_url, err
             ))
         })?;
-        let metadata_hash = HashValue::sha3_256_of(&bytes);
+        let metadata_hash = HashValue::quantum_safe_of(&bytes);
         Ok((metadata, metadata_hash))
     }
 }
@@ -859,7 +859,7 @@ fn compile_script(
     }
 
     let bytes = pack.extract_script_code().pop().unwrap();
-    let hash = HashValue::sha3_256_of(bytes.as_slice());
+    let hash = HashValue::quantum_safe_of(bytes.as_slice());
     Ok((bytes, hash))
 }
 
@@ -937,7 +937,7 @@ impl CompileScriptFunction {
             let bytes = std::fs::read(compiled_script_path).map_err(|e| {
                 CliError::IO(format!("Unable to read {:?}", self.compiled_script_path), e)
             })?;
-            let hash = HashValue::sha3_256_of(bytes.as_slice());
+            let hash = HashValue::quantum_safe_of(bytes.as_slice());
             return Ok((bytes, hash));
         }
 

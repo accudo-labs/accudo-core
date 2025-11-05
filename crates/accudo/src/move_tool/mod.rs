@@ -50,10 +50,12 @@ use accudo_rest_client::{
 };
 use accudo_types::{
     account_address::{create_resource_address, AccountAddress},
+    hash_digest::HashDigest,
     object_address::create_object_code_deployment_address,
     on_chain_config::accudo_test_feature_flags_genesis,
     transaction::{
-        ReplayProtector, Transaction, TransactionArgument, TransactionPayload, TransactionStatus,
+        ReplayProtector, Transaction, TransactionArgument, TransactionInfo, TransactionPayload,
+        TransactionStatus,
     },
 };
 use accudo_vm::data_cache::AsMoveResolver;
@@ -74,6 +76,7 @@ use serde_json::json;
 use std::{
     collections::BTreeMap,
     fmt::{Display, Formatter},
+    fs,
     path::{Path, PathBuf},
     str::FromStr,
 };
@@ -502,7 +505,7 @@ impl CompileScript {
         }
 
         let bytecode = pack.extract_script_code().pop().unwrap();
-        let script_hash = HashValue::sha3_256_of(bytecode.as_slice());
+        let script_hash = HashValue::quantum_safe_of(bytecode.as_slice());
         Ok((bytecode, script_hash))
     }
 }
@@ -2296,6 +2299,10 @@ pub struct Replay {
     /// as `Authorization: Bearer <key>`
     #[clap(long)]
     pub(crate) node_api_key: Option<String>,
+
+    /// Optional output path for persisting the digest summary produced during replay.
+    #[clap(long)]
+    pub(crate) digest_output: Option<PathBuf>,
 }
 
 impl FromStr for ReplayNetworkSelection {
@@ -2308,6 +2315,53 @@ impl FromStr for ReplayNetworkSelection {
             "devnet" => Self::Devnet,
             _ => Self::RestEndpoint(s.to_owned()),
         })
+    }
+}
+
+#[derive(Serialize)]
+struct ReplayDigestReport {
+    transaction_hash: HashDigest,
+    state_change_hash: HashDigest,
+    event_root_hash: HashDigest,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    state_checkpoint_hash: Option<HashDigest>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    auxiliary_info_hash: Option<HashDigest>,
+}
+
+impl ReplayDigestReport {
+    fn from_transaction_info(info: &TransactionInfo) -> Self {
+        Self {
+            transaction_hash: info.transaction_hash_digest(),
+            state_change_hash: info.state_change_digest(),
+            event_root_hash: info.event_root_digest(),
+            state_checkpoint_hash: info.state_checkpoint_digest(),
+            auxiliary_info_hash: info.auxiliary_info_digest(),
+        }
+    }
+
+    fn format_digest(label: &str, digest: &HashDigest) -> String {
+        let mut line = format!("{label}: {} (version {})", digest.hash(), digest.version());
+        if let Some(legacy) = digest.legacy_hash() {
+            line.push_str(&format!(" [legacy {}]", legacy));
+        }
+        line
+    }
+
+    fn log_to_console(&self) {
+        let mut lines = vec![
+            "Post-quantum digest summary:".to_string(),
+            Self::format_digest("  transaction", &self.transaction_hash),
+            Self::format_digest("  state_change", &self.state_change_hash),
+            Self::format_digest("  event_root", &self.event_root_hash),
+        ];
+        if let Some(digest) = &self.state_checkpoint_hash {
+            lines.push(Self::format_digest("  state_checkpoint", digest));
+        }
+        if let Some(digest) = &self.auxiliary_info_hash {
+            lines.push(Self::format_digest("  auxiliary_info", digest));
+        }
+        println!("{}", lines.join("\n"));
     }
 }
 
@@ -2350,6 +2404,15 @@ impl CliCommand<TransactionSummary> for Replay {
                 ))
             },
         };
+
+        let digest_report = ReplayDigestReport::from_transaction_info(&txn_info);
+        if let Some(path) = &self.digest_output {
+            let contents = serde_json::to_string_pretty(&digest_report)
+                .map_err(|err| CliError::UnexpectedError(err.to_string()))?;
+            fs::write(path, contents).map_err(|err| CliError::UnexpectedError(err.to_string()))?;
+            println!("Wrote digest summary to {}", path.display());
+        }
+        digest_report.log_to_console();
 
         let hash = txn.committed_hash();
 

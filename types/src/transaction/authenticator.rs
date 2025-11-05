@@ -24,7 +24,7 @@ use accudo_crypto::{
     CryptoMaterialError, ValidCryptoMaterial, ValidCryptoMaterialStringExt,
 };
 use accudo_crypto_derive::{BCSCryptoHash, CryptoHasher, DeserializeKey, SerializeKey};
-use anyhow::{bail, ensure, Error, Result};
+use anyhow::{bail, ensure, Context, Error, Result};
 use once_cell::sync::Lazy;
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest_derive::Arbitrary;
@@ -361,10 +361,10 @@ impl TransactionAuthenticator {
                     public_key,
                     signature,
                 } => {
-                    let authenticator = SingleKeyAuthenticator {
-                        public_key: AnyPublicKey::ed25519(public_key.clone()),
-                        signature: AnySignature::ed25519(signature.clone()),
-                    };
+                    let authenticator = SingleKeyAuthenticator::new(
+                        AnyPublicKey::ed25519(public_key.clone()),
+                        AnySignature::ed25519(signature.clone()),
+                    );
                     single_key_authenticators.push(authenticator);
                 },
                 AccountAuthenticator::MultiEd25519 {
@@ -1031,10 +1031,23 @@ pub struct MultiKeyAuthenticator {
     public_keys: MultiKey,
     signatures: Vec<AnySignature>,
     signatures_bitmap: accudo_bitvec::BitVec,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    post_quantum_signatures: Vec<Option<SignatureBundle>>,
 }
 
 impl MultiKeyAuthenticator {
     pub fn new(public_keys: MultiKey, signatures: Vec<(u8, AnySignature)>) -> Result<Self> {
+        let entries = signatures
+            .into_iter()
+            .map(|(idx, signature)| (idx, signature, None))
+            .collect();
+        Self::new_with_post_quantum(public_keys, entries)
+    }
+
+    pub fn new_with_post_quantum(
+        public_keys: MultiKey,
+        signatures: Vec<(u8, AnySignature, Option<SignatureBundle>)>,
+    ) -> Result<Self> {
         ensure!(
             public_keys.len() < (u8::MAX as usize),
             "Too many public keys, {}, in MultiKeyAuthenticator.",
@@ -1043,8 +1056,9 @@ impl MultiKeyAuthenticator {
 
         let mut signatures_bitmap = accudo_bitvec::BitVec::with_num_bits(public_keys.len() as u16);
         let mut any_signatures = vec![];
+        let mut pq_signatures = vec![];
 
-        for (idx, signature) in signatures {
+        for (idx, signature, pq_signature) in signatures {
             ensure!(
                 (idx as usize) < public_keys.len(),
                 "Signature index is out of public key range, {} < {}.",
@@ -1058,12 +1072,14 @@ impl MultiKeyAuthenticator {
             );
             signatures_bitmap.set(idx as u16);
             any_signatures.push(signature);
+            pq_signatures.push(pq_signature);
         }
 
         Ok(MultiKeyAuthenticator {
             public_keys,
             signatures: any_signatures,
             signatures_bitmap,
+            post_quantum_signatures: pq_signatures,
         })
     }
 
@@ -1105,13 +1121,29 @@ impl MultiKeyAuthenticator {
             self.signatures.len(),
             self.public_keys.signatures_required(),
         );
-        let authenticators: Vec<SingleKeyAuthenticator> =
-            std::iter::zip(self.signatures_bitmap.iter_ones(), self.signatures.iter())
-                .map(|(idx, sig)| SingleKeyAuthenticator {
-                    public_key: self.public_keys.public_keys[idx].clone(),
-                    signature: sig.clone(),
-                })
-                .collect();
+        let authenticators: Vec<SingleKeyAuthenticator> = std::iter::zip(
+            self.signatures_bitmap.iter_ones(),
+            self.signatures.iter().enumerate(),
+        )
+        .map(|(bit_idx, (position, signature))| {
+            let key_index = bit_idx as usize;
+            let public_key = self.public_keys.public_keys[key_index].clone();
+            match (
+                self.post_quantum_signatures.get(position),
+                self.public_keys.post_quantum_public_key(key_index),
+            ) {
+                (Some(Some(pq_signature)), Some(pq_key)) => {
+                    SingleKeyAuthenticator::with_post_quantum(
+                        public_key,
+                        signature.clone(),
+                        pq_key.clone(),
+                        pq_signature.clone(),
+                    )
+                },
+                _ => SingleKeyAuthenticator::new(public_key, signature.clone()),
+            }
+        })
+        .collect();
         Ok(authenticators)
     }
 
@@ -1121,6 +1153,13 @@ impl MultiKeyAuthenticator {
             .iter()
             .try_for_each(|authenticator| authenticator.verify(message))?;
         Ok(())
+    }
+
+    pub fn verify_dual<T: Serialize + CryptoHash>(&self, message: &T) -> Result<()> {
+        let authenticators = self.to_single_key_authenticators()?;
+        authenticators
+            .iter()
+            .try_for_each(|authenticator| authenticator.verify_dual(message))
     }
 
     pub fn public_key_bytes(&self) -> Vec<u8> {
@@ -1137,6 +1176,8 @@ impl MultiKeyAuthenticator {
 pub struct MultiKey {
     public_keys: Vec<AnyPublicKey>,
     signatures_required: u8,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    post_quantum_public_keys: Vec<Option<PostQuantumPublicKey>>,
 }
 
 impl From<MultiEd25519PublicKey> for MultiKey {
@@ -1150,12 +1191,21 @@ impl From<MultiEd25519PublicKey> for MultiKey {
         MultiKey {
             public_keys,
             signatures_required,
+            post_quantum_public_keys: vec![None; multi_ed25519_public_key.public_keys().len()],
         }
     }
 }
 
 impl MultiKey {
     pub fn new(public_keys: Vec<AnyPublicKey>, signatures_required: u8) -> Result<Self> {
+        Self::new_with_post_quantum(public_keys, signatures_required, vec![])
+    }
+
+    pub fn new_with_post_quantum(
+        public_keys: Vec<AnyPublicKey>,
+        signatures_required: u8,
+        post_quantum_public_keys: Vec<Option<PostQuantumPublicKey>>,
+    ) -> Result<Self> {
         ensure!(
             signatures_required > 0,
             "The number of required signatures is 0."
@@ -1174,9 +1224,20 @@ impl MultiKey {
             signatures_required
         );
 
+        let pq_keys = if post_quantum_public_keys.is_empty() {
+            vec![None; public_keys.len()]
+        } else {
+            ensure!(
+                post_quantum_public_keys.len() == public_keys.len(),
+                "The number of post-quantum public keys must match the number of classical keys."
+            );
+            post_quantum_public_keys
+        };
+
         Ok(Self {
             public_keys,
             signatures_required,
+            post_quantum_public_keys: pq_keys,
         })
     }
 
@@ -1192,6 +1253,16 @@ impl MultiKey {
         &self.public_keys
     }
 
+    pub fn post_quantum_public_keys(&self) -> &[Option<PostQuantumPublicKey>] {
+        &self.post_quantum_public_keys
+    }
+
+    pub fn post_quantum_public_key(&self, index: usize) -> Option<&PostQuantumPublicKey> {
+        self.post_quantum_public_keys
+            .get(index)
+            .and_then(|entry| entry.as_ref())
+    }
+
     pub fn signatures_required(&self) -> u8 {
         self.signatures_required
     }
@@ -1205,6 +1276,32 @@ impl MultiKey {
 pub struct SingleKeyAuthenticator {
     public_key: AnyPublicKey,
     signature: AnySignature,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    post_quantum_public_key: Option<PostQuantumPublicKey>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    post_quantum_signature: Option<SignatureBundle>,
+}
+
+/// Holder for a post-quantum public key associated with a classical authenticator.
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
+pub struct PostQuantumPublicKey {
+    scheme: SchemeId,
+    #[serde(with = "serde_bytes")]
+    key: Vec<u8>,
+}
+
+impl PostQuantumPublicKey {
+    pub fn new(scheme: SchemeId, key: Vec<u8>) -> Self {
+        Self { scheme, key }
+    }
+
+    pub fn scheme(&self) -> SchemeId {
+        self.scheme
+    }
+
+    pub fn as_bytes(&self) -> &[u8] {
+        &self.key
+    }
 }
 
 impl SingleKeyAuthenticator {
@@ -1212,6 +1309,22 @@ impl SingleKeyAuthenticator {
         Self {
             public_key,
             signature,
+            post_quantum_public_key: None,
+            post_quantum_signature: None,
+        }
+    }
+
+    pub fn with_post_quantum(
+        public_key: AnyPublicKey,
+        signature: AnySignature,
+        pq_public_key: PostQuantumPublicKey,
+        pq_signature: SignatureBundle,
+    ) -> Self {
+        Self {
+            public_key,
+            signature,
+            post_quantum_public_key: Some(pq_public_key),
+            post_quantum_signature: Some(pq_signature),
         }
     }
 
@@ -1231,8 +1344,69 @@ impl SingleKeyAuthenticator {
         bcs::to_bytes(&self.signature).expect("Only unhandleable errors happen here.")
     }
 
+    pub fn post_quantum_public_key(&self) -> Option<&PostQuantumPublicKey> {
+        self.post_quantum_public_key.as_ref()
+    }
+
+    pub fn post_quantum_signature(&self) -> Option<&SignatureBundle> {
+        self.post_quantum_signature.as_ref()
+    }
+
+    pub fn attach_post_quantum(
+        &mut self,
+        pq_public_key: PostQuantumPublicKey,
+        pq_signature: SignatureBundle,
+    ) {
+        self.post_quantum_public_key = Some(pq_public_key);
+        self.post_quantum_signature = Some(pq_signature);
+    }
+
+    pub fn has_post_quantum(&self) -> bool {
+        self.post_quantum_public_key.is_some() && self.post_quantum_signature.is_some()
+    }
+
+    pub fn requires_post_quantum(&self) -> bool {
+        matches!(
+            self.public_key,
+            AnyPublicKey::Ed25519 { .. }
+                | AnyPublicKey::Secp256k1Ecdsa { .. }
+                | AnyPublicKey::Secp256r1Ecdsa { .. }
+        )
+    }
+
     pub fn verify<T: Serialize + CryptoHash>(&self, message: &T) -> Result<()> {
-        self.signature.verify(&self.public_key, message)
+        if self.requires_post_quantum() {
+            ensure!(
+                self.has_post_quantum(),
+                "missing post-quantum materials for classical key"
+            );
+        }
+        self.signature.verify(&self.public_key, message)?;
+
+        if let (Some(pq_key), Some(pq_sig)) = (
+            self.post_quantum_public_key.as_ref(),
+            self.post_quantum_signature.as_ref(),
+        ) {
+            if pq_sig.scheme != pq_key.scheme() {
+                bail!("post-quantum public key and signature scheme mismatch");
+            }
+            let signing_bytes = signing_message(message)?;
+            let adapter = PQ_REGISTRY.signature(pq_sig.scheme).ok_or_else(|| {
+                Error::msg(format!(
+                    "no post-quantum verifier registered for scheme {}",
+                    pq_sig.scheme
+                ))
+            })?;
+            adapter
+                .verify(pq_key.as_bytes(), &signing_bytes, pq_sig.bytes())
+                .context("post-quantum signature verification failed")?;
+        }
+
+        Ok(())
+    }
+
+    pub fn verify_dual<T: Serialize + CryptoHash>(&self, message: &T) -> Result<()> {
+        self.verify(message)
     }
 }
 
@@ -1701,6 +1875,41 @@ mod tests {
     }
 
     #[test]
+    fn verify_dual_single_key_auth() {
+        use serde::Serialize;
+
+        #[derive(Clone, Serialize, CryptoHasher, BCSCryptoHash)]
+        struct DummyPayload {
+            value: u64,
+        }
+
+        let payload = DummyPayload { value: 7 };
+        let signing_bytes = signing_message(&payload).unwrap();
+
+        let classical = Ed25519PrivateKey::generate_for_testing();
+        let classical_pub = classical.public_key();
+        let classical_signature = classical.sign(&payload).unwrap();
+
+        let pq_keypair = Dilithium3KeyPair::generate().unwrap();
+        let pq_signature = pq_keypair.sign(&signing_bytes).unwrap();
+
+        let dual_auth = SingleKeyAuthenticator::with_post_quantum(
+            AnyPublicKey::ed25519(classical_pub.clone()),
+            AnySignature::ed25519(classical_signature),
+            PostQuantumPublicKey::new(SchemeId::Dilithium3, pq_keypair.public_key().to_vec()),
+            pq_signature,
+        );
+
+        dual_auth.verify_dual(&payload).unwrap();
+
+        let missing_pq = SingleKeyAuthenticator::new(
+            AnyPublicKey::ed25519(classical_pub),
+            AnySignature::ed25519(classical.sign(&payload).unwrap()),
+        );
+        missing_pq.verify_dual(&payload).unwrap_err();
+    }
+
+    #[test]
     fn verify_secp256k1_ecdsa_single_key_auth() {
         let fake_sender = Ed25519PrivateKey::generate_for_testing();
         let fake_sender_pub = fake_sender.public_key();
@@ -1766,15 +1975,9 @@ mod tests {
         .into_raw_transaction();
 
         let signature0 = AnySignature::ed25519(sender0.sign(&raw_txn).unwrap());
-        let sender0_auth = SingleKeyAuthenticator {
-            public_key: any_sender0_pub,
-            signature: signature0.clone(),
-        };
+        let sender0_auth = SingleKeyAuthenticator::new(any_sender0_pub.clone(), signature0.clone());
         let signature1 = AnySignature::secp256k1_ecdsa(sender1.sign(&raw_txn).unwrap());
-        let sender1_auth = SingleKeyAuthenticator {
-            public_key: any_sender1_pub,
-            signature: signature1.clone(),
-        };
+        let sender1_auth = SingleKeyAuthenticator::new(any_sender1_pub.clone(), signature1.clone());
 
         let mk_auth_0 =
             MultiKeyAuthenticator::new(multi_key.clone(), vec![(0, signature0.clone())]).unwrap();
@@ -2065,26 +2268,18 @@ mod tests {
         let fee_payer0_sig = AnySignature::ed25519(fee_payer0.sign(&raw_txn).unwrap());
         let fee_payer1_sig = AnySignature::secp256k1_ecdsa(fee_payer1.sign(&raw_txn).unwrap());
 
-        let sender_sk_auth = SingleKeyAuthenticator {
-            public_key: second_any_pub,
-            signature: AnySignature::ed25519(sender_sig.clone()),
-        };
-        let second_sender0_sk_auth = SingleKeyAuthenticator {
-            public_key: second_sender0_any_pub,
-            signature: second_sender0_sig.clone(),
-        };
-        let second_sender1_sk_auth = SingleKeyAuthenticator {
-            public_key: second_sender1_any_pub,
-            signature: second_sender1_sig.clone(),
-        };
-        let fee_payer0_sk_auth = SingleKeyAuthenticator {
-            public_key: fee_payer0_any_pub,
-            signature: fee_payer0_sig.clone(),
-        };
-        let fee_payer1_sk_auth = SingleKeyAuthenticator {
-            public_key: fee_payer1_any_pub,
-            signature: fee_payer1_sig.clone(),
-        };
+        let sender_sk_auth = SingleKeyAuthenticator::new(
+            second_any_pub.clone(),
+            AnySignature::ed25519(sender_sig.clone()),
+        );
+        let second_sender0_sk_auth =
+            SingleKeyAuthenticator::new(second_sender0_any_pub.clone(), second_sender0_sig.clone());
+        let second_sender1_sk_auth =
+            SingleKeyAuthenticator::new(second_sender1_any_pub.clone(), second_sender1_sig.clone());
+        let fee_payer0_sk_auth =
+            SingleKeyAuthenticator::new(fee_payer0_any_pub.clone(), fee_payer0_sig.clone());
+        let fee_payer1_sk_auth =
+            SingleKeyAuthenticator::new(fee_payer1_any_pub.clone(), fee_payer1_sig.clone());
 
         let sender_auth = AccountAuthenticator::Ed25519 {
             public_key: sender_pub,
@@ -2283,6 +2478,73 @@ mod tests {
         let signed_txn = maul_raw_groth16_txn(pk, sig, raw_txn);
 
         assert!(signed_txn.verify_signature().is_err());
+    }
+
+    #[test]
+    fn verify_dual_multi_key_authenticator() {
+        use serde::Serialize;
+
+        #[derive(Clone, Serialize, CryptoHasher, BCSCryptoHash)]
+        struct DummyPayload {
+            value: u64,
+        }
+
+        let payload = DummyPayload { value: 99 };
+        let signing_bytes = signing_message(&payload).unwrap();
+
+        let key0 = Ed25519PrivateKey::generate_for_testing();
+        let key1 = Ed25519PrivateKey::generate_for_testing();
+
+        let pq0 = Dilithium3KeyPair::generate().unwrap();
+        let pq1 = Dilithium3KeyPair::generate().unwrap();
+
+        let multi_key = MultiKey::new_with_post_quantum(
+            vec![
+                AnyPublicKey::ed25519(key0.public_key()),
+                AnyPublicKey::ed25519(key1.public_key()),
+            ],
+            2,
+            vec![
+                Some(PostQuantumPublicKey::new(
+                    SchemeId::Dilithium3,
+                    pq0.public_key().to_vec(),
+                )),
+                Some(PostQuantumPublicKey::new(
+                    SchemeId::Dilithium3,
+                    pq1.public_key().to_vec(),
+                )),
+            ],
+        )
+        .unwrap();
+
+        let sig0 = key0.sign(&payload).unwrap();
+        let sig1 = key1.sign(&payload).unwrap();
+
+        let pq_sig0 = pq0.sign(&signing_bytes).unwrap();
+        let pq_sig1 = pq1.sign(&signing_bytes).unwrap();
+
+        let authenticator = MultiKeyAuthenticator::new_with_post_quantum(
+            multi_key.clone(),
+            vec![
+                (
+                    0,
+                    AnySignature::ed25519(sig0.clone()),
+                    Some(pq_sig0.clone()),
+                ),
+                (
+                    1,
+                    AnySignature::ed25519(sig1.clone()),
+                    Some(pq_sig1.clone()),
+                ),
+            ],
+        )
+        .unwrap();
+
+        authenticator.verify_dual(&payload).unwrap();
+
+        let missing_pq =
+            MultiKeyAuthenticator::new(multi_key, vec![(0, AnySignature::ed25519(sig0))]).unwrap();
+        missing_pq.verify_dual(&payload).unwrap_err();
     }
 
     #[test]

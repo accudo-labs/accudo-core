@@ -141,6 +141,28 @@ pub struct TransactionsApi {
 
 #[OpenApi]
 impl TransactionsApi {
+    fn ensure_dual_signature(
+        &self,
+        txn: &SignedTransaction,
+        ledger_info: &LedgerInfo,
+    ) -> Result<(), SubmitTransactionError> {
+        if !txn.has_post_quantum_signature() {
+            return Err(SubmitTransactionError::bad_request_with_code(
+                "Transaction missing post-quantum signature bundle",
+                AccudoErrorCode::VmError,
+                ledger_info,
+            ));
+        }
+
+        txn.verify_signature().map_err(|err| {
+            SubmitTransactionError::bad_request_with_code(
+                format!("Invalid signature: {err}"),
+                AccudoErrorCode::VmError,
+                ledger_info,
+            )
+        })
+    }
+
     /// Get transactions
     ///
     /// Retrieve on-chain committed transactions. The page size and start ledger version
@@ -1297,21 +1319,26 @@ impl TransactionsApi {
                 }
                 // TODO: Verify script args?
 
+                self.ensure_dual_signature(&signed_transaction, ledger_info)?;
                 Ok(signed_transaction)
             },
-            SubmitTransactionPost::Json(data) => self
-                .context
-                .latest_state_view_poem(ledger_info)?
-                .as_converter(self.context.db.clone(), self.context.indexer_reader.clone())
-                .try_into_signed_transaction_poem(data.0, self.context.chain_id())
-                .context("Failed to create SignedTransaction from SubmitTransactionRequest")
-                .map_err(|err| {
-                    SubmitTransactionError::bad_request_with_code(
-                        err,
-                        AccudoErrorCode::InvalidInput,
-                        ledger_info,
-                    )
-                }),
+            SubmitTransactionPost::Json(data) => {
+                let signed_transaction = self
+                    .context
+                    .latest_state_view_poem(ledger_info)?
+                    .as_converter(self.context.db.clone(), self.context.indexer_reader.clone())
+                    .try_into_signed_transaction_poem(data.0, self.context.chain_id())
+                    .context("Failed to create SignedTransaction from SubmitTransactionRequest")
+                    .map_err(|err| {
+                        SubmitTransactionError::bad_request_with_code(
+                            err,
+                            AccudoErrorCode::InvalidInput,
+                            ledger_info,
+                        )
+                    })?;
+                self.ensure_dual_signature(&signed_transaction, ledger_info)?;
+                Ok(signed_transaction)
+            },
         }
     }
 
@@ -1363,7 +1390,7 @@ impl TransactionsApi {
     ) -> Result<Vec<SignedTransaction>, SubmitTransactionError> {
         match data {
             SubmitTransactionsBatchPost::Bcs(data) => {
-                let signed_transactions = bcs::from_bytes(&data.0)
+                let signed_transactions: Vec<SignedTransaction> = bcs::from_bytes(&data.0)
                     .context("Failed to deserialize input into SignedTransaction")
                     .map_err(|err| {
                         SubmitTransactionError::bad_request_with_code(
@@ -1372,6 +1399,9 @@ impl TransactionsApi {
                             ledger_info,
                         )
                     })?;
+                for txn in &signed_transactions {
+                    self.ensure_dual_signature(txn, ledger_info)?;
+                }
                 Ok(signed_transactions)
             }
             SubmitTransactionsBatchPost::Json(data) => data
@@ -1389,6 +1419,9 @@ impl TransactionsApi {
                                 AccudoErrorCode::InvalidInput,
                                 ledger_info,
                             )
+                        }).and_then(|txn| {
+                            self.ensure_dual_signature(&txn, ledger_info)?;
+                            Ok(txn)
                         })
                 })
                 .collect(),
@@ -1397,6 +1430,14 @@ impl TransactionsApi {
 
     /// Submits a single transaction, and converts mempool codes to errors
     async fn create_internal(&self, txn: SignedTransaction) -> Result<(), AccudoError> {
+        if !txn.has_post_quantum_signature() {
+            return Err(AccudoError::new_with_vm_status(
+                "Transaction missing post-quantum signature bundle",
+                AccudoErrorCode::VmError,
+                StatusCode::INVALID_SIGNATURE,
+            ));
+        }
+
         let (mempool_status, vm_status_opt) = self
             .context
             .submit_transaction(txn)

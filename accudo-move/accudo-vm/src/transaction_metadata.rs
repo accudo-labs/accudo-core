@@ -65,7 +65,7 @@ impl TransactionMetadata {
             script_hash: if let Ok(TransactionExecutableRef::Script(s)) =
                 txn.payload().executable_ref()
             {
-                HashValue::sha3_256_of(s.code()).to_vec()
+                HashValue::quantum_safe_of(s.code()).to_vec()
             } else {
                 vec![]
             },

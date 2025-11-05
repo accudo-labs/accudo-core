@@ -51,6 +51,7 @@ use accudo_config::config::Peer;
 use accudo_crypto::{
     bls12381,
     ed25519::{Ed25519PrivateKey, Ed25519PublicKey},
+    pq::KyberKeyPair,
     x25519, PrivateKey,
 };
 use accudo_framework::chunked_publish::CHUNK_SIZE_IN_BYTES;
@@ -64,6 +65,7 @@ use accudo_rest_client::{
 use accudo_sdk::move_types::{account_address::AccountAddress, language_storage::ModuleId};
 use accudo_temppath::TempPath;
 use accudo_types::on_chain_config::ValidatorSet;
+use hex::encode as hex_encode;
 use move_core_types::ident_str;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
@@ -750,11 +752,14 @@ impl CliTestFramework {
         private_key_file: PathBuf,
         output_file: PathBuf,
     ) -> CliTypedResult<HashMap<AccountAddress, Peer>> {
+        let pq_key = KyberKeyPair::generate().expect("failed to generate Kyber keypair for tests");
+        let pq_public_hex = hex_encode(pq_key.public.as_bytes());
         ExtractPeer {
             host,
             network_key_input_options: NetworkKeyInputOptions::from_private_key_file(
                 private_key_file,
-            ),
+            )
+            .with_post_quantum_public_key(pq_public_hex),
             output_file_options: SaveFile {
                 output_file,
                 prompt_options: PromptOptions::yes(),

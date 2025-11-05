@@ -13,8 +13,10 @@ use crate::{
     noise::{stream::NoiseStream, AntiReplayTimestamps, HandshakeAuthMode, NoiseUpgrader},
     testutils::fake_socket::{ReadOnlyTestSocket, ReadWriteTestSocket},
 };
-use accudo_config::network_id::NetworkContext;
-use accudo_crypto::{noise::NoiseSession, test_utils::TEST_SEED, x25519, Uniform as _};
+use accudo_config::{config::HANDSHAKE_VERSION, network_id::NetworkContext};
+use accudo_crypto::{
+    noise::NoiseSession, pq::KyberKeyPair, test_utils::TEST_SEED, x25519, Uniform as _,
+};
 use futures::{executor::block_on, future::join};
 use futures_util::io::AsyncReadExt;
 use once_cell::sync::Lazy;
@@ -31,8 +33,18 @@ use rand::SeedableRng;
 
 // let's cache the deterministic keypairs
 pub static KEYPAIRS: Lazy<(
-    (x25519::PrivateKey, x25519::PublicKey, NetworkContext),
-    (x25519::PrivateKey, x25519::PublicKey, NetworkContext),
+    (
+        x25519::PrivateKey,
+        x25519::PublicKey,
+        KyberKeyPair,
+        NetworkContext,
+    ),
+    (
+        x25519::PrivateKey,
+        x25519::PublicKey,
+        KyberKeyPair,
+        NetworkContext,
+    ),
 )> = Lazy::new(|| {
     let mut rng = ::rand::rngs::StdRng::from_seed(TEST_SEED);
 
@@ -41,12 +53,14 @@ pub static KEYPAIRS: Lazy<(
     let initiator_peer_id =
         accudo_types::account_address::from_identity_public_key(initiator_public_key);
     let initiator_network_context = NetworkContext::mock_with_peer_id(initiator_peer_id);
+    let initiator_pq_key = KyberKeyPair::generate().expect("initiator Kyber key generation");
 
     let responder_private_key = x25519::PrivateKey::generate(&mut rng);
     let responder_public_key = responder_private_key.public_key();
     let responder_peer_id =
         accudo_types::account_address::from_identity_public_key(responder_public_key);
     let responder_network_context = NetworkContext::mock_with_peer_id(responder_peer_id);
+    let responder_pq_key = KyberKeyPair::generate().expect("responder Kyber key generation");
     assert_eq!(
         initiator_network_context.network_id(),
         responder_network_context.network_id()
@@ -56,11 +70,13 @@ pub static KEYPAIRS: Lazy<(
         (
             initiator_private_key,
             initiator_public_key,
+            initiator_pq_key,
             initiator_network_context,
         ),
         (
             responder_private_key,
             responder_public_key,
+            responder_pq_key,
             responder_network_context,
         ),
     )
@@ -69,17 +85,19 @@ pub static KEYPAIRS: Lazy<(
 fn generate_first_two_messages() -> (Vec<u8>, Vec<u8>) {
     // build
     let (
-        (initiator_private_key, initiator_public_key, initiator_network_context),
-        (responder_private_key, responder_public_key, responder_network_context),
+        (initiator_private_key, initiator_public_key, initiator_pq_key, initiator_network_context),
+        (responder_private_key, responder_public_key, responder_pq_key, responder_network_context),
     ) = KEYPAIRS.clone();
     let initiator = NoiseUpgrader::new(
         initiator_network_context,
         initiator_private_key,
+        Some(initiator_pq_key.private.clone()),
         HandshakeAuthMode::server_only(&[initiator_network_context.network_id()]),
     );
     let responder = NoiseUpgrader::new(
         responder_network_context,
         responder_private_key,
+        Some(responder_pq_key.private.clone()),
         HandshakeAuthMode::server_only(&[responder_network_context.network_id()]),
     );
 
@@ -96,9 +114,11 @@ fn generate_first_two_messages() -> (Vec<u8>, Vec<u8>) {
             initiator_socket,
             responder_network_context.peer_id(),
             responder_public_key,
+            Some(responder_pq_key.public.clone()),
+            HANDSHAKE_VERSION,
             fake_timestamp,
         ),
-        responder.upgrade_inbound(responder_socket),
+        responder.upgrade_inbound(responder_socket, HANDSHAKE_VERSION),
     ));
 
     // take result
@@ -141,12 +161,13 @@ fn fake_timestamp() -> [u8; AntiReplayTimestamps::TIMESTAMP_SIZE] {
 pub fn fuzz_initiator(data: &[u8]) {
     // setup initiator
     let (
-        (initiator_private_key, _, initiator_network_context),
-        (_, responder_public_key, responder_network_context),
+        (initiator_private_key, _, initiator_pq_key, initiator_network_context),
+        (_, responder_public_key, responder_pq_key, responder_network_context),
     ) = KEYPAIRS.clone();
     let initiator = NoiseUpgrader::new(
         initiator_network_context,
         initiator_private_key,
+        Some(initiator_pq_key.private.clone()),
         HandshakeAuthMode::server_only(&[initiator_network_context.network_id()]),
     );
 
@@ -159,6 +180,8 @@ pub fn fuzz_initiator(data: &[u8]) {
         fake_socket,
         responder_network_context.peer_id(),
         responder_public_key,
+        Some(responder_pq_key.public.clone()),
+        HANDSHAKE_VERSION,
         fake_timestamp,
     ));
 }
@@ -166,10 +189,12 @@ pub fn fuzz_initiator(data: &[u8]) {
 /// Fuzz a server during the handshake
 pub fn fuzz_responder(data: &[u8]) {
     // setup responder
-    let (_, (responder_private_key, _, responder_network_context)) = KEYPAIRS.clone();
+    let (_, (responder_private_key, _, responder_pq_key, responder_network_context)) =
+        KEYPAIRS.clone();
     let responder = NoiseUpgrader::new(
         responder_network_context,
         responder_private_key,
+        Some(responder_pq_key.private.clone()),
         HandshakeAuthMode::server_only(&[responder_network_context.network_id()]),
     );
 
@@ -178,7 +203,7 @@ pub fn fuzz_responder(data: &[u8]) {
     fake_socket.set_trailing();
 
     // read fuzz data
-    let _ = block_on(responder.upgrade_inbound(fake_socket));
+    let _ = block_on(responder.upgrade_inbound(fake_socket, HANDSHAKE_VERSION));
 }
 
 /// Fuzz a peer post-handshake

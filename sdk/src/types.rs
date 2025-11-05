@@ -16,7 +16,9 @@ use crate::{
     },
 };
 use accudo_crypto::{
-    ed25519::Ed25519Signature, secp256r1_ecdsa, HashValue, PrivateKey, SigningKey,
+    ed25519::Ed25519Signature,
+    pq::{Dilithium3KeyPair, SchemeId},
+    secp256r1_ecdsa, HashValue, PrivateKey, SigningKey,
 };
 use accudo_ledger::AccudoLedgerError;
 use accudo_rest_client::{accudo_api_types::MoveStructTag, Client, PepperRequest, ProverRequest};
@@ -29,7 +31,9 @@ use accudo_types::{
         KeylessSignature, OpenIdSig, Pepper, ZeroKnowledgeSig,
     },
     transaction::{
-        authenticator::{AnyPublicKey, EphemeralPublicKey, EphemeralSignature},
+        authenticator::{
+            AnyPublicKey, EphemeralPublicKey, EphemeralSignature, PostQuantumPublicKey,
+        },
         Auth,
     },
 };
@@ -71,10 +75,7 @@ enum LocalAccountAuthenticator {
 impl LocalAccountAuthenticator {
     pub fn sign_transaction(&self, txn: RawTransaction) -> SignedTransaction {
         match self {
-            LocalAccountAuthenticator::PrivateKey(key) => txn
-                .sign(key.private_key(), key.public_key().clone())
-                .expect("Signing a txn can't fail")
-                .into_inner(),
+            LocalAccountAuthenticator::PrivateKey(key) => key.sign_transaction(txn),
             LocalAccountAuthenticator::Keyless(keyless_account) => {
                 let sig = self.build_keyless_signature(txn.clone(), &keyless_account);
                 SignedTransaction::new_keyless(txn, keyless_account.public_key.clone(), sig)
@@ -146,7 +147,7 @@ pub fn get_paired_fa_primary_store_address(
     let mut bytes = address.to_vec();
     bytes.append(&mut fa_metadata_address.to_vec());
     bytes.push(0xFC);
-    AccountAddress::from_bytes(accudo_crypto::hash::HashValue::sha3_256_of(&bytes).to_vec())
+    AccountAddress::from_bytes(accudo_crypto::hash::HashValue::quantum_safe_of(&bytes).to_vec())
         .unwrap()
 }
 
@@ -158,7 +159,7 @@ pub fn get_paired_fa_metadata_address(coin_type_name: &MoveStructTag) -> Account
         let mut preimage = APT_METADATA_ADDRESS.to_vec();
         preimage.extend(coin_type_name.as_bytes());
         preimage.push(0xFE);
-        AccountAddress::from_bytes(HashValue::sha3_256_of(&preimage).to_vec()).unwrap()
+        AccountAddress::from_bytes(HashValue::quantum_safe_of(&preimage).to_vec()).unwrap()
     }
 }
 
@@ -715,11 +716,20 @@ impl HardwareWalletAccount {
     }
 }
 
-#[derive(Debug)]
 pub struct AccountKey {
     private_key: Ed25519PrivateKey,
     public_key: Ed25519PublicKey,
     authentication_key: AuthenticationKey,
+    post_quantum_keypair: Dilithium3KeyPair,
+}
+
+impl fmt::Debug for AccountKey {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AccountKey")
+            .field("public_key", &self.public_key)
+            .field("authentication_key", &self.authentication_key)
+            .finish()
+    }
 }
 
 impl AccountKey {
@@ -734,11 +744,14 @@ impl AccountKey {
     pub fn from_private_key(private_key: Ed25519PrivateKey) -> Self {
         let public_key = Ed25519PublicKey::from(&private_key);
         let authentication_key = AuthenticationKey::ed25519(&public_key);
+        let post_quantum_keypair =
+            Dilithium3KeyPair::generate().expect("Dilithium3 keypair generation should not fail");
 
         Self {
             private_key,
             public_key,
             authentication_key,
+            post_quantum_keypair,
         }
     }
 
@@ -752,6 +765,34 @@ impl AccountKey {
 
     pub fn authentication_key(&self) -> AuthenticationKey {
         self.authentication_key
+    }
+
+    pub fn post_quantum_keypair(&self) -> &Dilithium3KeyPair {
+        &self.post_quantum_keypair
+    }
+
+    pub fn sign_transaction(&self, txn: RawTransaction) -> SignedTransaction {
+        let signature = self
+            .private_key
+            .sign(&txn)
+            .expect("Signing a txn can't fail");
+        let signing_bytes =
+            signing_message(&txn).expect("Unable to compute signing message for RawTransaction");
+        let pq_signature = self
+            .post_quantum_keypair
+            .sign(&signing_bytes)
+            .expect("Dilithium signing should not fail");
+        let pq_public_key = PostQuantumPublicKey::new(
+            SchemeId::Dilithium3,
+            self.post_quantum_keypair.public_key().to_vec(),
+        );
+        SignedTransaction::new_with_post_quantum(
+            txn,
+            self.public_key.clone(),
+            signature,
+            pq_public_key,
+            pq_signature,
+        )
     }
 }
 

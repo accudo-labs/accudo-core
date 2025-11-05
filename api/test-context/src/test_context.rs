@@ -396,6 +396,10 @@ impl TestContext {
         )
     }
 
+    pub fn root_private_key(&self) -> Ed25519PrivateKey {
+        self.root_key.private_key()
+    }
+
     pub async fn enable_feature(&mut self, feature: u64) {
         // This function executes the following script as the root account:
         // script {

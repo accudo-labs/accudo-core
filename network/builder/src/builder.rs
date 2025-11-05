@@ -170,16 +170,22 @@ impl NetworkBuilder {
         let peer_id = config.peer_id();
         let identity_key = config.identity_key();
         let pq_identity_key = config.identity_post_quantum_key();
+        if HANDSHAKE_VERSION > 0 && pq_identity_key.is_none() {
+            panic!(
+                "network {} is missing a post-quantum identity key required for handshake version {}",
+                config.network_id, HANDSHAKE_VERSION
+            );
+        }
 
         let authentication_mode = if config.mutual_authentication {
             AuthenticationMode::Mutual {
                 network_private_key: identity_key,
-                post_quantum_private_key: pq_identity_key,
+                post_quantum_private_key: pq_identity_key.clone(),
             }
         } else {
             AuthenticationMode::MaybeMutual {
                 network_private_key: identity_key,
-                post_quantum_private_key: pq_identity_key,
+                post_quantum_private_key: pq_identity_key.clone(),
             }
         };
 

@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{
-    epoch_state::EpochState, on_chain_config::ValidatorSet, transaction::Version,
-    validator_verifier::ValidatorVerifier,
+    epoch_state::EpochState, hash_digest::HashDigest, on_chain_config::ValidatorSet,
+    transaction::Version, validator_verifier::ValidatorVerifier,
 };
 use accudo_crypto::hash::{HashValue, ACCUMULATOR_PLACEHOLDER_HASH};
 #[cfg(any(test, feature = "fuzzing"))]
@@ -165,6 +165,10 @@ impl BlockInfo {
 
     pub fn executed_state_id(&self) -> HashValue {
         self.executed_state_id
+    }
+
+    pub fn executed_state_digest(&self) -> HashDigest {
+        HashDigest::post_quantum(self.executed_state_id)
     }
 
     pub fn has_reconfiguration(&self) -> bool {

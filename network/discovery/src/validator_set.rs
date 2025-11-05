@@ -10,7 +10,7 @@ use accudo_config::{
     config::{Peer, PeerRole, PeerSet},
     network_id::NetworkContext,
 };
-use accudo_crypto::x25519;
+use accudo_crypto::{pq::KyberKeyPair, x25519};
 use accudo_event_notifications::ReconfigNotificationListener;
 use accudo_logger::prelude::*;
 use accudo_network::{counters::inc_by_with_context, logging::NetworkSchema};
@@ -244,8 +244,14 @@ mod tests {
             ReconfigNotification<InMemoryOnChainConfig>,
         >,
     ) {
-        let validator_address =
-            NetworkAddress::mock().append_prod_protos_with_pq(pubkey, None, HANDSHAKE_VERSION);
+        let pq_public = KyberKeyPair::generate()
+            .expect("failed to generate validator Kyber keypair")
+            .public;
+        let validator_address = NetworkAddress::mock().append_prod_protos_with_pq(
+            pubkey,
+            Some(pq_public),
+            HANDSHAKE_VERSION,
+        );
         let addresses = vec![validator_address];
         let validator_encoded_addresses = bcs::to_bytes(&addresses).unwrap();
         let fullnode_encoded_addresses = bcs::to_bytes(&addresses).unwrap();

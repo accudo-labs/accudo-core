@@ -48,21 +48,31 @@ pub fn add_node_to_seeds(
     let seed_key = seed_network_config.identity_key().public_key();
 
     let seed_peer = if peer_role != PeerRole::Downstream {
-        // For upstreams, we know the address, but so don't duplicate the keys in the config (lazy way)
-        // TODO: This is ridiculous, we need a better way to manipulate these `NetworkAddress`s
-        let address = seed_network_config.listen_address.clone();
-        let port_protocol = address
+        // For upstreams, reuse the existing listen address protocols but override the host/IP.
+        let base_address = seed_network_config.listen_address.clone();
+        let port_protocol = base_address
             .as_slice()
             .iter()
             .find(|protocol| matches!(protocol, Protocol::Tcp(_)))
-            .unwrap();
-        let address = NetworkAddress::from_protocols(vec![
+            .cloned()
+            .expect("seed listen address missing tcp segment");
+        let kyber_protocol = base_address
+            .as_slice()
+            .iter()
+            .find(|protocol| matches!(protocol, Protocol::NoiseKyber(_)))
+            .cloned();
+
+        let mut protocols = vec![
             Protocol::Ip4(Ipv4Addr::new(127, 0, 0, 1)),
-            port_protocol.clone(),
+            port_protocol,
             Protocol::NoiseIK(seed_key),
-            Protocol::Handshake(HANDSHAKE_VERSION),
-        ])
-        .unwrap();
+        ];
+        if let Some(pq) = kyber_protocol {
+            protocols.push(pq);
+        }
+        protocols.push(Protocol::Handshake(HANDSHAKE_VERSION));
+
+        let address = NetworkAddress::from_protocols(protocols).unwrap();
 
         Peer::new(vec![address], HashSet::new(), peer_role)
     } else {

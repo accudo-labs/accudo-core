@@ -50,8 +50,8 @@ fn large_transactions() {
 
     let entries = ApprovedExecutionHashes {
         entries: vec![
-            (0, HashValue::sha3_256_of(&large).to_vec()),
-            (1, HashValue::sha3_256_of(&very_large).to_vec()),
+            (0, HashValue::quantum_safe_of(&large).to_vec()),
+            (1, HashValue::quantum_safe_of(&very_large).to_vec()),
         ],
     };
     h.set_resource(
@@ -131,7 +131,7 @@ fn alt_execution_limit_for_gov_proposals() {
         *root.address(),
         ApprovedExecutionHashes::struct_tag(),
         &ApprovedExecutionHashes {
-            entries: vec![(0, HashValue::sha3_256_of(&script).to_vec())],
+            entries: vec![(0, HashValue::quantum_safe_of(&script).to_vec())],
         },
     );
 
